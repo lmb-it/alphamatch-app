@@ -76,8 +76,11 @@ import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import Addons from '../../Helpers/Addons/index.js';
 import { useFormInputController } from '../../Helpers/useFormInputController/useFormInputController.js';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
-const KitsInputMask = ({ ref, ...props }) => {
+const KitsInputMask = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("InputMask", rawProps, "Input");
   const {
     id,
     label,
@@ -121,8 +124,8 @@ const KitsInputMask = ({ ref, ...props }) => {
         size: "md",
         isDisabled: disabled,
         isInvalid: !!invalid,
-        style: { width: "100%" },
-        children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: /* @__PURE__ */ jsx(
+        style: { width: "100%", ...themeStyle },
+        children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsx(
           InputField,
           {
             ref,
@@ -153,8 +156,8 @@ const KitsInputMask = ({ ref, ...props }) => {
           size: "md",
           isDisabled: disabled,
           isInvalid: !!invalid,
-          style: { width: "100%" },
-          children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: /* @__PURE__ */ jsx(
+          style: { width: "100%", ...themeStyle },
+          children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsx(
             InputField,
             {
               ref,

@@ -79,11 +79,12 @@ require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var usePhoneInput = require('./usePhoneInput.cjs');
 var Svg = require('react-native-svg');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 var index_native$1 = require('../../Helpers/FormContainer/index.cjs');
 var index_native$2 = require('../InputText/index.cjs');
 require('axios');
 require('../../../UI/Flex/index.cjs');
-require('../../../../../Contexts/DialogContext.cjs');
 require('primereact/tooltip');
 require('primereact/skeleton');
 require('../../KitsSelect/SelectContext.cjs');
@@ -112,6 +113,7 @@ const KitsPhoneComponent = ({
   outputFormat = "string",
   ...props
 }) => {
+  const { mergedProps: _mergedProps, themeStyle } = useComponentDefaults.default("PhoneInput", props, "Input");
   useSeparator.default(props);
   const {
     displayValue,
@@ -167,7 +169,8 @@ const KitsPhoneComponent = ({
           onChange: (e) => handleChange(e.target.value),
           invalid,
           disabled,
-          placeholder: placeholder ?? (isWithCountryCode ? "+1 (555) 123-4567" : "")
+          placeholder: placeholder ?? (isWithCountryCode ? "+1 (555) 123-4567" : ""),
+          localProps: Object.keys(themeStyle).length ? { style: { width: "100%", ...themeStyle } } : void 0
         }
       )
     }

@@ -15,7 +15,7 @@ export { default as InputSwitch } from './Components/Molecules/Form/KitsInput/In
 export { default as Editable } from './Components/Molecules/Form/Editable/index.js';
 export { default as KitsCheckboxes } from './Components/Molecules/Form/Buttons/Checkboxes/index.js';
 export { default as KitsRadios } from './Components/Molecules/Form/Buttons/RadioButton/radio.js';
-export { KitsAutoComplete, KitsCascadeSelect, KitsDropdown, KitsListBox, KitsMultiSelect, KitsTreeSelect } from './Components/Molecules/Form/KitsSelect/index.js';
+export { KitsAutoComplete, KitsCascadeSelect, KitsDropdown, KitsListBox, KitsMultiSelect, KitsTreeSelect, KitsMultiSelect as MultiSelect } from './Components/Molecules/Form/KitsSelect/index.js';
 export { default as FormSelect } from './Components/Molecules/Form/KitsSelect/SelectContext.js';
 export { default as KitsFilePicker } from './Components/Molecules/Form/KitsFilePicker/index.js';
 export { default as KitsSliders } from './Components/Molecules/Form/Sliders/index.js';
@@ -85,7 +85,7 @@ export { default as GoTable, TableContext, fontSizeMapping, sizeMapping, useTabl
 export { Group } from './Components/Organism/Form/components/fields/Group/index.js';
 export { InputNumber } from './Components/Organism/Form/components/fields/InputNumber/index.js';
 export { InputText } from './Components/Organism/Form/components/fields/InputText/index.js';
-export { Select as ListBox, Select as NormalSelect, Select, Select as TagsSelect, Select as TreeSelect } from './Components/Organism/Form/components/fields/Select/index.js';
+export { Select as ListBox, Select as NormalSelect, Select, Select as TagsSelect } from './Components/Organism/Form/components/fields/Select/index.js';
 export { Location } from './Components/Organism/Form/components/fields/Location/index.js';
 export { ObjectElement } from './Components/Organism/Form/components/fields/Object/index.js';
 export { Password } from './Components/Organism/Form/components/fields/Password/index.js';

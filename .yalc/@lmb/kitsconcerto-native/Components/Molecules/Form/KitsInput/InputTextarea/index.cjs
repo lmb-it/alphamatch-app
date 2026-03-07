@@ -83,7 +83,7 @@ require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
 const KitsInputTextarea = React.forwardRef((rawProps, ref) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults.default("Textarea", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("Textarea", rawProps, "Input");
   const {
     id,
     label,

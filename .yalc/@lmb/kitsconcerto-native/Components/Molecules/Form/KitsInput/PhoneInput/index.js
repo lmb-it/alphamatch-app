@@ -75,11 +75,12 @@ import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import { usePhoneInput } from './usePhoneInput.js';
 import { SvgUri } from 'react-native-svg';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 import KitsContainer from '../../Helpers/FormContainer/index.js';
 import KitsInputText from '../InputText/index.js';
 import 'axios';
 import '../../../UI/Flex/index.js';
-import '../../../../../Contexts/DialogContext.js';
 import 'primereact/tooltip';
 import 'primereact/skeleton';
 import '../../KitsSelect/SelectContext.js';
@@ -108,6 +109,7 @@ const KitsPhoneComponent = ({
   outputFormat = "string",
   ...props
 }) => {
+  const { mergedProps: _mergedProps, themeStyle } = useComponentDefaults("PhoneInput", props, "Input");
   useSeparator(props);
   const {
     displayValue,
@@ -163,7 +165,8 @@ const KitsPhoneComponent = ({
           onChange: (e) => handleChange(e.target.value),
           invalid,
           disabled,
-          placeholder: placeholder ?? (isWithCountryCode ? "+1 (555) 123-4567" : "")
+          placeholder: placeholder ?? (isWithCountryCode ? "+1 (555) 123-4567" : ""),
+          localProps: Object.keys(themeStyle).length ? { style: { width: "100%", ...themeStyle } } : void 0
         }
       )
     }

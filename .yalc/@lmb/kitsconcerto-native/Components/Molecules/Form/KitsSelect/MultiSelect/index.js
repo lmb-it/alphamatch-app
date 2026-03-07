@@ -76,8 +76,11 @@ import KitsContainer from '../../Helpers/FormContainer/index.js';
 import { ClHelper } from '../../Helpers/Functions.js';
 import { checkKeys } from '../helper.js';
 import { useSelectBase } from '../hooks/useSelectBase.js';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
-const KitsMultiSelect = ({ className, ref, ...props }) => {
+const KitsMultiSelect = ({ className, ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("MultiSelect", rawProps, "Select");
   const {
     id,
     disabled,
@@ -148,6 +151,7 @@ const KitsMultiSelect = ({ className, ref, ...props }) => {
           display: valueMode === "comma" ? "comma" : localProps?.maxSelectedLabels ? void 0 : "chip",
           maxSelectedLabels: selectionLimit ?? localProps?.maxSelectedLabels ?? 10,
           className: `w-full ${ClState}`,
+          style: Object.keys(themeStyle).length ? themeStyle : void 0,
           ...localProps ? localProps : {}
         }
       )

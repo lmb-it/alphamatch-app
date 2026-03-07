@@ -6,13 +6,17 @@ import Addons from '../../Helpers/Addons/index.js';
 import 'react';
 import 'axios';
 import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 import '../../KitsSelect/SelectContext.js';
 import Flex from '../../../UI/Flex/index.js';
 import Text from '../../../UI/Text/index.js';
 import 'primereact/tooltip';
 import 'primereact/skeleton';
+import { useKitsTheme } from '../../../../../Contexts/Theme/KitsThemeProvider.js';
 
-const KitsInputCalendar = ({ ref, ...props }) => {
+const KitsInputCalendar = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("Datepicker", rawProps, "Input");
+  const { resolveToken } = useKitsTheme();
   const {
     id,
     label,
@@ -49,8 +53,9 @@ const KitsInputCalendar = ({ ref, ...props }) => {
     overflow: "hidden",
     borderRadius: 3.5,
     borderWidth: 1,
-    borderColor: invalid ? "#e24c4c" : "rgba(213, 212, 212, 1)",
-    width: "100%"
+    borderColor: invalid ? resolveToken("danger") : resolveToken("border"),
+    width: "100%",
+    ...themeStyle
   };
   const val = internalVal instanceof Date ? internalVal : /* @__PURE__ */ new Date();
   return /* @__PURE__ */ jsx(
@@ -65,7 +70,7 @@ const KitsInputCalendar = ({ ref, ...props }) => {
       hideError,
       isFloatedLabel,
       disabled,
-      children: /* @__PURE__ */ jsx(Flex, { ...containerStyle, children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxs(Flex, { alignItems: "center", w: "full", backgroundColor: "#8d8d8d", children: [
+      children: /* @__PURE__ */ jsx(Flex, { ...containerStyle, children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxs(Flex, { alignItems: "center", w: "full", backgroundColor: resolveToken("text-secondary"), children: [
         /* @__PURE__ */ jsx(
           DateTimePicker,
           {
@@ -77,7 +82,7 @@ const KitsInputCalendar = ({ ref, ...props }) => {
             ...localProps
           }
         ),
-        /* @__PURE__ */ jsx(Flex, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: "white", pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsx(Text, { children: val.toLocaleDateString() }) })
+        /* @__PURE__ */ jsx(Flex, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsx(Text, { children: val.toLocaleDateString() }) })
       ] }) }) })
     }
   );

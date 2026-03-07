@@ -10,13 +10,17 @@ var index$1 = require('../../Helpers/Addons/index.cjs');
 require('react');
 require('axios');
 require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 require('../../KitsSelect/SelectContext.cjs');
 var index = require('../../../UI/Flex/index.cjs');
 var index_native$1 = require('../../../UI/Text/index.cjs');
 require('primereact/tooltip');
 require('primereact/skeleton');
+var KitsThemeProvider_native = require('../../../../../Contexts/Theme/KitsThemeProvider.cjs');
 
-const KitsInputCalendar = ({ ref, ...props }) => {
+const KitsInputCalendar = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("Datepicker", rawProps, "Input");
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
   const {
     id,
     label,
@@ -53,8 +57,9 @@ const KitsInputCalendar = ({ ref, ...props }) => {
     overflow: "hidden",
     borderRadius: 3.5,
     borderWidth: 1,
-    borderColor: invalid ? "#e24c4c" : "rgba(213, 212, 212, 1)",
-    width: "100%"
+    borderColor: invalid ? resolveToken("danger") : resolveToken("border"),
+    width: "100%",
+    ...themeStyle
   };
   const val = internalVal instanceof Date ? internalVal : /* @__PURE__ */ new Date();
   return /* @__PURE__ */ jsxRuntime.jsx(
@@ -69,7 +74,7 @@ const KitsInputCalendar = ({ ref, ...props }) => {
       hideError,
       isFloatedLabel,
       disabled,
-      children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { ...containerStyle, children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsxs(index.default, { alignItems: "center", w: "full", backgroundColor: "#8d8d8d", children: [
+      children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { ...containerStyle, children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsxs(index.default, { alignItems: "center", w: "full", backgroundColor: resolveToken("text-secondary"), children: [
         /* @__PURE__ */ jsxRuntime.jsx(
           DateTimePicker,
           {
@@ -81,7 +86,7 @@ const KitsInputCalendar = ({ ref, ...props }) => {
             ...localProps
           }
         ),
-        /* @__PURE__ */ jsxRuntime.jsx(index.default, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: "white", pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { children: val.toLocaleDateString() }) })
+        /* @__PURE__ */ jsxRuntime.jsx(index.default, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { children: val.toLocaleDateString() }) })
       ] }) }) })
     }
   );

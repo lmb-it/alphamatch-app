@@ -47,7 +47,9 @@ const useAutoCompleteLogic = (props) => {
           value = null;
         } else if (typeof item !== "string") {
           value = filterValue(item);
-        } else ;
+        } else {
+          value = item;
+        }
       }
       if (value !== void 0) {
         onChange(
@@ -63,8 +65,21 @@ const useAutoCompleteLogic = (props) => {
   );
   useEffect(() => {
     if (isMultiple) {
-      if (Array.isArray(selectedValue) && selectedValue.length > 0 && selectedValue.every((v) => typeof v === "object")) {
-        setInputValue(selectedValue);
+      if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+        if (selectedValue.every((v) => typeof v === "object")) {
+          setInputValue(selectedValue);
+        } else {
+          const mapped = selectedValue.map((v) => {
+            if (typeof v === "string") {
+              const found = list?.find((item) => item[valueKey] === v);
+              return found ?? { [labelKey]: v, [valueKey]: v };
+            }
+            return v;
+          });
+          setInputValue(mapped);
+        }
+      } else {
+        setInputValue(null);
       }
     } else {
       if (selectedValue != null && typeof selectedValue === "object") {
@@ -75,7 +90,7 @@ const useAutoCompleteLogic = (props) => {
         setInputValue(null);
       }
     }
-  }, [selectedValue, labelKey, isMultiple]);
+  }, [selectedValue, labelKey, valueKey, isMultiple, list]);
   const makeFallback = useCallback(
     (query) => {
       if (childrenKey) {
@@ -96,18 +111,19 @@ const useAutoCompleteLogic = (props) => {
     (event) => {
       if (completeMethod && typeof completeMethod === "function") {
         const res = completeMethod(event.query);
+        const fallback = !forceSelection ? makeFallback(event.query) : [];
         if (res instanceof Promise) {
           res.then((response) => {
             if (Array.isArray(response)) {
               setFilteredList(
-                response.length > 0 ? response : makeFallback(event.query)
+                response.length > 0 ? response : fallback
               );
             } else if (response?.data && Array.isArray(response.data)) {
               setFilteredList(
-                response.data.length > 0 ? response.data : makeFallback(event.query)
+                response.data.length > 0 ? response.data : fallback
               );
             } else {
-              setFilteredList(makeFallback(event.query));
+              setFilteredList(fallback);
             }
           });
         } else {

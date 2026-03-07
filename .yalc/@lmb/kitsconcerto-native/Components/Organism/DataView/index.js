@@ -13,6 +13,7 @@ import 'primereact/tooltip';
 import 'primereact/skeleton';
 import { FlatList, ActivityIndicator, View } from 'react-native';
 import Pagination from './Pagination/index.js';
+import { useKitsTheme } from '../../../Contexts/Theme/KitsThemeProvider.js';
 import Form from '../Form/Form.js';
 
 const defaultText = {
@@ -27,6 +28,7 @@ const DataViewContext = createContext(
   {}
 );
 const DataView = (props) => {
+  const { resolveToken } = useKitsTheme();
   const {
     id,
     dataViewTitle,
@@ -248,7 +250,7 @@ const DataView = (props) => {
         }
       )
     ] }),
-    /* @__PURE__ */ jsx(View, { style: { height: 1, backgroundColor: "#e0e0e0", width: "100%" } })
+    /* @__PURE__ */ jsx(View, { style: { height: 1, backgroundColor: resolveToken("border"), width: "100%" } })
   ] });
   const isHeader = !hideModeButtons || !!filtersFormElements;
   return /* @__PURE__ */ jsx(

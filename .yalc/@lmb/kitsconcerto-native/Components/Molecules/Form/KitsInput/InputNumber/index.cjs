@@ -79,8 +79,11 @@ require('../../../../../apps/mobile/src/Core/ProgressBar/index.cjs');
 require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var index$1 = require('../../Helpers/Addons/index.cjs');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
-const KitsInputNumber = ({ ref, ...props }) => {
+const KitsInputNumber = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputNumber", rawProps, "Input");
   const {
     id,
     label,
@@ -219,8 +222,8 @@ const KitsInputNumber = ({ ref, ...props }) => {
           isDisabled: !!disabled,
           isInvalid: !!invalid,
           ...rest,
-          style: { width: "100%" },
-          children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsx(
+          style: { width: "100%", ...themeStyle },
+          children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(
             index.InputField,
             {
               ref,

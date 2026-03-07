@@ -79,13 +79,15 @@ import { useFormInputController } from '../../Helpers/useFormInputController/use
 import Auth0PasswordStrength from './Strengthen.js';
 import 'axios';
 import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 import '../../KitsSelect/SelectContext.js';
 import '../../../UI/Flex/index.js';
 import Text from '../../../UI/Text/index.js';
 import 'primereact/tooltip';
 import 'primereact/skeleton';
 
-const KitsInputPassword = ({ ref, ...props }) => {
+const KitsInputPassword = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("InputPassword", rawProps, "Input");
   const {
     id,
     label,
@@ -144,9 +146,9 @@ const KitsInputPassword = ({ ref, ...props }) => {
             ...rest,
             isDisabled: !!disabled,
             isInvalid: !!invalid,
-            style: { width: "100%" },
+            style: { width: "100%", ...themeStyle },
             children: [
-              /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: /* @__PURE__ */ jsx(
+              /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsx(
                 InputField,
                 {
                   ref,

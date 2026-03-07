@@ -79,8 +79,11 @@ require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var Functions = require('../../Helpers/Functions.cjs');
 var useTreeBuild = require('../hooks/useTreeBuild.cjs');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
-const KitsTreeSelect = ({ ref, ...props }) => {
+const KitsTreeSelect = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("TreeSelect", rawProps, "Select");
   const {
     rightAddon,
     leftAddon,
@@ -136,6 +139,7 @@ const KitsTreeSelect = ({ ref, ...props }) => {
       resetFilterOnHide,
       scrollHeight,
       emptyMessage,
+      style: Object.keys(themeStyle).length ? themeStyle : void 0,
       ...localProps
     }
   );

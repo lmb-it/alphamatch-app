@@ -74,8 +74,11 @@ import '../../../../../apps/mobile/src/Core/ProgressBar/index.js';
 import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import { useAutoCompleteLogic } from '../hooks/useAutoCompleteLogic.js';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
-const KitsAutoComplete = ({ ref, ...props }) => {
+const KitsAutoComplete = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("AutoComplete", rawProps, "Select");
   const {
     id,
     rightAddon,
@@ -144,6 +147,7 @@ const KitsAutoComplete = ({ ref, ...props }) => {
           showEmptyMessage: showEmptyMessage ?? true,
           optionGroupChildren: childrenKey ?? void 0,
           optionGroupLabel: childrenKey ? labelKey : void 0,
+          style: Object.keys(themeStyle).length ? themeStyle : void 0,
           onChange: (event) => {
             setInputValue(event.value);
             handleOnChange(event);

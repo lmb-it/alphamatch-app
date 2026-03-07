@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const colorPickerStyle = StyleSheet.create({
+const createColorPickerStyle = (resolveToken) => StyleSheet.create({
   title: {
     textAlign: "center",
     fontFamily: "Quicksand",
@@ -13,7 +13,7 @@ const colorPickerStyle = StyleSheet.create({
   pickerContainer: {
     alignSelf: "center",
     width: 300,
-    backgroundColor: "#fff",
+    backgroundColor: resolveToken("surface-card"),
     padding: 20,
     borderRadius: 20,
     shadowColor: "#000",
@@ -60,7 +60,7 @@ const colorPickerStyle = StyleSheet.create({
     elevation: 5
   },
   sliderTitle: {
-    color: "#000",
+    color: resolveToken("text"),
     fontWeight: "bold",
     marginBottom: 5,
     paddingHorizontal: 4,
@@ -71,13 +71,13 @@ const colorPickerStyle = StyleSheet.create({
     borderRadius: 14
   },
   previewTxt: {
-    color: "#707070",
+    color: resolveToken("text-secondary"),
     fontFamily: "Quicksand"
   },
   inputStyle: {
-    color: "#707070",
+    color: resolveToken("text-secondary"),
     paddingVertical: 2,
-    borderColor: "#707070",
+    borderColor: resolveToken("border"),
     fontSize: 12,
     marginLeft: 5
   },
@@ -97,5 +97,5 @@ const colorPickerStyle = StyleSheet.create({
   }
 });
 
-export { colorPickerStyle };
+export { createColorPickerStyle };
 //# sourceMappingURL=colorPickerStyle.js.map

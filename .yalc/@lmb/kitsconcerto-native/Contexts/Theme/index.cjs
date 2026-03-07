@@ -6,6 +6,12 @@ var jsxRuntime = require('react/jsx-runtime');
 var React = require('react');
 var reactNative = require('react-native');
 var KitsThemeProvider_native = require('./KitsThemeProvider.cjs');
+require('react-icons/fa');
+require('react-icons/ai');
+require('react-icons/io');
+require('../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
+require('yup');
+require('../../packages/types/src/Css/map/index.cjs');
 
 const ThemeContext = React.createContext({});
 const ThemeContextProvider = ({ children, theme }) => {

@@ -4,6 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var jsxRuntime = require('react/jsx-runtime');
 var reactNative = require('react-native');
+var KitsThemeProvider_native = require('../../../../Contexts/Theme/KitsThemeProvider.cjs');
 var index_native = require('../../../../Assets/Icons/index.cjs');
 
 const Icon = ({ name, color = "#333", size = 16 }) => {
@@ -19,9 +20,10 @@ const ActionButton = ({
   variant = "primary",
   hideDisabledButton
 }) => {
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
   if (disabled && hideDisabledButton) return null;
-  const bgColor = variant === "danger" ? "#ffebee" : variant === "secondary" ? "#f5f5f5" : "#e3f2fd";
-  const iconColor = variant === "danger" ? "#d32f2f" : variant === "secondary" ? "#616161" : "#1976d2";
+  const bgColor = variant === "danger" ? resolveToken("red.50") : variant === "secondary" ? resolveToken("bg-subtle") : resolveToken("blue.50");
+  const iconColor = variant === "danger" ? resolveToken("danger") : variant === "secondary" ? resolveToken("text-secondary") : resolveToken("primary");
   return /* @__PURE__ */ jsxRuntime.jsx(
     reactNative.TouchableOpacity,
     {
@@ -29,9 +31,9 @@ const ActionButton = ({
       disabled,
       style: [
         styles.button,
-        { backgroundColor: disabled ? "#f0f0f0" : bgColor, opacity: disabled ? 0.5 : 1 }
+        { backgroundColor: disabled ? resolveToken("bg-subtle") : bgColor, opacity: disabled ? 0.5 : 1 }
       ],
-      children: /* @__PURE__ */ jsxRuntime.jsx(Icon, { name: icon, color: disabled ? "#aaa" : iconColor })
+      children: /* @__PURE__ */ jsxRuntime.jsx(Icon, { name: icon, color: disabled ? resolveToken("gray.400") : iconColor })
     }
   );
 };
@@ -51,6 +53,13 @@ const TreeViewToolbar = ({
 }) => {
   const { width } = reactNative.useWindowDimensions();
   const isWide = width >= 768;
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
+  const toolbarBg = resolveToken("bg-subtle");
+  const toolbarBorder = resolveToken("border");
+  const searchBg = resolveToken("surface-card");
+  const searchBorder = resolveToken("border");
+  const searchTextColor = resolveToken("text");
+  const searchPlaceholderColor = resolveToken("text-secondary");
   const {
     expendableControls,
     serverSide,
@@ -62,15 +71,15 @@ const TreeViewToolbar = ({
   const categoryButton = rules?.addCategory && !selectedNode || rules?.addSubCategory && !!selectedNode && !selectedNode.data?.isItem;
   const deleteButton = !!selectedNode && (rules?.deleteCategory && !selectedNode.data?.isItem && !selectedNode.data?.parentId || rules?.deleteSubCategory && !selectedNode.data?.isItem && !!selectedNode.data?.parentId || rules?.deleteItem && !!selectedNode.data?.isItem);
   const editButton = !!selectedNode && (rules?.updateCategory && !selectedNode.data?.isItem && !selectedNode.data?.parentId || rules?.updateSubCategory && !selectedNode.data?.isItem && !!selectedNode.data?.parentId || rules?.updateItem && !!selectedNode.data?.isItem);
-  const SearchBox = /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: styles.searchBox, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(Icon, { name: "pi pi-search", color: "#999" }),
+  const SearchBox = /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: [styles.searchBox, { backgroundColor: searchBg, borderColor: searchBorder }], children: [
+    /* @__PURE__ */ jsxRuntime.jsx(Icon, { name: "pi pi-search", color: searchPlaceholderColor }),
     /* @__PURE__ */ jsxRuntime.jsx(
       reactNative.TextInput,
       {
-        style: styles.searchInput,
+        style: [styles.searchInput, { color: searchTextColor }],
         value: filterValue,
         placeholder: "Search...",
-        placeholderTextColor: "#999",
+        placeholderTextColor: searchPlaceholderColor,
         onChangeText: (val) => {
           setFilterValue(val);
           treeRef?.filter?.(val);
@@ -92,13 +101,13 @@ const TreeViewToolbar = ({
     (!hideDisabledButton && !editButton || editButton) && /* @__PURE__ */ jsxRuntime.jsx(ActionButton, { icon: "pi pi-pencil", onPress: () => onEditNode(selectedNode?.key), disabled: !editButton, variant: "secondary", hideDisabledButton })
   ] });
   if (isWide) {
-    return /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: styles.toolbarRow, children: [
+    return /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: [styles.toolbarRow, { backgroundColor: toolbarBg, borderColor: toolbarBorder }], children: [
       /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: styles.searchSection, children: SearchBox }),
       ExpandButtons,
       CrudButtons
     ] });
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: styles.toolbarColumn, children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: [styles.toolbarColumn, { backgroundColor: toolbarBg, borderColor: toolbarBorder }], children: [
     SearchBox,
     /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: styles.buttonsRow, children: [
       ExpandButtons,
@@ -111,9 +120,7 @@ const styles = reactNative.StyleSheet.create({
   toolbarRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
     borderWidth: 1,
-    borderColor: "#dee2e6",
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -125,9 +132,7 @@ const styles = reactNative.StyleSheet.create({
   },
   // Narrow layout (phone)
   toolbarColumn: {
-    backgroundColor: "#f8f9fa",
     borderWidth: 1,
-    borderColor: "#dee2e6",
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -142,18 +147,15 @@ const styles = reactNative.StyleSheet.create({
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
     borderRadius: 6,
     paddingHorizontal: 10,
     height: 40,
-    borderWidth: 1,
-    borderColor: "#ced4da"
+    borderWidth: 1
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
     fontSize: 14,
-    color: "#495057",
     paddingVertical: 0
   },
   // Button groups

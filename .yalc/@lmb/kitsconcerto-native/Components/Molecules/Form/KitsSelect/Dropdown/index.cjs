@@ -89,7 +89,7 @@ var Functions = require('../../Helpers/Functions.cjs');
 var useSelectBase = require('../hooks/useSelectBase.cjs');
 
 const KitsDropdown = ({ className, ref, ...rawProps }) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults.default("Select", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("DropdownSelect", rawProps, "Select");
   const {
     id,
     rightAddon,

@@ -28,4 +28,6 @@ exports.KitsDropdown = KitsDropdown;
 exports.KitsListBox = KitsListBox;
 exports.KitsMultiSelect = KitsMultiSelect;
 exports.KitsTreeSelect = KitsTreeSelect;
+exports.MultiSelect = KitsMultiSelect;
+exports.TreeSelect = KitsTreeSelect;
 //# sourceMappingURL=index.cjs.map

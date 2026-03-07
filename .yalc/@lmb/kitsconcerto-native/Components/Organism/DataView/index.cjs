@@ -17,6 +17,7 @@ require('primereact/tooltip');
 require('primereact/skeleton');
 var reactNative = require('react-native');
 var index_native$1 = require('./Pagination/index.cjs');
+var KitsThemeProvider_native = require('../../../Contexts/Theme/KitsThemeProvider.cjs');
 var Form = require('../Form/Form.cjs');
 
 const defaultText = {
@@ -31,6 +32,7 @@ const DataViewContext = React.createContext(
   {}
 );
 const DataView = (props) => {
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
   const {
     id,
     dataViewTitle,
@@ -252,7 +254,7 @@ const DataView = (props) => {
         }
       )
     ] }),
-    /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: { height: 1, backgroundColor: "#e0e0e0", width: "100%" } })
+    /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: { height: 1, backgroundColor: resolveToken("border"), width: "100%" } })
   ] });
   const isHeader = !hideModeButtons || !!filtersFormElements;
   return /* @__PURE__ */ jsxRuntime.jsx(

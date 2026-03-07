@@ -24,12 +24,17 @@ function KitsThemeProvider({ theme: themeOverride, children }) {
   );
   const systemScheme = reactNative.useColorScheme();
   const [colorMode, setColorMode] = React.useState(mergedTheme.config.initialColorMode);
-  const toggleColorMode = React.useCallback(
-    () => setColorMode((m) => m === "light" ? "dark" : "light"),
-    []
-  );
+  const manualOverrideRef = React.useRef(false);
+  const toggleColorMode = React.useCallback(() => {
+    manualOverrideRef.current = true;
+    setColorMode((m) => m === "light" ? "dark" : "light");
+  }, []);
+  const setColorModeManual = React.useCallback((mode) => {
+    manualOverrideRef.current = true;
+    setColorMode(mode);
+  }, []);
   React.useEffect(() => {
-    if (mergedTheme.config.useSystemColorMode && systemScheme) {
+    if (mergedTheme.config.useSystemColorMode && systemScheme && !manualOverrideRef.current) {
       setColorMode(systemScheme);
     }
   }, [systemScheme, mergedTheme.config.useSystemColorMode]);
@@ -43,8 +48,8 @@ function KitsThemeProvider({ theme: themeOverride, children }) {
     [mergedTheme, colorMode]
   );
   const value = React.useMemo(
-    () => ({ theme: mergedTheme, colorMode, toggleColorMode, setColorMode, resolveToken }),
-    [mergedTheme, colorMode, toggleColorMode, resolveToken]
+    () => ({ theme: mergedTheme, colorMode, toggleColorMode, setColorMode: setColorModeManual, resolveToken }),
+    [mergedTheme, colorMode, toggleColorMode, setColorModeManual, resolveToken]
   );
   return /* @__PURE__ */ jsxRuntime.jsx(KitsThemeContext.Provider, { value, children: /* @__PURE__ */ jsxRuntime.jsx(NativeColorMapContext.Provider, { value: resolvedColorMap, children }) });
 }

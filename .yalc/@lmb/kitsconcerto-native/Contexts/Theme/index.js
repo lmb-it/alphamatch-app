@@ -2,6 +2,12 @@ import { jsx } from 'react/jsx-runtime';
 import { useState, useEffect, useContext, createContext } from 'react';
 import { useColorScheme } from 'react-native';
 export { KitsThemeProvider, useKitsTheme, useNativeColorMap } from './KitsThemeProvider.js';
+import 'react-icons/fa';
+import 'react-icons/ai';
+import 'react-icons/io';
+import '../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
+import 'yup';
+import '../../packages/types/src/Css/map/index.js';
 
 const ThemeContext = createContext({});
 const ThemeContextProvider = ({ children, theme }) => {

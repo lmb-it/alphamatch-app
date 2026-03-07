@@ -75,8 +75,11 @@ import '../../../../../apps/mobile/src/Core/ProgressBar/index.js';
 import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import Addons from '../../Helpers/Addons/index.js';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
-const KitsInputNumber = ({ ref, ...props }) => {
+const KitsInputNumber = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("InputNumber", rawProps, "Input");
   const {
     id,
     label,
@@ -215,8 +218,8 @@ const KitsInputNumber = ({ ref, ...props }) => {
           isDisabled: !!disabled,
           isInvalid: !!invalid,
           ...rest,
-          style: { width: "100%" },
-          children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: /* @__PURE__ */ jsx(
+          style: { width: "100%", ...themeStyle },
+          children: /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsx(
             InputField,
             {
               ref,

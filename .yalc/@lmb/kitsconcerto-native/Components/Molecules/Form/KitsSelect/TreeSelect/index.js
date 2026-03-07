@@ -75,8 +75,11 @@ import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import { ClHelper } from '../../Helpers/Functions.js';
 import { useTreeBuild } from '../hooks/useTreeBuild.js';
+import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
-const KitsTreeSelect = ({ ref, ...props }) => {
+const KitsTreeSelect = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("TreeSelect", rawProps, "Select");
   const {
     rightAddon,
     leftAddon,
@@ -132,6 +135,7 @@ const KitsTreeSelect = ({ ref, ...props }) => {
       resetFilterOnHide,
       scrollHeight,
       emptyMessage,
+      style: Object.keys(themeStyle).length ? themeStyle : void 0,
       ...localProps
     }
   );

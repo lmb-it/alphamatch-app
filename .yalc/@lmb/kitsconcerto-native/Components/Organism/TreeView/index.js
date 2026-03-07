@@ -74,6 +74,7 @@ import '../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../apps/mobile/src/Core/RadioButton/index.js';
 import { useTreeViewController } from './useTreeViewController.js';
 import TreeViewToolbar from './Toolbar/index.js';
+import { useKitsTheme } from '../../../Contexts/Theme/KitsThemeProvider.js';
 import Flex from '../../Molecules/UI/Flex/index.js';
 import Text from '../../Molecules/UI/Text/index.js';
 
@@ -88,6 +89,8 @@ const TreeView = (props) => {
     operations,
     treeProps
   } = useTreeViewController(props);
+  const { resolveToken } = useKitsTheme();
+  const selectedBg = resolveToken("surface-hover");
   const {
     nodeTemplate,
     containerProps,
@@ -150,7 +153,7 @@ const TreeView = (props) => {
                     alignItems: "center",
                     minHeight: 40,
                     paddingHorizontal: 4,
-                    backgroundColor: isSelected ? "#e3f2fd" : "transparent",
+                    backgroundColor: isSelected ? selectedBg : "transparent",
                     borderRadius: 4
                   },
                   children: !!nodeTemplate ? nodeTemplate(node, options) : /* @__PURE__ */ jsx(

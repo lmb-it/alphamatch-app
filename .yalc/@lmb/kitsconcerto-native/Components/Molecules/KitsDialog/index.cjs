@@ -81,7 +81,8 @@ const styles = reactNative.StyleSheet.create({
   panel: {
     borderRadius: 16,
     borderWidth: 1,
-    width: "100%",
+    minWidth: 250,
+    maxWidth: "90%",
     maxHeight: "80%",
     overflow: "hidden",
     elevation: 12,

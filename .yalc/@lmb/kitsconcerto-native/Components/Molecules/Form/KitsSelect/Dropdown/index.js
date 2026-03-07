@@ -85,7 +85,7 @@ import { ClHelper } from '../../Helpers/Functions.js';
 import { useSelectBase } from '../hooks/useSelectBase.js';
 
 const KitsDropdown = ({ className, ref, ...rawProps }) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults("Select", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults("DropdownSelect", rawProps, "Select");
   const {
     id,
     rightAddon,

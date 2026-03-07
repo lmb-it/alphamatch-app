@@ -156,7 +156,7 @@ const defaultTheme = {
       "surface-hover": "gray.100"
     },
     dark: {
-      primary: "blue.400",
+      primary: "teal.400",
       secondary: "gray.400",
       success: "green.400",
       danger: "red.400",
@@ -244,13 +244,7 @@ const defaultTheme = {
     loose: 2
   },
   severity: defaultSeverityTheme.defaultSeverityTheme,
-  components: {
-    Button: {
-      style: {
-        borderRadius: 0
-      }
-    }
-  },
+  components: {},
   config: {
     initialColorMode: "light",
     useSystemColorMode: false

@@ -20,5 +20,5 @@ const KitsCascadeSelect = (props) => {
   return /* @__PURE__ */ jsx(FormSelect, { shape: "cascade", ...props });
 };
 
-export { KitsAutoComplete, KitsCascadeSelect, KitsDropdown, KitsListBox, KitsMultiSelect, KitsTreeSelect };
+export { KitsAutoComplete, KitsCascadeSelect, KitsDropdown, KitsListBox, KitsMultiSelect, KitsTreeSelect, KitsMultiSelect as MultiSelect, KitsTreeSelect as TreeSelect };
 //# sourceMappingURL=index.js.map

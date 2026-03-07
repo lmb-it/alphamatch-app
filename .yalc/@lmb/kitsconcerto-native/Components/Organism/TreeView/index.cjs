@@ -78,6 +78,7 @@ require('../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var useTreeViewController = require('./useTreeViewController.cjs');
 var index_native = require('./Toolbar/index.cjs');
+var KitsThemeProvider_native = require('../../../Contexts/Theme/KitsThemeProvider.cjs');
 var index = require('../../Molecules/UI/Flex/index.cjs');
 var index_native$1 = require('../../Molecules/UI/Text/index.cjs');
 
@@ -92,6 +93,8 @@ const TreeView = (props) => {
     operations,
     treeProps
   } = useTreeViewController.useTreeViewController(props);
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
+  const selectedBg = resolveToken("surface-hover");
   const {
     nodeTemplate,
     containerProps,
@@ -154,7 +157,7 @@ const TreeView = (props) => {
                     alignItems: "center",
                     minHeight: 40,
                     paddingHorizontal: 4,
-                    backgroundColor: isSelected ? "#e3f2fd" : "transparent",
+                    backgroundColor: isSelected ? selectedBg : "transparent",
                     borderRadius: 4
                   },
                   children: !!nodeTemplate ? nodeTemplate(node, options) : /* @__PURE__ */ jsxRuntime.jsx(

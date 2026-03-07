@@ -1,5 +1,5 @@
 import { jsx } from 'react/jsx-runtime';
-import { useContext, useMemo, useState, useCallback, useEffect, createContext } from 'react';
+import { useContext, useMemo, useState, useRef, useCallback, useEffect, createContext } from 'react';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';
@@ -22,12 +22,17 @@ function KitsThemeProvider({ theme: themeOverride, children }) {
   );
   const systemScheme = useColorScheme();
   const [colorMode, setColorMode] = useState(mergedTheme.config.initialColorMode);
-  const toggleColorMode = useCallback(
-    () => setColorMode((m) => m === "light" ? "dark" : "light"),
-    []
-  );
+  const manualOverrideRef = useRef(false);
+  const toggleColorMode = useCallback(() => {
+    manualOverrideRef.current = true;
+    setColorMode((m) => m === "light" ? "dark" : "light");
+  }, []);
+  const setColorModeManual = useCallback((mode) => {
+    manualOverrideRef.current = true;
+    setColorMode(mode);
+  }, []);
   useEffect(() => {
-    if (mergedTheme.config.useSystemColorMode && systemScheme) {
+    if (mergedTheme.config.useSystemColorMode && systemScheme && !manualOverrideRef.current) {
       setColorMode(systemScheme);
     }
   }, [systemScheme, mergedTheme.config.useSystemColorMode]);
@@ -41,8 +46,8 @@ function KitsThemeProvider({ theme: themeOverride, children }) {
     [mergedTheme, colorMode]
   );
   const value = useMemo(
-    () => ({ theme: mergedTheme, colorMode, toggleColorMode, setColorMode, resolveToken }),
-    [mergedTheme, colorMode, toggleColorMode, resolveToken]
+    () => ({ theme: mergedTheme, colorMode, toggleColorMode, setColorMode: setColorModeManual, resolveToken }),
+    [mergedTheme, colorMode, toggleColorMode, setColorModeManual, resolveToken]
   );
   return /* @__PURE__ */ jsx(KitsThemeContext.Provider, { value, children: /* @__PURE__ */ jsx(NativeColorMapContext.Provider, { value: resolvedColorMap, children }) });
 }

@@ -79,7 +79,7 @@ import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
 const KitsInputTextarea = forwardRef((rawProps, ref) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults("Textarea", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults("Textarea", rawProps, "Input");
   const {
     id,
     label,

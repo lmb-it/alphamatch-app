@@ -83,13 +83,15 @@ var useFormInputController_native = require('../../Helpers/useFormInputControlle
 var Strengthen = require('./Strengthen.cjs');
 require('axios');
 require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 require('../../KitsSelect/SelectContext.cjs');
 require('../../../UI/Flex/index.cjs');
 var index_native$1 = require('../../../UI/Text/index.cjs');
 require('primereact/tooltip');
 require('primereact/skeleton');
 
-const KitsInputPassword = ({ ref, ...props }) => {
+const KitsInputPassword = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputPassword", rawProps, "Input");
   const {
     id,
     label,
@@ -148,9 +150,9 @@ const KitsInputPassword = ({ ref, ...props }) => {
             ...rest,
             isDisabled: !!disabled,
             isInvalid: !!invalid,
-            style: { width: "100%" },
+            style: { width: "100%", ...themeStyle },
             children: [
-              /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsx(
+              /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(
                 index.InputField,
                 {
                   ref,

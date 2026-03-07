@@ -8,6 +8,7 @@ var reactNative = require('react-native');
 var index_native = require('../../Helpers/FormContainer/index.cjs');
 require('axios');
 require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 require('../SelectContext.cjs');
 require('../../../UI/Flex/index.cjs');
 var index_native$2 = require('../../../UI/Text/index.cjs');
@@ -89,7 +90,8 @@ require('../../../../../apps/mobile/src/Core/ProgressBar/index.cjs');
 require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 
-const KitsListBox = (props) => {
+const KitsListBox = (rawProps) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("ListBox", rawProps, "Select");
   const {
     id,
     label,
@@ -201,6 +203,7 @@ const KitsListBox = (props) => {
           borderRadius: "$sm",
           height: 250,
           opacity: disabled ? 0.5 : 1,
+          style: Object.keys(themeStyle).length ? themeStyle : void 0,
           children: [
             withFilter && /* @__PURE__ */ jsxRuntime.jsx(
               reactNative.TextInput,

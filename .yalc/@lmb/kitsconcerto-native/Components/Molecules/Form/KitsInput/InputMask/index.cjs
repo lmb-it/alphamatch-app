@@ -80,8 +80,11 @@ require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var index$1 = require('../../Helpers/Addons/index.cjs');
 var useFormInputController_native = require('../../Helpers/useFormInputController/useFormInputController.cjs');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
-const KitsInputMask = ({ ref, ...props }) => {
+const KitsInputMask = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputMask", rawProps, "Input");
   const {
     id,
     label,
@@ -125,8 +128,8 @@ const KitsInputMask = ({ ref, ...props }) => {
         size: "md",
         isDisabled: disabled,
         isInvalid: !!invalid,
-        style: { width: "100%" },
-        children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsx(
+        style: { width: "100%", ...themeStyle },
+        children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(
           index.InputField,
           {
             ref,
@@ -157,8 +160,8 @@ const KitsInputMask = ({ ref, ...props }) => {
           size: "md",
           isDisabled: disabled,
           isInvalid: !!invalid,
-          style: { width: "100%" },
-          children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsx(
+          style: { width: "100%", ...themeStyle },
+          children: /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(
             index.InputField,
             {
               ref,

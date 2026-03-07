@@ -4,6 +4,7 @@ import { TextInput, ScrollView, Pressable } from 'react-native';
 import KitsContainer from '../../Helpers/FormContainer/index.js';
 import 'axios';
 import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 import '../SelectContext.js';
 import '../../../UI/Flex/index.js';
 import Text from '../../../UI/Text/index.js';
@@ -85,7 +86,8 @@ import '../../../../../apps/mobile/src/Core/ProgressBar/index.js';
 import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 
-const KitsListBox = (props) => {
+const KitsListBox = (rawProps) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("ListBox", rawProps, "Select");
   const {
     id,
     label,
@@ -197,6 +199,7 @@ const KitsListBox = (props) => {
           borderRadius: "$sm",
           height: 250,
           opacity: disabled ? 0.5 : 1,
+          style: Object.keys(themeStyle).length ? themeStyle : void 0,
           children: [
             withFilter && /* @__PURE__ */ jsx(
               TextInput,

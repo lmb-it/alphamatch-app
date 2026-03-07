@@ -85,7 +85,7 @@ require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
 const KitsInputText = ({ ref, ...rawProps }) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults.default("Input", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputText", rawProps, "Input");
   const {
     id,
     label,
@@ -158,7 +158,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
     }
   );
   if (attached) {
-    const attachedEl = leftAddon || rightAddon ? /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, children: inputEl }) : inputEl;
+    const attachedEl = leftAddon || rightAddon ? /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: inputEl }) : inputEl;
     return isFloatedLabel ? /* @__PURE__ */ jsxRuntime.jsx(
       FloatLabel_native.FloatLabelNative,
       {

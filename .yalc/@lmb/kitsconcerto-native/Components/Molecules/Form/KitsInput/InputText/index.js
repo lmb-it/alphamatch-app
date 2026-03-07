@@ -81,7 +81,7 @@ import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 
 const KitsInputText = ({ ref, ...rawProps }) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults("Input", rawProps);
+  const { mergedProps: props, themeStyle } = useComponentDefaults("InputText", rawProps, "Input");
   const {
     id,
     label,
@@ -154,7 +154,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
     }
   );
   if (attached) {
-    const attachedEl = leftAddon || rightAddon ? /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, children: inputEl }) : inputEl;
+    const attachedEl = leftAddon || rightAddon ? /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: inputEl }) : inputEl;
     return isFloatedLabel ? /* @__PURE__ */ jsx(
       FloatLabelNative,
       {

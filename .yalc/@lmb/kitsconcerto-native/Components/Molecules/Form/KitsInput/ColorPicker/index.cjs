@@ -10,8 +10,14 @@ var index_native = require('../../Helpers/FormContainer/index.cjs');
 var useFormInputController_native = require('../../Helpers/useFormInputController/useFormInputController.cjs');
 var index = require('../../Helpers/Addons/index.cjs');
 var colorPickerStyle_native = require('./colorPickerStyle.cjs');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
+var KitsThemeProvider_native = require('../../../../../Contexts/Theme/KitsThemeProvider.cjs');
 
-const KitsInputColorPicker = ({ ref, ...props }) => {
+const KitsInputColorPicker = ({ ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("ColorPicker", rawProps, "Input");
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
+  const colorPickerStyle = colorPickerStyle_native.createColorPickerStyle(resolveToken);
   const {
     id,
     label,
@@ -51,7 +57,7 @@ const KitsInputColorPicker = ({ ref, ...props }) => {
       invalid,
       disabled,
       required,
-      children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { leftAddon, rightAddon, children: /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: { width: "100%" }, children: /* @__PURE__ */ jsxRuntime.jsxs(
+      children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: { width: "100%", ...themeStyle }, children: /* @__PURE__ */ jsxRuntime.jsxs(
         ColorPicker,
         {
           value: resultColor,
@@ -60,21 +66,21 @@ const KitsInputColorPicker = ({ ref, ...props }) => {
           thumbShape: "circle",
           onChange: onColorChange,
           onCompleteJS: (color) => emitChange(color.hex),
-          style: colorPickerStyle_native.colorPickerStyle.picker,
+          style: colorPickerStyle.picker,
           boundedThumb: true,
           children: [
-            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.Panel1, { style: colorPickerStyle_native.colorPickerStyle.panelStyle }),
-            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.HueSlider, { style: colorPickerStyle_native.colorPickerStyle.sliderStyle }),
-            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.OpacitySlider, { style: colorPickerStyle_native.colorPickerStyle.sliderStyle }),
+            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.Panel1, { style: colorPickerStyle.panelStyle }),
+            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.HueSlider, { style: colorPickerStyle.sliderStyle }),
+            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.OpacitySlider, { style: colorPickerStyle.sliderStyle }),
             /* @__PURE__ */ jsxRuntime.jsx(
               ColorPicker.Swatches,
               {
-                style: colorPickerStyle_native.colorPickerStyle.swatchesContainer,
-                swatchStyle: colorPickerStyle_native.colorPickerStyle.swatchStyle,
+                style: colorPickerStyle.swatchesContainer,
+                swatchStyle: colorPickerStyle.swatchStyle,
                 colors: customSwatches
               }
             ),
-            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.PreviewText, { style: colorPickerStyle_native.colorPickerStyle.previewTxt, colorFormat: "hwba" })
+            /* @__PURE__ */ jsxRuntime.jsx(ColorPicker.PreviewText, { style: colorPickerStyle.previewTxt, colorFormat: "hwba" })
           ]
         }
       ) }) })

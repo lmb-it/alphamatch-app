@@ -104,7 +104,16 @@ function Button(rawProps) {
   const { cssProps, nativeProps } = useSeparator(_nativeProps);
   const { t } = useLanguage();
   const gluestackVariant = outlined ? "outline" : "solid";
-  const action = severity === "danger" ? "negative" : severity === "success" ? "positive" : "secondary";
+  const SEVERITY_TO_ACTION = {
+    primary: "primary",
+    danger: "negative",
+    success: "positive",
+    secondary: "secondary",
+    info: "primary",
+    warning: "negative",
+    help: "secondary"
+  };
+  const action = SEVERITY_TO_ACTION[severity] ?? "primary";
   const resolvedIcon = resolveIcon(icon);
   const resolvedLabel = typeof children === "string" ? children : loading && isLoadingText ? isLoadingText : t(label ?? "");
   const iconSizesMap = {
@@ -115,15 +124,27 @@ function Button(rawProps) {
     "lg": "lg",
     "xl": "lg"
   };
-  const computedStyles = style(cssProps);
+  const mergedCssProps = { ...themeStyle, ...cssProps };
+  const computedStyles = style(mergedCssProps);
   const textStyles = Object.fromEntries(
     Object.entries(computedStyles).filter(([k]) => TEXT_STYLE_KEYS.has(k))
+  );
+  const BORDER_RADIUS_KEYS = /* @__PURE__ */ new Set([
+    "borderRadius",
+    "borderTopLeftRadius",
+    "borderTopRightRadius",
+    "borderBottomLeftRadius",
+    "borderBottomRightRadius"
+  ]);
+  const borderRadiusStyles = Object.fromEntries(
+    Object.entries(computedStyles).filter(([k]) => BORDER_RADIUS_KEYS.has(k))
   );
   return /* @__PURE__ */ jsx(
     ResponsiveElement,
     {
       as: "Box",
-      cssProps: { alignSelf: "flex-start", ...themeStyle, ...cssProps },
+      additionalStyles: { alignSelf: "flex-start", overflow: "hidden" },
+      cssProps: mergedCssProps,
       nativeProps: {},
       children: /* @__PURE__ */ jsxs(
         Button$1,
@@ -137,6 +158,7 @@ function Button(rawProps) {
           onPressOut: handlers.onPressOut,
           testID: props.testID,
           ...nativeProps,
+          style: Object.keys(borderRadiusStyles).length ? borderRadiusStyles : void 0,
           children: [
             isValidElement(resolvedIcon) && iconPos === "left" && resolvedIcon,
             resolvedIcon && !isValidElement(resolvedIcon) && iconPos === "left" && /* @__PURE__ */ jsx(ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] }),

@@ -86,6 +86,7 @@ export interface IPageISection<
     title: string;
     path?: L["To"];
     collapsable?:boolean;
+    defaultOpen?:boolean;
     badge?:string;
     element?: ReactNode | null;
 }
@@ -2518,7 +2519,6 @@ export type ICardComponent<T = any> = ElementProps<T> & {
     title?: ReactNode | ((props: T) => ReactNode);
     subTitle?: ReactNode | ((props: T) => ReactNode);
     size?:'sm'|'md'|'lg'
-    icon: string | ReactNode;
     variant?:'elevated' | 'outline' | 'ghost' | 'filled'
     coloring?: {
         backgroundColor: string;
@@ -6242,13 +6242,35 @@ export interface IComponentThemeConfig<P = Record<string, any>> {
 /** Typed component defaults map */
 export interface IKitsComponentDefaults {
     Button?: IComponentThemeConfig<{ rounded?: boolean; size?: string; severity?: string; outlined?: boolean; raised?: boolean }>;
+
+    // Base groups — apply to all members of the group
     Input?: IComponentThemeConfig<{ inputSize?: string }>;
     Select?: IComponentThemeConfig;
+
+    // Input group members (inherit from Input)
+    InputText?: IComponentThemeConfig<{ inputSize?: string }>;
+    InputNumber?: IComponentThemeConfig<{ inputSize?: string }>;
+    InputMask?: IComponentThemeConfig<{ inputSize?: string }>;
+    InputPassword?: IComponentThemeConfig<{ inputSize?: string }>;
     Textarea?: IComponentThemeConfig;
+    Datepicker?: IComponentThemeConfig<{ inputSize?: string }>;
+    ColorPicker?: IComponentThemeConfig<{ inputSize?: string }>;
+    PhoneInput?: IComponentThemeConfig<{ inputSize?: string }>;
+
+    // Select group members (inherit from Select)
+    DropdownSelect?: IComponentThemeConfig;
+    MultiSelect?: IComponentThemeConfig;
+    TreeSelect?: IComponentThemeConfig;
+    AutoComplete?: IComponentThemeConfig;
+    ListBox?: IComponentThemeConfig;
+    CascadeSelect?: IComponentThemeConfig;
+
+    // Standalone
     Card?: IComponentThemeConfig<{ variant?: string; size?: string }>;
     Switch?: IComponentThemeConfig;
     Checkbox?: IComponentThemeConfig;
     Radio?: IComponentThemeConfig;
+
     [componentName: string]: IComponentThemeConfig<any> | undefined;
 }
 
@@ -6520,7 +6542,7 @@ declare const defaultTheme: IKitsTheme = {
             'surface-hover': 'gray.100',
         },
         dark: {
-            primary: 'blue.400',
+            primary: 'teal.400',
             secondary: 'gray.400',
             success: 'green.400',
             danger: 'red.400',
@@ -6608,13 +6630,7 @@ declare const defaultTheme: IKitsTheme = {
         loose: 2,
     },
     severity: defaultSeverityTheme,
-    components: {
-        Button:{
-            style:{
-                borderRadius:0
-            }
-        }
-    },
+    components: {},
     config: {
         initialColorMode: 'light',
         useSystemColorMode: false,
@@ -6796,11 +6812,11 @@ declare const KitsContainer: FC<PropsWithChildren<IKitsContainer>>;
 
 declare const KitsInputText: ({ ref, ...rawProps }: IKitsInputText) => react_jsx_runtime.JSX.Element;
 
-declare const KitsInputNumber: ({ ref, ...props }: IKitsInputNumber) => react_jsx_runtime.JSX.Element;
+declare const KitsInputNumber: ({ ref, ...rawProps }: IKitsInputNumber) => react_jsx_runtime.JSX.Element;
 
-declare const KitsInputMask: ({ ref, ...props }: IKitsInputMask) => react_jsx_runtime.JSX.Element;
+declare const KitsInputMask: ({ ref, ...rawProps }: IKitsInputMask) => react_jsx_runtime.JSX.Element;
 
-declare const KitsInputColorPicker: ({ ref, ...props }: IKitsInputColorPicker) => react_jsx_runtime.JSX.Element;
+declare const KitsInputColorPicker: ({ ref, ...rawProps }: IKitsInputColorPicker) => react_jsx_runtime.JSX.Element;
 
 export type NativeTextareaRef = {
     focus(): void;
@@ -6809,13 +6825,13 @@ export type NativeTextareaRef = {
 };
 declare const KitsInputTextarea: React__default.ForwardRefExoticComponent<Omit<IKitsInputTextarea, "ref"> & React__default.RefAttributes<NativeTextareaRef>>;
 
-declare const KitsInputPassword: ({ ref, ...props }: IKitsInputPassword) => react_jsx_runtime.JSX.Element;
+declare const KitsInputPassword: ({ ref, ...rawProps }: IKitsInputPassword) => react_jsx_runtime.JSX.Element;
 
 declare const KitsPhoneComponent: ({ ref, isWithCountryCode, label, value, placeholder, onChange, invalid, disabled, required, errors, hideError, id, defaultCountry, inputSize, isFloatedLabel, leftAddon, rightAddon, includedCountries, excludedCountries, outputFormat, ...props }: IKitsPhoneInput) => react_jsx_runtime.JSX.Element;
 
 declare const KitsInputLocation: ({ id, label, errors, invalid, value, hideError, onAddressClick, onChange, disabled, placeholder, countryISO, helperText, provider, api_key, labelKey, valueKey, list, ...rest }: IKitsInputLocation) => react_jsx_runtime.JSX.Element;
 
-declare const KitsInputCalendar: <T = DatePickerOptions>({ ref, ...props }: IKitsInputCalendar<T>) => react_jsx_runtime.JSX.Element;
+declare const KitsInputCalendar: <T = DatePickerOptions>({ ref, ...rawProps }: IKitsInputCalendar<T>) => react_jsx_runtime.JSX.Element;
 
 declare const KitsInputSwitch: React__default.FC<IKitsInputSwitch>;
 
@@ -6828,7 +6844,9 @@ declare const KitsRadio: <T>({ id, label, required, errors, hideError, isFloated
 declare const KitsAutoComplete: FunctionComponent<IAutoCompleteElement>;
 declare const KitsDropdown: FunctionComponent<IDropdownSelect>;
 declare const KitsMultiSelect: FunctionComponent<IMultiSelect>;
+
 declare const KitsTreeSelect: FunctionComponent<ITreeSelect>;
+
 declare const KitsListBox: FunctionComponent<IListBoxSelect>;
 declare const KitsCascadeSelect: FunctionComponent<ICascadeSelect>;
 
@@ -7663,16 +7681,16 @@ export interface UseComponentDefaultsResult<T> {
 }
 /**
  * Merges theme-level component defaults with user-supplied props.
- * Returns both merged props and theme style overrides.
+ * Supports base-group inheritance: e.g. `useComponentDefaults('InputNumber', rawProps, 'Input')`
+ * merges Input base config first, then InputNumber overrides, then user props.
  *
  * @example
- * function Button(rawProps: IButtonProps) {
- *   const { mergedProps: props, themeStyle } = useComponentDefaults('Button', rawProps);
- *   // props now includes theme.components.Button.props defaults
- *   // themeStyle contains theme.components.Button.style overrides
+ * function InputNumber(rawProps: IKitsInputNumber) {
+ *   const { mergedProps: props, themeStyle } = useComponentDefaults('InputNumber', rawProps, 'Input');
+ *   // themeStyle = { ...theme.components.Input.style, ...theme.components.InputNumber.style }
  * }
  */
-declare function useComponentDefaults<T extends Record<string, any>>(componentName: string, props: T): UseComponentDefaultsResult<T>;
+declare function useComponentDefaults<T extends Record<string, any>>(componentName: string, props: T, baseGroup?: string): UseComponentDefaultsResult<T>;
 
 /**
  * Resolves theme tokens in a style object and maps KitsConcerto
@@ -12102,5 +12120,5 @@ declare const localeFiles: {
     };
 };
 
-export { CustomAccordion as Accordion, Alert, KitsAnimatePresence as AnimatePresence, AnyFile, AuthLayout, Badge, Box, BreadCrumb, Button, Card, Center, Checkboxes, CircularProgress, Collapse, ColorPicker, Container$1 as Container, Container as ContainerElement, CustomPopover, DataView, DataViewContext, DateField, DetailList as DetailsList, EDateFormat, EKeyFilter, Editable, FIELD_LABEL_MARGIN, FIELD_MARGIN, FileUploader, Flex, Form, FormSelect, GUTTER, Form as GoForm, Datatable as GoTable, Grid, GridItem, Group, HELPER_TEXT_MARGIN, HStack, Heading, Icon, IconMap, Image, InputNumber, KitsInputSwitch as InputSwitch, InputText, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, Select as ListBox, ListItem, Loader, LocaleContext, LocaleContextProvider, Location, MainContext, MainContextProvider, Select as NormalSelect, ObjectElement, Password, Phone, Radios, SPACER, KitsScrollView as ScrollView, Select, SelectButton, Skeleton, SkeletonRows, Skeleton$1 as SkeletonText, Svg, Switch, TableContext, Select as TagsSelect, Text, Textarea, ThemeContextProvider, Tooltip, Translate, Select as TreeSelect, TreeView, TriStateCheckbox, VStack, index_native as Widgets, borderProperties, breakpoints, capitalizeFirstLetter, checkExtAgainstAccepted, checkNameDuplication, convertSize, dateTimeFormat, deepMerge, defaultSeverityTheme, defaultTheme, downloadCanvas, dynamicList, extendTheme, fileTypeIcon, fileValidation, filesExt, filesMemes, filesTypes, fontSizeMapping, formFileValidation, getCustomDateTime, getDateElements, getDefaultValues, getMeme, getParams, getPropertyByPath, getType, getTypes, getURLParams, imagesExt, imagesMemes, imagesTypes, isNumber, isSemanticToken, isThemeToken, isToday, isValidURL, listingProperties, localeFiles, allProperties as mapCssProperties, nonPxProperties, propertiesWithoutCssEquivalent, pxProperties, resolveTokenValue, schemaBuilder, sizeMapping, sizingProperties, timeAgo, timeSince, toArray, toMemes, useButton, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFormManager, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedStyle, useScrollState, useSelectionController, useTable, useTheme };
+export { CustomAccordion as Accordion, Alert, KitsAnimatePresence as AnimatePresence, AnyFile, AuthLayout, Badge, Box, BreadCrumb, Button, Card, Center, Checkboxes, CircularProgress, Collapse, ColorPicker, Container$1 as Container, Container as ContainerElement, CustomPopover, DataView, DataViewContext, DateField, DetailList as DetailsList, EDateFormat, EKeyFilter, Editable, FIELD_LABEL_MARGIN, FIELD_MARGIN, FileUploader, Flex, Form, FormSelect, GUTTER, Form as GoForm, Datatable as GoTable, Grid, GridItem, Group, HELPER_TEXT_MARGIN, HStack, Heading, Icon, IconMap, Image, InputNumber, KitsInputSwitch as InputSwitch, InputText, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, Select as ListBox, ListItem, Loader, LocaleContext, LocaleContextProvider, Location, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, Select as NormalSelect, ObjectElement, Password, Phone, Radios, SPACER, KitsScrollView as ScrollView, Select, SelectButton, Skeleton, SkeletonRows, Skeleton$1 as SkeletonText, Svg, Switch, TableContext, Select as TagsSelect, Text, Textarea, ThemeContextProvider, Tooltip, Translate, TreeView, TriStateCheckbox, VStack, index_native as Widgets, borderProperties, breakpoints, capitalizeFirstLetter, checkExtAgainstAccepted, checkNameDuplication, convertSize, dateTimeFormat, deepMerge, defaultSeverityTheme, defaultTheme, downloadCanvas, dynamicList, extendTheme, fileTypeIcon, fileValidation, filesExt, filesMemes, filesTypes, fontSizeMapping, formFileValidation, getCustomDateTime, getDateElements, getDefaultValues, getMeme, getParams, getPropertyByPath, getType, getTypes, getURLParams, imagesExt, imagesMemes, imagesTypes, isNumber, isSemanticToken, isThemeToken, isToday, isValidURL, listingProperties, localeFiles, allProperties as mapCssProperties, nonPxProperties, propertiesWithoutCssEquivalent, pxProperties, resolveTokenValue, schemaBuilder, sizeMapping, sizingProperties, timeAgo, timeSince, toArray, toMemes, useButton, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFormManager, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedStyle, useScrollState, useSelectionController, useTable, useTheme };
 export type { AlignmentsValues, AnimationsValues, BaseFieldProps, Booleanish, Breakpoint, CallbackProps, ChartData, ColorMode, ColorScale, ColorValue, Colors, ColorsType, ComponentSize, ConfirmDialogOptions, ConfirmDialogProps, ConfirmDialogReturn, CustomSubmitButtonProps, DataTableSelectionSingleChangeEvent, DeepPartial, DetailItemInputType, DialogProps, DynamicValue, ElementProps, EnteringAnimation, ExitingAnimation, ExpandedKeys, FetchError, FetchSuccess, FetchTableDataRes, FetchTablePaginationData, FieldWrapperProps, File$1 as File, FileTypeMap, FlexAlignmentsValues, FlexValues, FormBooleanEvent, FormBooleanTarget, FormEvent, FormTarget, GroupFieldConfigs, HighSizingValue, IAccordionProps, IAddressExperianFormat, IAddressFormat, IAddressFormatResults, IAddressSearchResults, IAlertComponent, IAlertProps, IAlignment, IAnimation, IAutoCompleteCore, IAutoCompleteElement, IBarChartProps, IBg, IBodyTemplate, IBorder, IBoxComponent, IButton, IButtonParams, IButtonProps, IButtonState, IButtonsFilter, ICardComponent, ICascadeSelect, ICascadeSelectCore, ICheckbox, ICheckboxFilter, IChildren, IChildrenParams, ICircularProgressProps, ICollapseProps, IColorPicker, IColumn, IColumnBase, IComponentThemeConfig, IConfirmDialogProps, IConfirmPopupProps, IContainer, IContainerProps, IContextValues, ICountrySearchResults, ICssStyling, IDVButtonsFilter, IDVCheckboxFilter, IDVDateFilter, IDVDropdownFilter, IDVFilters, IDVMessages, IDVMultiselectFilter, IDVNumberFilter, IDVPaginationRequest, IDVPaginationResponse, IDVPaginationState, IDVPhoneFilter, IDVRangeFilter, IDVTextFilter, IDVTriStateFilter, IDataTableContextValues, IDataTableProps, IDataViewContextValues, IDataViewProps, IDataViewRefValues, IDatatableRefValues, IDate, IDateFilter, IDateProps, IDetailItem, IDetailListProps, IDialogButton, IDialogProps, IDialogRef, IDialogState, IDisplay, IDoughnutChartProps, IDropdownCore, IDropdownFilter, IDropdownSelect, IEditableProps, IEditors, IEffects, IElementBase, IElementStyle, IEmail, IEmailSearchResults, IFile, IFileUploader, IFileUploaderElement, IFileUploaderTypes, IFilesExtTypeKeys, IFilters, IFlexAlignment, IFlexComponent, IFormAddon, IFormComponent, IFormContextPropsFormData, IFormContextPropsJSON, IFormElement, IFormGrid, IFormListsElements, IFormSelect, IFormSelectElements, IFormSingleElement, IGrid, IGridComponent, IGridItem, IGridItemComponent, IGroup, IGroupSettings, IHeadingComponent, IIconProps, IImageComponent, IImagesExtTypeKeys, IInteractivity, IKeyedColumn, IKitsAnimation, IKitsCheckboxProps, IKitsComponentDefaults, IKitsContainer, IKitsDialogControlled, IKitsInputCalendar, IKitsInputColorPicker, IKitsInputLocation, IKitsInputMask, IKitsInputNumber, IKitsInputPassword, IKitsInputRating, IKitsInputSwitch, IKitsInputText, IKitsInputTextarea, IKitsPhoneInput, IKitsRadioProps, IKitsTheme, IKitsThemeColors, IKitsThemeConfig, IKitsThemeContextValues, IKitsThemeFontSizes, IKitsThemeFontWeights, IKitsThemeFonts, IKitsThemeLineHeights, IKitsThemeRadii, IKitsThemeShadows, IKitsThemeSpacing, IKitsToastRef, ILabelElement, ILabelProps, ILanguage, ILayout, ILineChartProps, ILinkComponent, ILinkOverrides, IList, IListBoxCore, IListBoxElement, IListBoxSelect, IListItem, IListing, ILoaderProps, ILocaleContextProps, ILocaleContextValues, ILocation, ILocationDetailsResponse, ILocationResponse, IMainContextProps, IMainContextValues, IMemes, IMenuItem, IMessages, IMinusButton, IModalComponent, IModalFormProps, IMultiSelect, IMultiSelectCore, IMultiselect, IMultiselectFilter, INativeProps, INonCrossPlatformTypes, INumberFilter, INumberInput, INumberProps, IObjectGroup, IOneOfTypes, IPageISection, IPaginationRequest, IPaginationResponse, IPassword, IPasswordProps, IPhone, IPhoneFilter, IPhoneObjectValue, IPhoneValidationResults, IPhoneValue, IPieChartProps, IPlusButton, IPolarAreaChartProps, IPopoverProps, IRTLDetection, IRadarChartProps, IRadioCheckboxListItem, IRadioGroup, IRangeFilter, IRef, IRepeatableSettings, IResponsiveElement, ISVGComponent, IScrollViewComponent, ISelect, ISelectBase, ISelectCore, ISelectElement, ISelectType, ISelectedFile, ISelectedFileType, ISeverityColorSlots, ISeverityThemeMap, ISizing, ISkeleton, ISkeletonRowsProps, ISkeletonText, ISliderProps, ISpacing, IStackProps, IStatisticsProps, IStats, IStyleClasses, ISwitch, ITags, IText, ITextComponent, ITextFieldProps, ITextFilter, ITextInput, ITextInputProps, ITextarea, IThemeContextProps, IThemeContextValues, IToastFunction, IToastParams, IToolbarProps, ITransforms, ITransition, ITranslateComponent, ITreeItem, ITreeSelect, ITreeSelectCore, ITreeSelectElement, ITreeSelectNode, ITreeViewProps, ITriStateFilter, IUnkeyedColumn, IUseFormReturn, IWidgetBarIncomingProp, IWidgetChartContextProps, IWidgetChartProp, IWidgetData, IWidgetDoughnutIncomingProp, IWidgetLineIncomingProp, IWidgetPieIncomingProp, IWidgetPolarAreaIncomingProp, IWidgetRadarIncomingProp, IconName, IconType, ImageTypeMap, InputTextFieldProps, KitsBreakpoint, KitsConditionalObject, KitsDevice, KitsOrientation, KitsPlatform, KitsResponsiveObject, KitsResponsiveValue, KitsThemeOverride, LabelVariant, LogicFunction, MeasurementValues, MimeOrArray, NativeLinkProps, NativeModalProps, Nullable, Numbering0_12, Numbering0_32, Numberish, OnSubmitHandler, Orientation, PaginationState, Permissions, PlatformKey, PrimeTooltipProps, SelectFieldProps, SemanticColorTokens, ServerMethod, ServerResponse, ServerSideProps, SetManyOpts, Severity, Shades, Shapes, SidesValues, SizingNumbering, SizingValue, SliderChangeEvent, SortOrder$1 as SortOrder, TextLabels, TextProps, Timeout, TimingNumbering, ToastPosition, ToastSeverity, ToastSize, TooltipDataAttributes, TooltipProps, TreeChangeProps, TreeCheckboxSelectionKeyType, TreeCheckboxSelectionKeys, TreeNode, TreeNodeClickEvent, TreeNodeTemplateOptions, TreeProps, TreeRef, TreeSelectionEvent, TreeViewProps, Types, UseComponentDefaultsResult, UseDisclosureReturnType, UseFieldLogicElementProps, UseFieldLogicProps, UseFieldLogicReturn, UseFormManagerEvents, UseFormManagerReturn, ValidationProps, Various, children, clearFunction, downloadableFileResponse, settings1, settings2 };

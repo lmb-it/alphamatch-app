@@ -57,7 +57,7 @@ function KitsConfirm(props) {
         Animated.View,
         {
           entering: Animated.ZoomIn.springify().damping(40).stiffness(300),
-          style: [styles.panel, { backgroundColor: surfaceColor }],
+          style: [styles.panel, { backgroundColor: surfaceColor, minWidth: 250, maxWidth: 380 }],
           children: content
         }
       )
@@ -145,7 +145,7 @@ const styles = reactNative.StyleSheet.create({
     padding: 28
   },
   cardStack: {
-    width: "100%",
+    minWidth: 250,
     maxWidth: 380,
     alignItems: "center"
   },
@@ -164,7 +164,7 @@ const styles = reactNative.StyleSheet.create({
     shadowRadius: 8
   },
   panel: {
-    width: "100%",
+    alignSelf: "stretch",
     borderRadius: 16,
     paddingHorizontal: 24,
     paddingBottom: 24,

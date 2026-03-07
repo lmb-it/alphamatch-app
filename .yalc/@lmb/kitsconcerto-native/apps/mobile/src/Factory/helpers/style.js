@@ -107,6 +107,8 @@ function toNativeValue(value) {
   if (emMatch) return parseFloat(emMatch[1]) * 16;
   const pxMatch = value.match(/^(-?\d*\.?\d+)px$/);
   if (pxMatch) return parseFloat(pxMatch[1]);
+  const pcMatch = value.match(/^(-?\d*\.?\d+)pc$/);
+  if (pcMatch) return parseFloat(pcMatch[1]) * 16;
   const numMatch = value.match(/^(-?\d*\.?\d+)$/);
   if (numMatch) return parseFloat(numMatch[1]);
   return value;

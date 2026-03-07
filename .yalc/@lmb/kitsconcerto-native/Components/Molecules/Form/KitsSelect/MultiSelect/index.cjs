@@ -80,8 +80,11 @@ var index_native = require('../../Helpers/FormContainer/index.cjs');
 var Functions = require('../../Helpers/Functions.cjs');
 var helper = require('../helper.cjs');
 var useSelectBase = require('../hooks/useSelectBase.cjs');
+require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 
-const KitsMultiSelect = ({ className, ref, ...props }) => {
+const KitsMultiSelect = ({ className, ref, ...rawProps }) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("MultiSelect", rawProps, "Select");
   const {
     id,
     disabled,
@@ -152,6 +155,7 @@ const KitsMultiSelect = ({ className, ref, ...props }) => {
           display: valueMode === "comma" ? "comma" : localProps?.maxSelectedLabels ? void 0 : "chip",
           maxSelectedLabels: selectionLimit ?? localProps?.maxSelectedLabels ?? 10,
           className: `w-full ${ClState}`,
+          style: Object.keys(themeStyle).length ? themeStyle : void 0,
           ...localProps ? localProps : {}
         }
       )
