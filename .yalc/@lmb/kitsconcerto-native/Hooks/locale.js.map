@@ -1,0 +1,1 @@
+{"version":3,"file":"locale.js","sources":["../../../src/Hooks/locale.ts"],"sourcesContent":["import {useContext} from \"react\";\nimport {LocaleContext} from \"../Contexts/Locale\";\n\nexport const useLanguage = () => useContext(LocaleContext);\n"],"names":[],"mappings":";;;AAGO,MAAM,WAAA,GAAc,MAAM,UAAA,CAAW,aAAa;;;;"}

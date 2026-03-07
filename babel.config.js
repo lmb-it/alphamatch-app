@@ -8,6 +8,7 @@ module.exports = {
         alias: {
           '@': './',
           '@src': './src',
+          '@lmb/kitsconcerto': '@lmb/kitsconcerto-native',
           'tailwind.config': './tailwind.config.js',
         },
       },

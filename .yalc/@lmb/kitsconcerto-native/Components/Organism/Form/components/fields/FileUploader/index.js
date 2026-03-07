@@ -1,0 +1,80 @@
+import { jsx } from 'react/jsx-runtime';
+import { useFormContext } from 'react-hook-form';
+import 'react';
+import 'axios';
+import '../../../../../../Contexts/DialogContext.js';
+import '../../../../../Molecules/Form/KitsSelect/SelectContext.js';
+import FilePicker from '../../../../../Molecules/Form/KitsFilePicker/index.js';
+import '../../../../../Molecules/UI/Flex/index.js';
+import 'primereact/tooltip';
+import 'primereact/skeleton';
+
+const FileUploader = ({
+  element,
+  control,
+  getValues,
+  fieldLogic
+}) => {
+  const { setError, clearErrors, getValues: getFormConfig } = useFormContext();
+  const outputFormat = getFormConfig().outputFormat || "Json";
+  const {
+    field,
+    fieldState,
+    label,
+    isDisabled,
+    isRequired,
+    helperText,
+    placeholder
+  } = fieldLogic;
+  const fileElement = element;
+  const {
+    type,
+    multiple,
+    limit,
+    acceptedTypes,
+    maxFileSize,
+    minFileSize,
+    classicUploader
+  } = fileElement;
+  const handleOnChange = (files, base64Data) => {
+    if (outputFormat === "FormData") {
+      field.onChange(multiple ? files : files[0]);
+    } else {
+      field.onChange(multiple ? base64Data : base64Data[0]);
+    }
+  };
+  const handleError = (errorMessage) => {
+    if (errorMessage === "clear") {
+      clearErrors(field.name);
+    } else {
+      setError(field.name, { type: "custom", message: errorMessage });
+    }
+  };
+  return /* @__PURE__ */ jsx(
+    FilePicker,
+    {
+      id: field.name,
+      value: field.value,
+      onChange: handleOnChange,
+      onError: handleError,
+      label,
+      disabled: isDisabled,
+      required: isRequired,
+      invalid: fieldState.invalid,
+      errors: fieldState.error?.message,
+      helperText,
+      placeholder,
+      type,
+      multiple,
+      limit,
+      acceptedTypes,
+      maxFileSize,
+      minFileSize,
+      classicUploader,
+      isJsonOutput: outputFormat === "Json"
+    }
+  );
+};
+
+export { FileUploader, FileUploader as default };
+//# sourceMappingURL=index.js.map

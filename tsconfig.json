@@ -1,14 +1,7 @@
 {
   "extends": "@react-native/typescript-config",
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "nativewind-env.d.ts"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "**/Pods"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts"],
+  "exclude": ["**/node_modules", "**/Pods"],
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -18,8 +11,8 @@
     "baseUrl": ".",
     "types": ["react", "react-native"],
     "paths": {
-      "@lmb/kitsconcerto": ["./node_modules/@lmb/kitsconcerto/dist/native/index.d.ts"],
-      "@lmb/kitsconcerto/*": ["./node_modules/@lmb/kitsconcerto/*"],
+      "@lmb/kitsconcerto": ["./node_modules/@lmb/kitsconcerto-native"],
+      "@lmb/kitsconcerto/*": ["./node_modules/@lmb/kitsconcerto-native/*"],
       "@/*": ["./*"],
       "@src/*": ["./src/*"],
       "tailwind.config": ["./tailwind.config.js"]

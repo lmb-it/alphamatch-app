@@ -1,28 +1,29 @@
 import React from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { GluestackUIProvider } from '@/src/ui/gluestack-ui-provider';
-import HomeScreen from '@src/screens/HomeScreen';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {MainContextProvider} from '@lmb/kitsconcerto';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistor, store} from '@src/redux';
+import {languages} from '@src/config/languages';
+import {alphaMatchTheme} from '@src/config/theme';
+import Routes from '@src/routes';
 import './global.css';
 
-const Stack = createNativeStackNavigator();
-
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <GluestackUIProvider mode={isDarkMode ? 'dark' : 'light'}>
-      <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </GluestackUIProvider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <MainContextProvider
+            languages={languages}
+            defaultLanguage="en"
+            kitsTheme={alphaMatchTheme}
+          >
+            <Routes />
+          </MainContextProvider>
+        </PersistGate>
+      </Provider>
+    </SafeAreaProvider>
   );
 }
 
