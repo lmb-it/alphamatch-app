@@ -27,8 +27,9 @@ const Textarea = ({
     isRequired,
     hideError,
     helperText,
-    keyFilter
+    keyFilter,
     // The hook resolves this dynamic prop
+    attached
   } = fieldLogic;
   const textareaElement = element;
   const { rows, cols, autoResize } = textareaElement;
@@ -46,6 +47,7 @@ const Textarea = ({
       errors: fieldState.error?.message,
       helperText,
       keyFilter,
+      attached,
       rows,
       cols,
       autoResize

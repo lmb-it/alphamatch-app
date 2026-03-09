@@ -60,6 +60,7 @@ require('../../../../packages/types/src/Components/Molecules/Form/FilePicker/typ
 require('yup');
 require('../../../../packages/types/src/Css/map/index.cjs');
 var useSeparator = require('../../../../apps/mobile/src/Factory/useSeparator.cjs');
+require('../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
 require('react-i18next');
 require('../../../../apps/mobile/src/Core/AutoComplete/index.cjs');

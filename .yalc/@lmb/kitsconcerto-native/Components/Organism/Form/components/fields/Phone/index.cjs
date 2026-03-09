@@ -27,7 +27,8 @@ const Phone = ({
     helperText,
     hideError,
     leftAddon,
-    rightAddon
+    rightAddon,
+    attached
   } = fieldLogic;
   const phoneElement = element;
   const {
@@ -56,6 +57,7 @@ const Phone = ({
       required: isRequired,
       errors: fieldState.error?.message,
       invalid: fieldState.invalid,
+      attached,
       onChange: (value) => {
         field.onChange({ target: { value } });
       },

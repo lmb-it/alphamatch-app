@@ -24,7 +24,8 @@ const FileUploader = ({
     isDisabled,
     isRequired,
     helperText,
-    placeholder
+    placeholder,
+    attached
   } = fieldLogic;
   const fileElement = element;
   const {
@@ -64,6 +65,7 @@ const FileUploader = ({
       errors: fieldState.error?.message,
       helperText,
       placeholder,
+      attached,
       type,
       multiple,
       limit,

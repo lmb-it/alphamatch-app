@@ -56,6 +56,8 @@ export type ExitingAnimation =
 export interface IKitsAnimation {
     entering?: EnteringAnimation;
     exiting?: ExitingAnimation;
+    animationDuration?: number;
+    animationDelay?: number;
 }
 
 /**
@@ -220,6 +222,8 @@ export interface IElementBase<T extends FieldValues> {
     /** Grid layout properties. */
     hideError?: boolean;
     displayOnly?: boolean;
+    /** When true, the molecule component renders without its KitsContainer wrapper (no label, no error). */
+    attached?: boolean;
     placeholder?: DynamicValue<T, string>;
     colSpan?: DynamicValue<T, KitsResponsiveValue<string | number>>;
     rowSpan?: DynamicValue<T, KitsResponsiveValue<string | number>>;
@@ -279,7 +283,7 @@ export interface INumberInput<T extends FieldValues = any> extends Omit<ITextFie
     type: 'Number';
     keyFilter?: EKeyFilter | RegExp;
     initialValue?: number;
-    localProps?: INumberProps;
+    localProps?: any;
 }
 
 
@@ -432,6 +436,30 @@ export interface IContainer<T extends FieldValues = any> extends IElementBase<T>
     children: IChildren<ControllerRenderProps<T, any>, T>;
 }
 
+/**
+ * A Combined element groups multiple child inputs under one logical field.
+ * It renders a single container with one label and one validation schema,
+ * while internally rendering multiple input elements.
+ *
+ * The `output` prop defines how the final value is derived from child values:
+ * - A template string referencing child IDs (e.g., "firstName middleName lastName")
+ *   will concatenate the child values with spaces.
+ * - A single child ID (e.g., "stateRef") will map the output to that child's value directly.
+ */
+export interface ICombined<T extends FieldValues = any> extends IElementBase<T> {
+    type: 'Combined';
+    /** Child form elements rendered inside the Combined container. */
+    elements: IFormElement<T>[];
+    /**
+     * Defines how the final value is produced from child field values.
+     * - Multi-token string (e.g., "fname mname lname"): concatenates child values with spaces.
+     * - Single token string (e.g., "stateRef"): maps output to that child's value directly.
+     */
+    output: string;
+    /** Grid layout for the child elements. */
+    grid?: IFormGrid;
+}
+
 // --- Union Type ---
 
 export interface IFileUploaderElement<T extends FieldValues = any> extends IElementBase<T> {
@@ -468,6 +496,7 @@ export type IFormListsElements<T extends FieldValues = FieldValues> =
 export type IFormElement<T extends FieldValues = FieldValues> =
     | IObjectGroup<T>
     | IGroup<T>
+    | ICombined<T>
     | ITextInput<T>
     | INumberInput<T>
     | ITextarea<T>
@@ -501,7 +530,9 @@ export type OnSubmitHandler<T extends FieldValues | FormData> = ((
     formContext?: UseFormReturn<T>
 ) => void);
 
-export type CustomSubmitButtonProps = | ReactNode
+export type CustomSubmitButtonProps =
+    | "none"
+    | ReactElement
     | ((
     onSubmit: () => void,
     isSubmitting: boolean,
@@ -688,6 +719,8 @@ export interface UseFieldLogicReturn<T extends FieldValues> {
     withMask?: boolean;
     keyFilter?: ITextFieldProps<T>['keyFilter'];
     localProps?: any;
+    /** When true, the molecule component renders without its KitsContainer wrapper. */
+    attached?: boolean;
     /** Animation config from the element definition. */
     animation?: IKitsAnimation;
 }
@@ -2283,6 +2316,7 @@ export type ICssStyling = ISpacing &
     IText;
 export type IStyleClasses = ICssStyling & {
     _hover?: ICssStyling;
+    _focus?: ICssStyling;
 };
 
 // Factory/constants/breakpoints.native.ts
@@ -2400,7 +2434,7 @@ export interface IButtonProps<IconT> extends IStyleClasses{
     ref?:Ref<any>;
     // Unified props that work on both platforms
     children?: string | ReactNode;
-    severity?: "secondary" | "success" | "info" | "warning" | "help" | "danger" | "contrast" | undefined;
+    severity?: "secondary" | "success" | "info" | "warning" | "help" | "danger" | "contrast" | "brand" | undefined;
     icon?: IconT;
     iconPos?: 'left' | 'right' | 'top' | 'bottom';
     size?: 'sm' | 'md' | 'lg';
@@ -2665,6 +2699,14 @@ export interface ISkeleton {
 
 export type IScrollViewComponent = ElementProps<ScrollViewProps>;
 
+export interface IDividerComponent extends IStyleClasses {
+    align?: 'center' | 'left' | 'top' | 'bottom' | 'right';
+    children?: ReactNode;
+    layout?: 'horizontal' | 'vertical';
+    type?: 'dashed' | 'dotted' | 'solid';
+    unstyled?: boolean;
+}
+
 export type IFormAddon =
     | string
     | number
@@ -2715,6 +2757,7 @@ export interface IFormSingleElement<Value = any> {
 
     /** allow style props */
     style?: IStyleClasses;
+    containerStyle?: IStyleClasses;
 
 
 }
@@ -2921,6 +2964,11 @@ export interface IKitsInputPassword extends Omit<IFormSingleElement, 'onChange'>
     localProps?: any;
     schema?:Yup.Schema | Yup.AnySchema
     ref?: Ref<any>;
+
+    /** Custom icon shown when password is hidden (native only; web uses PrimeReact's built-in icon) */
+    eyeIcon?: ReactNode;
+    /** Custom icon shown when password is visible (native only; web uses PrimeReact's built-in icon) */
+    eyeSlashIcon?: ReactNode;
 }
 
 export interface IKitsInputCalendar<T = any> extends IFormSingleElement {
@@ -6265,6 +6313,9 @@ export interface IKitsComponentDefaults {
     ListBox?: IComponentThemeConfig;
     CascadeSelect?: IComponentThemeConfig;
 
+    // Form container (wraps all form elements)
+    FormContainer?: IComponentThemeConfig;
+
     // Standalone
     Card?: IComponentThemeConfig<{ variant?: string; size?: string }>;
     Switch?: IComponentThemeConfig;
@@ -6536,6 +6587,7 @@ declare const defaultTheme: IKitsTheme = {
             bg: '#FFFFFF',
             'bg-subtle': 'gray.50',
             border: 'gray.200',
+            divider: 'gray.200',
             'surface-ground': 'gray.50',
             'surface-card': '#FFFFFF',
             'surface-overlay': 'gray.300',
@@ -6553,6 +6605,7 @@ declare const defaultTheme: IKitsTheme = {
             bg: 'gray.900',
             'bg-subtle': 'gray.800',
             border: 'gray.700',
+            divider: 'gray.700',
             'surface-ground': 'gray.900',
             'surface-card': 'gray.800',
             'surface-overlay': 'gray.700',
@@ -6837,7 +6890,7 @@ declare const KitsInputSwitch: React__default.FC<IKitsInputSwitch>;
 
 declare const Editable: FC<IEditableProps>;
 
-declare const KitsCheckbox: <T>({ id, label, required, errors, hideError, isFloatedLabel, helperText, item, value, checked, defaultValue, onChange, limit, appearanceMode, disabled, invalid, }: IKitsCheckboxProps<T>) => react_jsx_runtime.JSX.Element;
+declare const KitsCheckbox: <T>({ id, label, required, errors, hideError, isFloatedLabel, helperText, item, value, checked, defaultValue, onChange, limit, appearanceMode, disabled, invalid, attached, containerStyle }: IKitsCheckboxProps<T>) => react_jsx_runtime.JSX.Element;
 
 declare const KitsRadio: <T>({ id, label, required, errors, hideError, isFloatedLabel, helperText, item, value, defaultValue, onChange, appearanceMode, disabled, invalid, }: IKitsRadioProps<T>) => react_jsx_runtime.JSX.Element;
 
@@ -7090,6 +7143,8 @@ declare const KitsScrollView: ({ children, ref, ...props }: PropsWithChildren<IS
 
 declare const KitsAnimatePresence: ({ children }: React__default.PropsWithChildren) => react_jsx_runtime.JSX.Element;
 
+declare const Divider: React__default.FC<IDividerComponent>;
+
 declare function Button(rawProps: IButtonProps<IconName | string | ElementType | ReactElement>): react_jsx_runtime.JSX.Element;
 
 declare function useButton(props: IButtonProps<any>): {
@@ -7106,7 +7161,7 @@ declare function useButton(props: IButtonProps<any>): {
         type?: "submit" | "button";
         ref?: React__default.Ref<any>;
         children?: string | ReactNode;
-        severity?: "secondary" | "success" | "info" | "warning" | "help" | "danger" | "contrast" | undefined;
+        severity?: "secondary" | "success" | "info" | "warning" | "help" | "danger" | "contrast" | "brand" | undefined;
         icon?: any;
         iconPos?: "left" | "right" | "top" | "bottom";
         size?: "sm" | "md" | "lg";
@@ -7313,6 +7368,7 @@ declare function useButton(props: IButtonProps<any>): {
         whiteSpace?: "nowrap" | "normal" | null;
         numberOfLines?: KitsResponsiveValue<number>;
         _hover?: ICssStyling;
+        _focus?: ICssStyling;
     };
     isDisabled: boolean;
 };
@@ -7464,6 +7520,15 @@ declare const Group: <T extends FieldValues>({ element, control, getValues, grou
 declare const ObjectElement: <T extends FieldValues>({ element, control, getValues, groupField, focusedField, setFocusedField, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
 
 /**
+ * Combined element: groups multiple child inputs under one logical field.
+ *
+ * - Renders a single KitsContainer with one label and one validation error.
+ * - Child elements render with `attached: true` (no individual containers/labels).
+ * - The parent's value is computed from child values via the `output` template.
+ */
+declare const CombinedElement: <T extends FieldValues>({ element, control, getValues, groupField, focusedField, setFocusedField, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
+
+/**
  * The core logic engine for an individual form field.
  * This hook replaces LogicContext and FormFieldContext. It watches dependencies,
  * calculates all dynamic properties (visibility, disabled state, required status, etc.),
@@ -7531,6 +7596,11 @@ declare const checkNameDuplication: (fields: IFormElement<any>[]) => void;
  * @returns An object with the form's default values.
  */
 declare const getDefaultValues: (fields: IFormElement<any>[]) => Record<string, any>;
+/**
+ * Recursively collects the IDs of all child elements inside Combined elements.
+ * These IDs are internal to the Combined and should not appear in the form's output data.
+ */
+declare const getCombinedChildIds: (fields: IFormElement<any>[]) => Set<string>;
 
 /**
  * Recursively builds a Yup validation schema from an array of form element definitions.
@@ -7711,6 +7781,34 @@ declare function useResolvedStyle(themeStyle: Record<string, any>): React.CSSPro
  */
 declare function useKitsColorScheme(colorScheme: string | undefined, variant?: 'solid' | 'subtle' | 'outline' | 'ghost'): Partial<IStyleClasses>;
 
+export interface ResolvedSeverityColors {
+    solid: string;
+    bgTint: string;
+    iconFg: string;
+    iconBg: string;
+    text: string;
+    border: string;
+}
+/**
+ * Resolves all severity color slots for a given severity using the current theme.
+ * Returns platform-appropriate values (CSS vars on web, hex on native).
+ * Handles dark mode by swapping shade levels for subtle tints.
+ */
+declare function useSeverityColors(severity: Severity): ResolvedSeverityColors;
+/**
+ * Returns the full resolved map for all severities.
+ * Useful when a component needs to look up colors dynamically
+ * (e.g., per-button severity in a buttons array).
+ */
+declare function useAllSeverityColors(): Record<Severity, ResolvedSeverityColors>;
+
+/**
+ * Native focus-style helper.
+ * Merges `_focus` styles into the computed style object when `isFocused` is true.
+ * Returns a React Native ViewStyle object ready for the `style` prop.
+ */
+declare function useFocusStyles(themeStyle: IStyleClasses | undefined, isFocused: boolean): Partial<react_native.ViewStyle>;
+
 declare const isValidURL: (url: string) => boolean;
 declare const isNumber: (value: any) => value is number;
 
@@ -7820,6 +7918,35 @@ declare const localeFiles: {
         emptyMessage: string;
         emptyFileUploadMessage: string;
         password: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -7962,6 +8089,35 @@ declare const localeFiles: {
         passwordPrompt: string;
         emptyFilterMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8081,6 +8237,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8200,6 +8385,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8320,6 +8534,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8443,6 +8686,35 @@ declare const localeFiles: {
         emptyMessage: string;
         emptyFileUploadMessage: string;
         password: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8540,6 +8812,35 @@ declare const localeFiles: {
         passwordPrompt: string;
         emptyFilterMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8659,6 +8960,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8776,6 +9106,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8895,6 +9254,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -8990,6 +9378,35 @@ declare const localeFiles: {
         passwordPrompt: string;
         emptyFilterMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             close: string;
             previous: string;
@@ -9074,6 +9491,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9195,6 +9641,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9315,6 +9790,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9434,6 +9938,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9555,6 +10088,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9678,6 +10240,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9799,6 +10390,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -9920,6 +10540,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10039,6 +10688,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10159,6 +10837,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10302,6 +11009,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10420,6 +11156,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10540,6 +11305,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10660,6 +11454,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10781,6 +11604,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -10902,6 +11754,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11021,6 +11902,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11118,6 +12028,35 @@ declare const localeFiles: {
         passwordPrompt: string;
         emptyFilterMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11202,6 +12141,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11322,6 +12290,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11464,6 +12461,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11585,6 +12611,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11706,6 +12761,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11827,6 +12911,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -11946,6 +13059,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -12067,6 +13209,35 @@ declare const localeFiles: {
         emptySelectionMessage: string;
         emptySearchMessage: string;
         emptyMessage: string;
+        openMenu: string;
+        toggleColorMode: string;
+        signOut: string;
+        profile: string;
+        filesSelected: string;
+        dragFilesHere: string;
+        filesBeingDropped: string;
+        typeNotSupported: string;
+        maximumAllowedFiles: string;
+        remove: string;
+        edit: string;
+        save: string;
+        generatePhoto: string;
+        settings: string;
+        addCategory: string;
+        addItem: string;
+        delete: string;
+        any: string;
+        chooseFile: string;
+        greaterThan: string;
+        greaterThanOrEqualTo: string;
+        lessThan: string;
+        lessThanOrEqualTo: string;
+        between: string;
+        include: string;
+        equal: string;
+        after: string;
+        before: string;
+        not: string;
         aria: {
             trueLabel: string;
             falseLabel: string;
@@ -12120,5 +13291,5 @@ declare const localeFiles: {
     };
 };
 
-export { CustomAccordion as Accordion, Alert, KitsAnimatePresence as AnimatePresence, AnyFile, AuthLayout, Badge, Box, BreadCrumb, Button, Card, Center, Checkboxes, CircularProgress, Collapse, ColorPicker, Container$1 as Container, Container as ContainerElement, CustomPopover, DataView, DataViewContext, DateField, DetailList as DetailsList, EDateFormat, EKeyFilter, Editable, FIELD_LABEL_MARGIN, FIELD_MARGIN, FileUploader, Flex, Form, FormSelect, GUTTER, Form as GoForm, Datatable as GoTable, Grid, GridItem, Group, HELPER_TEXT_MARGIN, HStack, Heading, Icon, IconMap, Image, InputNumber, KitsInputSwitch as InputSwitch, InputText, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, Select as ListBox, ListItem, Loader, LocaleContext, LocaleContextProvider, Location, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, Select as NormalSelect, ObjectElement, Password, Phone, Radios, SPACER, KitsScrollView as ScrollView, Select, SelectButton, Skeleton, SkeletonRows, Skeleton$1 as SkeletonText, Svg, Switch, TableContext, Select as TagsSelect, Text, Textarea, ThemeContextProvider, Tooltip, Translate, TreeView, TriStateCheckbox, VStack, index_native as Widgets, borderProperties, breakpoints, capitalizeFirstLetter, checkExtAgainstAccepted, checkNameDuplication, convertSize, dateTimeFormat, deepMerge, defaultSeverityTheme, defaultTheme, downloadCanvas, dynamicList, extendTheme, fileTypeIcon, fileValidation, filesExt, filesMemes, filesTypes, fontSizeMapping, formFileValidation, getCustomDateTime, getDateElements, getDefaultValues, getMeme, getParams, getPropertyByPath, getType, getTypes, getURLParams, imagesExt, imagesMemes, imagesTypes, isNumber, isSemanticToken, isThemeToken, isToday, isValidURL, listingProperties, localeFiles, allProperties as mapCssProperties, nonPxProperties, propertiesWithoutCssEquivalent, pxProperties, resolveTokenValue, schemaBuilder, sizeMapping, sizingProperties, timeAgo, timeSince, toArray, toMemes, useButton, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFormManager, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedStyle, useScrollState, useSelectionController, useTable, useTheme };
-export type { AlignmentsValues, AnimationsValues, BaseFieldProps, Booleanish, Breakpoint, CallbackProps, ChartData, ColorMode, ColorScale, ColorValue, Colors, ColorsType, ComponentSize, ConfirmDialogOptions, ConfirmDialogProps, ConfirmDialogReturn, CustomSubmitButtonProps, DataTableSelectionSingleChangeEvent, DeepPartial, DetailItemInputType, DialogProps, DynamicValue, ElementProps, EnteringAnimation, ExitingAnimation, ExpandedKeys, FetchError, FetchSuccess, FetchTableDataRes, FetchTablePaginationData, FieldWrapperProps, File$1 as File, FileTypeMap, FlexAlignmentsValues, FlexValues, FormBooleanEvent, FormBooleanTarget, FormEvent, FormTarget, GroupFieldConfigs, HighSizingValue, IAccordionProps, IAddressExperianFormat, IAddressFormat, IAddressFormatResults, IAddressSearchResults, IAlertComponent, IAlertProps, IAlignment, IAnimation, IAutoCompleteCore, IAutoCompleteElement, IBarChartProps, IBg, IBodyTemplate, IBorder, IBoxComponent, IButton, IButtonParams, IButtonProps, IButtonState, IButtonsFilter, ICardComponent, ICascadeSelect, ICascadeSelectCore, ICheckbox, ICheckboxFilter, IChildren, IChildrenParams, ICircularProgressProps, ICollapseProps, IColorPicker, IColumn, IColumnBase, IComponentThemeConfig, IConfirmDialogProps, IConfirmPopupProps, IContainer, IContainerProps, IContextValues, ICountrySearchResults, ICssStyling, IDVButtonsFilter, IDVCheckboxFilter, IDVDateFilter, IDVDropdownFilter, IDVFilters, IDVMessages, IDVMultiselectFilter, IDVNumberFilter, IDVPaginationRequest, IDVPaginationResponse, IDVPaginationState, IDVPhoneFilter, IDVRangeFilter, IDVTextFilter, IDVTriStateFilter, IDataTableContextValues, IDataTableProps, IDataViewContextValues, IDataViewProps, IDataViewRefValues, IDatatableRefValues, IDate, IDateFilter, IDateProps, IDetailItem, IDetailListProps, IDialogButton, IDialogProps, IDialogRef, IDialogState, IDisplay, IDoughnutChartProps, IDropdownCore, IDropdownFilter, IDropdownSelect, IEditableProps, IEditors, IEffects, IElementBase, IElementStyle, IEmail, IEmailSearchResults, IFile, IFileUploader, IFileUploaderElement, IFileUploaderTypes, IFilesExtTypeKeys, IFilters, IFlexAlignment, IFlexComponent, IFormAddon, IFormComponent, IFormContextPropsFormData, IFormContextPropsJSON, IFormElement, IFormGrid, IFormListsElements, IFormSelect, IFormSelectElements, IFormSingleElement, IGrid, IGridComponent, IGridItem, IGridItemComponent, IGroup, IGroupSettings, IHeadingComponent, IIconProps, IImageComponent, IImagesExtTypeKeys, IInteractivity, IKeyedColumn, IKitsAnimation, IKitsCheckboxProps, IKitsComponentDefaults, IKitsContainer, IKitsDialogControlled, IKitsInputCalendar, IKitsInputColorPicker, IKitsInputLocation, IKitsInputMask, IKitsInputNumber, IKitsInputPassword, IKitsInputRating, IKitsInputSwitch, IKitsInputText, IKitsInputTextarea, IKitsPhoneInput, IKitsRadioProps, IKitsTheme, IKitsThemeColors, IKitsThemeConfig, IKitsThemeContextValues, IKitsThemeFontSizes, IKitsThemeFontWeights, IKitsThemeFonts, IKitsThemeLineHeights, IKitsThemeRadii, IKitsThemeShadows, IKitsThemeSpacing, IKitsToastRef, ILabelElement, ILabelProps, ILanguage, ILayout, ILineChartProps, ILinkComponent, ILinkOverrides, IList, IListBoxCore, IListBoxElement, IListBoxSelect, IListItem, IListing, ILoaderProps, ILocaleContextProps, ILocaleContextValues, ILocation, ILocationDetailsResponse, ILocationResponse, IMainContextProps, IMainContextValues, IMemes, IMenuItem, IMessages, IMinusButton, IModalComponent, IModalFormProps, IMultiSelect, IMultiSelectCore, IMultiselect, IMultiselectFilter, INativeProps, INonCrossPlatformTypes, INumberFilter, INumberInput, INumberProps, IObjectGroup, IOneOfTypes, IPageISection, IPaginationRequest, IPaginationResponse, IPassword, IPasswordProps, IPhone, IPhoneFilter, IPhoneObjectValue, IPhoneValidationResults, IPhoneValue, IPieChartProps, IPlusButton, IPolarAreaChartProps, IPopoverProps, IRTLDetection, IRadarChartProps, IRadioCheckboxListItem, IRadioGroup, IRangeFilter, IRef, IRepeatableSettings, IResponsiveElement, ISVGComponent, IScrollViewComponent, ISelect, ISelectBase, ISelectCore, ISelectElement, ISelectType, ISelectedFile, ISelectedFileType, ISeverityColorSlots, ISeverityThemeMap, ISizing, ISkeleton, ISkeletonRowsProps, ISkeletonText, ISliderProps, ISpacing, IStackProps, IStatisticsProps, IStats, IStyleClasses, ISwitch, ITags, IText, ITextComponent, ITextFieldProps, ITextFilter, ITextInput, ITextInputProps, ITextarea, IThemeContextProps, IThemeContextValues, IToastFunction, IToastParams, IToolbarProps, ITransforms, ITransition, ITranslateComponent, ITreeItem, ITreeSelect, ITreeSelectCore, ITreeSelectElement, ITreeSelectNode, ITreeViewProps, ITriStateFilter, IUnkeyedColumn, IUseFormReturn, IWidgetBarIncomingProp, IWidgetChartContextProps, IWidgetChartProp, IWidgetData, IWidgetDoughnutIncomingProp, IWidgetLineIncomingProp, IWidgetPieIncomingProp, IWidgetPolarAreaIncomingProp, IWidgetRadarIncomingProp, IconName, IconType, ImageTypeMap, InputTextFieldProps, KitsBreakpoint, KitsConditionalObject, KitsDevice, KitsOrientation, KitsPlatform, KitsResponsiveObject, KitsResponsiveValue, KitsThemeOverride, LabelVariant, LogicFunction, MeasurementValues, MimeOrArray, NativeLinkProps, NativeModalProps, Nullable, Numbering0_12, Numbering0_32, Numberish, OnSubmitHandler, Orientation, PaginationState, Permissions, PlatformKey, PrimeTooltipProps, SelectFieldProps, SemanticColorTokens, ServerMethod, ServerResponse, ServerSideProps, SetManyOpts, Severity, Shades, Shapes, SidesValues, SizingNumbering, SizingValue, SliderChangeEvent, SortOrder$1 as SortOrder, TextLabels, TextProps, Timeout, TimingNumbering, ToastPosition, ToastSeverity, ToastSize, TooltipDataAttributes, TooltipProps, TreeChangeProps, TreeCheckboxSelectionKeyType, TreeCheckboxSelectionKeys, TreeNode, TreeNodeClickEvent, TreeNodeTemplateOptions, TreeProps, TreeRef, TreeSelectionEvent, TreeViewProps, Types, UseComponentDefaultsResult, UseDisclosureReturnType, UseFieldLogicElementProps, UseFieldLogicProps, UseFieldLogicReturn, UseFormManagerEvents, UseFormManagerReturn, ValidationProps, Various, children, clearFunction, downloadableFileResponse, settings1, settings2 };
+export { CustomAccordion as Accordion, Alert, KitsAnimatePresence as AnimatePresence, AnyFile, AuthLayout, Badge, Box, BreadCrumb, Button, Card, Center, Checkboxes, CircularProgress, Collapse, ColorPicker, CombinedElement, Container$1 as Container, Container as ContainerElement, CustomPopover, DataView, DataViewContext, DateField, DetailList as DetailsList, Divider, EDateFormat, EKeyFilter, Editable, FIELD_LABEL_MARGIN, FIELD_MARGIN, FileUploader, Flex, Form, FormSelect, GUTTER, Form as GoForm, Datatable as GoTable, Grid, GridItem, Group, HELPER_TEXT_MARGIN, HStack, Heading, Icon, IconMap, Image, InputNumber, KitsInputSwitch as InputSwitch, InputText, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, Select as ListBox, ListItem, Loader, LocaleContext, LocaleContextProvider, Location, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, Select as NormalSelect, ObjectElement, Password, Phone, Radios, SPACER, KitsScrollView as ScrollView, Select, SelectButton, Skeleton, SkeletonRows, Skeleton$1 as SkeletonText, Svg, Switch, TableContext, Select as TagsSelect, Text, Textarea, ThemeContextProvider, Tooltip, Translate, TreeView, TriStateCheckbox, VStack, index_native as Widgets, borderProperties, breakpoints, capitalizeFirstLetter, checkExtAgainstAccepted, checkNameDuplication, convertSize, dateTimeFormat, deepMerge, defaultSeverityTheme, defaultTheme, downloadCanvas, dynamicList, extendTheme, fileTypeIcon, fileValidation, filesExt, filesMemes, filesTypes, fontSizeMapping, formFileValidation, getCombinedChildIds, getCustomDateTime, getDateElements, getDefaultValues, getMeme, getParams, getPropertyByPath, getType, getTypes, getURLParams, imagesExt, imagesMemes, imagesTypes, isNumber, isSemanticToken, isThemeToken, isToday, isValidURL, listingProperties, localeFiles, allProperties as mapCssProperties, nonPxProperties, propertiesWithoutCssEquivalent, pxProperties, resolveTokenValue, schemaBuilder, sizeMapping, sizingProperties, timeAgo, timeSince, toArray, toMemes, useAllSeverityColors, useButton, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFocusStyles, useFormManager, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedStyle, useScrollState, useSelectionController, useSeverityColors, useTable, useTheme };
+export type { AlignmentsValues, AnimationsValues, BaseFieldProps, Booleanish, Breakpoint, CallbackProps, ChartData, ColorMode, ColorScale, ColorValue, Colors, ColorsType, ComponentSize, ConfirmDialogOptions, ConfirmDialogProps, ConfirmDialogReturn, CustomSubmitButtonProps, DataTableSelectionSingleChangeEvent, DeepPartial, DetailItemInputType, DialogProps, DynamicValue, ElementProps, EnteringAnimation, ExitingAnimation, ExpandedKeys, FetchError, FetchSuccess, FetchTableDataRes, FetchTablePaginationData, FieldWrapperProps, File$1 as File, FileTypeMap, FlexAlignmentsValues, FlexValues, FormBooleanEvent, FormBooleanTarget, FormEvent, FormTarget, GroupFieldConfigs, HighSizingValue, IAccordionProps, IAddressExperianFormat, IAddressFormat, IAddressFormatResults, IAddressSearchResults, IAlertComponent, IAlertProps, IAlignment, IAnimation, IAutoCompleteCore, IAutoCompleteElement, IBarChartProps, IBg, IBodyTemplate, IBorder, IBoxComponent, IButton, IButtonParams, IButtonProps, IButtonState, IButtonsFilter, ICardComponent, ICascadeSelect, ICascadeSelectCore, ICheckbox, ICheckboxFilter, IChildren, IChildrenParams, ICircularProgressProps, ICollapseProps, IColorPicker, IColumn, IColumnBase, ICombined, IComponentThemeConfig, IConfirmDialogProps, IConfirmPopupProps, IContainer, IContainerProps, IContextValues, ICountrySearchResults, ICssStyling, IDVButtonsFilter, IDVCheckboxFilter, IDVDateFilter, IDVDropdownFilter, IDVFilters, IDVMessages, IDVMultiselectFilter, IDVNumberFilter, IDVPaginationRequest, IDVPaginationResponse, IDVPaginationState, IDVPhoneFilter, IDVRangeFilter, IDVTextFilter, IDVTriStateFilter, IDataTableContextValues, IDataTableProps, IDataViewContextValues, IDataViewProps, IDataViewRefValues, IDatatableRefValues, IDate, IDateFilter, IDateProps, IDetailItem, IDetailListProps, IDialogButton, IDialogProps, IDialogRef, IDialogState, IDisplay, IDividerComponent, IDoughnutChartProps, IDropdownCore, IDropdownFilter, IDropdownSelect, IEditableProps, IEditors, IEffects, IElementBase, IElementStyle, IEmail, IEmailSearchResults, IFile, IFileUploader, IFileUploaderElement, IFileUploaderTypes, IFilesExtTypeKeys, IFilters, IFlexAlignment, IFlexComponent, IFormAddon, IFormComponent, IFormContextPropsFormData, IFormContextPropsJSON, IFormElement, IFormGrid, IFormListsElements, IFormSelect, IFormSelectElements, IFormSingleElement, IGrid, IGridComponent, IGridItem, IGridItemComponent, IGroup, IGroupSettings, IHeadingComponent, IIconProps, IImageComponent, IImagesExtTypeKeys, IInteractivity, IKeyedColumn, IKitsAnimation, IKitsCheckboxProps, IKitsComponentDefaults, IKitsContainer, IKitsDialogControlled, IKitsInputCalendar, IKitsInputColorPicker, IKitsInputLocation, IKitsInputMask, IKitsInputNumber, IKitsInputPassword, IKitsInputRating, IKitsInputSwitch, IKitsInputText, IKitsInputTextarea, IKitsPhoneInput, IKitsRadioProps, IKitsTheme, IKitsThemeColors, IKitsThemeConfig, IKitsThemeContextValues, IKitsThemeFontSizes, IKitsThemeFontWeights, IKitsThemeFonts, IKitsThemeLineHeights, IKitsThemeRadii, IKitsThemeShadows, IKitsThemeSpacing, IKitsToastRef, ILabelElement, ILabelProps, ILanguage, ILayout, ILineChartProps, ILinkComponent, ILinkOverrides, IList, IListBoxCore, IListBoxElement, IListBoxSelect, IListItem, IListing, ILoaderProps, ILocaleContextProps, ILocaleContextValues, ILocation, ILocationDetailsResponse, ILocationResponse, IMainContextProps, IMainContextValues, IMemes, IMenuItem, IMessages, IMinusButton, IModalComponent, IModalFormProps, IMultiSelect, IMultiSelectCore, IMultiselect, IMultiselectFilter, INativeProps, INonCrossPlatformTypes, INumberFilter, INumberInput, INumberProps, IObjectGroup, IOneOfTypes, IPageISection, IPaginationRequest, IPaginationResponse, IPassword, IPasswordProps, IPhone, IPhoneFilter, IPhoneObjectValue, IPhoneValidationResults, IPhoneValue, IPieChartProps, IPlusButton, IPolarAreaChartProps, IPopoverProps, IRTLDetection, IRadarChartProps, IRadioCheckboxListItem, IRadioGroup, IRangeFilter, IRef, IRepeatableSettings, IResponsiveElement, ISVGComponent, IScrollViewComponent, ISelect, ISelectBase, ISelectCore, ISelectElement, ISelectType, ISelectedFile, ISelectedFileType, ISeverityColorSlots, ISeverityThemeMap, ISizing, ISkeleton, ISkeletonRowsProps, ISkeletonText, ISliderProps, ISpacing, IStackProps, IStatisticsProps, IStats, IStyleClasses, ISwitch, ITags, IText, ITextComponent, ITextFieldProps, ITextFilter, ITextInput, ITextInputProps, ITextarea, IThemeContextProps, IThemeContextValues, IToastFunction, IToastParams, IToolbarProps, ITransforms, ITransition, ITranslateComponent, ITreeItem, ITreeSelect, ITreeSelectCore, ITreeSelectElement, ITreeSelectNode, ITreeViewProps, ITriStateFilter, IUnkeyedColumn, IUseFormReturn, IWidgetBarIncomingProp, IWidgetChartContextProps, IWidgetChartProp, IWidgetData, IWidgetDoughnutIncomingProp, IWidgetLineIncomingProp, IWidgetPieIncomingProp, IWidgetPolarAreaIncomingProp, IWidgetRadarIncomingProp, IconName, IconType, ImageTypeMap, InputTextFieldProps, KitsBreakpoint, KitsConditionalObject, KitsDevice, KitsOrientation, KitsPlatform, KitsResponsiveObject, KitsResponsiveValue, KitsThemeOverride, LabelVariant, LogicFunction, MeasurementValues, MimeOrArray, NativeLinkProps, NativeModalProps, Nullable, Numbering0_12, Numbering0_32, Numberish, OnSubmitHandler, Orientation, PaginationState, Permissions, PlatformKey, PrimeTooltipProps, SelectFieldProps, SemanticColorTokens, ServerMethod, ServerResponse, ServerSideProps, SetManyOpts, Severity, Shades, Shapes, SidesValues, SizingNumbering, SizingValue, SliderChangeEvent, SortOrder$1 as SortOrder, TextLabels, TextProps, Timeout, TimingNumbering, ToastPosition, ToastSeverity, ToastSize, TooltipDataAttributes, TooltipProps, TreeChangeProps, TreeCheckboxSelectionKeyType, TreeCheckboxSelectionKeys, TreeNode, TreeNodeClickEvent, TreeNodeTemplateOptions, TreeProps, TreeRef, TreeSelectionEvent, TreeViewProps, Types, UseComponentDefaultsResult, UseDisclosureReturnType, UseFieldLogicElementProps, UseFieldLogicProps, UseFieldLogicReturn, UseFormManagerEvents, UseFormManagerReturn, ValidationProps, Various, children, clearFunction, downloadableFileResponse, settings1, settings2 };

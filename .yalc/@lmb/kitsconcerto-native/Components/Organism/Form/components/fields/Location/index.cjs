@@ -25,7 +25,8 @@ const Location = ({
     isDisabled,
     hideError,
     isRequired,
-    helperText
+    helperText,
+    attached
   } = fieldLogic;
   const locationElement = element;
   const {
@@ -48,6 +49,7 @@ const Location = ({
       invalid: fieldState.invalid,
       errors: fieldState.error?.message,
       helperText,
+      attached,
       list: [],
       api_key: apiKey,
       provider,

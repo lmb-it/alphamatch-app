@@ -50,6 +50,7 @@ import '../../ui/tooltip/index.js';
 import '../../ui/vstack/index.js';
 import 'react-native-reanimated';
 import { resolveThemeTokenForNative } from '../../Factory/helpers/style.js';
+import '../../Factory/DimensionsContext.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';

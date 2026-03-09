@@ -56,13 +56,13 @@ require('../../../../../apps/mobile/src/ui/toast/index.cjs');
 require('../../../../../apps/mobile/src/ui/tooltip/index.cjs');
 require('../../../../../apps/mobile/src/ui/vstack/index.cjs');
 require('react-native-reanimated');
-var style = require('../../../../../apps/mobile/src/Factory/helpers/style.cjs');
 require('react-icons/fa');
 require('react-icons/ai');
 require('react-icons/io');
 require('../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
 require('yup');
 require('../../../../../packages/types/src/Css/map/index.cjs');
+require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
 require('react-i18next');
 require('../../../../../apps/mobile/src/Core/AutoComplete/index.cjs');
@@ -83,6 +83,7 @@ require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var index$1 = require('../../Helpers/Addons/index.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
+var useFocusStyles_native = require('../../../../../Hooks/useFocusStyles.cjs');
 
 const KitsInputText = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputText", rawProps, "Input");
@@ -113,6 +114,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
     String(defaultValue ?? "")
   );
   const [isFocused, setFocused] = React.useState(false);
+  const focusResolvedStyle = useFocusStyles_native.useFocusStyles(themeStyle, isFocused);
   React.useEffect(() => {
     if (isControlled) {
       setInternalValue(String(value ?? ""));
@@ -135,7 +137,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
       ...localProps,
       isDisabled: !!disabled,
       isInvalid: !!invalid,
-      style: { width: "100%", ...Object.keys(themeStyle).length ? style.style(themeStyle) : {} },
+      style: { width: "100%", ...focusResolvedStyle },
       ...rest,
       children: /* @__PURE__ */ jsxRuntime.jsx(
         index.InputField,

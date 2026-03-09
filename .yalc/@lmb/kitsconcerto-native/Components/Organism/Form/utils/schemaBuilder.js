@@ -25,6 +25,12 @@ const buildShape = (elements, id) => {
       }
       return acc;
     }
+    if (element.type === "Combined") {
+      if (element.schema) {
+        acc[fieldId] = cloneSchema(element.schema);
+      }
+      return acc;
+    }
     if (element.type === "Group") {
       const nested = element.elements;
       if (typeof nested !== "function") {

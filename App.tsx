@@ -4,7 +4,7 @@ import {MainContextProvider} from '@lmb/kitsconcerto';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, store} from '@src/redux';
-import {languages} from '@src/config/languages';
+import languages from '@src/localization';
 import {alphaMatchTheme} from '@src/config/theme';
 import Routes from '@src/routes';
 import './global.css';

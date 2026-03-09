@@ -51,6 +51,7 @@ import '../../../apps/mobile/src/ui/vstack/index.js';
 import ResponsiveElement from '../../../apps/mobile/src/Factory/ResponsiveElement.js';
 import { style } from '../../../apps/mobile/src/Factory/helpers/style.js';
 import useSeparator from '../../../apps/mobile/src/Factory/useSeparator.js';
+import '../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -73,6 +74,7 @@ import { IconMap } from '../../../Assets/Icons/index.js';
 import { useLanguage } from '../../../Hooks/locale.js';
 import '../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../Hooks/useComponentDefaults.js';
+import { useSeverityColors } from '../../../Hooks/useSeverityColors.js';
 
 const TEXT_STYLE_KEYS = /* @__PURE__ */ new Set([
   "color",
@@ -103,6 +105,8 @@ function Button(rawProps) {
   const { handlers, isDisabled, _nativeProps } = useButton(props);
   const { cssProps, nativeProps } = useSeparator(_nativeProps);
   const { t } = useLanguage();
+  const brandColors = useSeverityColors(severity ?? "secondary");
+  const isBrand = severity === "brand";
   const gluestackVariant = outlined ? "outline" : "solid";
   const SEVERITY_TO_ACTION = {
     primary: "primary",
@@ -111,7 +115,8 @@ function Button(rawProps) {
     secondary: "secondary",
     info: "primary",
     warning: "negative",
-    help: "secondary"
+    help: "secondary",
+    brand: "primary"
   };
   const action = SEVERITY_TO_ACTION[severity] ?? "primary";
   const resolvedIcon = resolveIcon(icon);
@@ -139,6 +144,24 @@ function Button(rawProps) {
   const borderRadiusStyles = Object.fromEntries(
     Object.entries(computedStyles).filter(([k]) => BORDER_RADIUS_KEYS.has(k))
   );
+  const brandButtonStyle = {};
+  if (isBrand) {
+    if (outlined) {
+      brandButtonStyle.borderColor = brandColors.solid;
+      brandButtonStyle.backgroundColor = "transparent";
+      textStyles.color = brandColors.solid;
+    } else {
+      brandButtonStyle.backgroundColor = brandColors.solid;
+      brandButtonStyle.borderColor = brandColors.solid;
+      textStyles.color = "#FFFFFF";
+    }
+  }
+  const gluestackStyle = {
+    ...borderRadiusStyles,
+    ...brandButtonStyle,
+    width: "100%",
+    height: "100%"
+  };
   return /* @__PURE__ */ jsx(
     ResponsiveElement,
     {
@@ -158,11 +181,11 @@ function Button(rawProps) {
           onPressOut: handlers.onPressOut,
           testID: props.testID,
           ...nativeProps,
-          style: Object.keys(borderRadiusStyles).length ? borderRadiusStyles : void 0,
+          style: Object.keys(gluestackStyle).length ? gluestackStyle : void 0,
           children: [
             isValidElement(resolvedIcon) && iconPos === "left" && resolvedIcon,
             resolvedIcon && !isValidElement(resolvedIcon) && iconPos === "left" && /* @__PURE__ */ jsx(ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] }),
-            loading && /* @__PURE__ */ jsx(ButtonSpinner, { color: "gray" }),
+            loading && /* @__PURE__ */ jsx(ButtonSpinner, { color: isBrand ? "#FFFFFF" : "gray" }),
             (children || label) && /* @__PURE__ */ jsx(ButtonText, { style: Object.keys(textStyles).length ? textStyles : void 0, children: resolvedLabel }),
             isValidElement(resolvedIcon) && iconPos === "right" && resolvedIcon,
             resolvedIcon && !isValidElement(resolvedIcon) && iconPos === "right" && /* @__PURE__ */ jsx(ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] })

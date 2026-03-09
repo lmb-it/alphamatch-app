@@ -22,7 +22,8 @@ const Checkboxes = ({
     isRequired,
     helperText,
     hideError,
-    list
+    list,
+    attached
   } = fieldLogic;
   getValues();
   const checkboxElement = element;
@@ -54,6 +55,7 @@ const Checkboxes = ({
           errors: fieldState.error?.message,
           helperText,
           item: list,
+          attached,
           appearanceMode: vertical ? "vertical" : "horizontal"
         }
       )

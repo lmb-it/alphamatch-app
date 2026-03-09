@@ -59,6 +59,7 @@ import 'react-icons/io';
 import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -93,7 +94,7 @@ const Label = ({ label, className, isFormControl = false, elementId }) => {
     return "";
   }, [label]);
   const labelClasses = useMemo(() => {
-    const classes = ["p-12", "label-position", "w-full"];
+    const classes = ["label-position", "w-full"];
     if (className) {
       classes.push(className);
     }
@@ -118,7 +119,7 @@ const Label = ({ label, className, isFormControl = false, elementId }) => {
       }
     );
   }
-  return /* @__PURE__ */ jsx(FormControlLabel, { className: labelClasses, children: /* @__PURE__ */ jsx(FormControlLabelText, { children: renderLabel }) });
+  return /* @__PURE__ */ jsx(FormControlLabel, { className: labelClasses, style: { padding: 0 }, children: /* @__PURE__ */ jsx(FormControlLabelText, { style: { padding: 0 }, children: renderLabel }) });
 };
 
 export { Label as default };

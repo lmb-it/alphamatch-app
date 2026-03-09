@@ -226,6 +226,7 @@ const useFieldLogic = ({
     style,
     ...resolvedProps,
     localProps: "localProps" in element ? element?.localProps : void 0,
+    attached: element.attached,
     animation: element.animation
   };
 };

@@ -52,6 +52,7 @@ import '../../../apps/mobile/src/ui/vstack/index.js';
 import ResponsiveElement from '../../../apps/mobile/src/Factory/ResponsiveElement.js';
 import { resolveCssVar } from '../../../apps/mobile/src/Factory/helpers/style.js';
 import useSeparator from '../../../apps/mobile/src/Factory/useSeparator.js';
+import '../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../apps/mobile/src/Core/AutoComplete/index.js';

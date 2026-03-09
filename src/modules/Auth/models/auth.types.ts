@@ -1,16 +1,23 @@
 /**
  * Auth module types
+ *
+ * IUser mirrors the appMap output from Backend UserResource:
+ *   identifier, uid, contactEmail, active, emailConfirmed, confirmed,
+ *   registeredAt, modifiedAt + profile fields (displayName, familyName, avatar, accountType)
  */
 export interface IUser {
-  ref: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string | null;
+  identifier: string;
+  uid: string;
+  contactEmail: string;
+  active: boolean;
+  emailConfirmed: boolean;
+  confirmed: boolean;
+  displayName: string | null;
+  familyName: string | null;
   avatar: string | null;
-  userType: 'customer' | 'worker';
-  isVerified: boolean;
-  createdAt: string;
+  accountType: 'customer' | 'worker';
+  registeredAt: string;
+  modifiedAt: string;
 }
 
 export interface IAuthState {
@@ -22,16 +29,12 @@ export interface IAuthState {
 }
 
 export interface ILoginPayload {
-  email: string;
-  password: string;
+  contactEmail: string;
+  secret: string;
 }
 
 export interface IRegisterPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  passwordConfirmation: string;
-  phone?: string;
-  userType: 'customer' | 'worker';
+  contactEmail: string;
+  secret: string;
+  secret_confirmation: string;
 }

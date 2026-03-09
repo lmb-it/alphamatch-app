@@ -50,6 +50,7 @@ import '../ui/tooltip/index.js';
 import { VStack } from '../ui/vstack/index.js';
 import 'react-native-reanimated';
 import { style } from './helpers/style.js';
+import './DimensionsContext.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';

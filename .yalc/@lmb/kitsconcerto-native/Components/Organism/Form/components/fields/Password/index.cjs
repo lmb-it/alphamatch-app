@@ -27,7 +27,8 @@ const Password = ({
     isRequired,
     helperText,
     leftAddon,
-    rightAddon
+    rightAddon,
+    attached
   } = fieldLogic;
   const passwordElement = element;
   const { showStrengthProgress, toggleEye, localProps } = passwordElement;
@@ -45,6 +46,7 @@ const Password = ({
       helperText,
       leftAddon,
       rightAddon,
+      attached,
       showStrengthProgress,
       toggleEye,
       ...localProps

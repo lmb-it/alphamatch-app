@@ -54,6 +54,7 @@ require('../../../apps/mobile/src/ui/vstack/index.cjs');
 var ResponsiveElement = require('../../../apps/mobile/src/Factory/ResponsiveElement.cjs');
 var style = require('../../../apps/mobile/src/Factory/helpers/style.cjs');
 var useSeparator = require('../../../apps/mobile/src/Factory/useSeparator.cjs');
+require('../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
 require('react-i18next');
 require('../../../apps/mobile/src/Core/AutoComplete/index.cjs');

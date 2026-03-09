@@ -54,6 +54,7 @@ require('../ui/tooltip/index.cjs');
 var index = require('../ui/vstack/index.cjs');
 require('react-native-reanimated');
 var style = require('./helpers/style.cjs');
+require('./DimensionsContext.cjs');
 require('react-icons/fa');
 require('react-icons/ai');
 require('react-icons/io');

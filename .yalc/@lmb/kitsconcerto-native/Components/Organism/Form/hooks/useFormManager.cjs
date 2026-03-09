@@ -25,6 +25,17 @@ const useFormManager = ({
   }, [elements]);
   const defaultValues = React.useMemo(() => helpers.getDefaultValues(elements), [elements]);
   const schema = React.useMemo(() => schemaBuilder.schemaBuilder(elements), [elements]);
+  const combinedChildIds = React.useMemo(() => helpers.getCombinedChildIds(elements), [elements]);
+  const stripCombinedChildren = React.useCallback((data) => {
+    if (combinedChildIds.size === 0) return data;
+    const filtered = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (!combinedChildIds.has(key)) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  }, [combinedChildIds]);
   const formMethods = reactHookForm.useForm({
     resolver: yup.yupResolver(schema),
     defaultValues,
@@ -34,7 +45,8 @@ const useFormManager = ({
     // ... (defaultValues logic remains the same)
   });
   const onValidSubmit = React.useCallback(
-    (data) => {
+    (rawData) => {
+      const data = stripCombinedChildren(rawData);
       if (outputFormat === "FormData") {
         const formData = new FormData();
         for (const [key, value] of Object.entries(data)) {
@@ -67,7 +79,7 @@ const useFormManager = ({
         onSubmit && onSubmit(data, setIsSubmitting, formMethods);
       }
     },
-    [outputFormat, onSubmit, setIsSubmitting, formMethods]
+    [outputFormat, onSubmit, setIsSubmitting, formMethods, stripCombinedChildren]
   );
   const handleSubmitWrapper = React.useCallback(() => {
     formMethods.handleSubmit(onValidSubmit, (errors) => {
@@ -83,14 +95,16 @@ const useFormManager = ({
   }
   React.useEffect(() => {
     const subscription = formMethods.watch((currentValues, { name, type }) => {
-      onChange?.(currentValues);
+      onChange?.(stripCombinedChildren(currentValues));
       if (onChangeSingleValue && name && type === "change") {
-        const value = getValueByPath(currentValues, name);
-        onChangeSingleValue(name, value);
+        if (!combinedChildIds.has(name)) {
+          const value = getValueByPath(currentValues, name);
+          onChangeSingleValue(name, value);
+        }
       }
     });
     return () => subscription.unsubscribe();
-  }, [formMethods.watch, onChange, onChangeSingleValue]);
+  }, [formMethods.watch, onChange, onChangeSingleValue, stripCombinedChildren, combinedChildIds]);
   return {
     formMethods,
     // The original object for FormProvider

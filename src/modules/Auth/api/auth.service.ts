@@ -17,7 +17,7 @@ export default {
   },
 
   me: async (): Promise<{success: boolean; data: IUser}> => {
-    const res = await api.get(URLs.auth.me);
+    const res = await api.post(URLs.auth.me);
     return res.data;
   },
 

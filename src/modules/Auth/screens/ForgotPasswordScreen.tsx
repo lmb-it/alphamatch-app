@@ -1,48 +1,48 @@
-import React, {useRef, useCallback, useState} from 'react';
-import {Alert} from 'react-native';
+import React, {useRef, useCallback, useMemo, useState} from 'react';
+import {Alert, TouchableOpacity} from 'react-native';
 import {
-  Box,
-  Text,
-  Heading,
   Button,
   Flex,
-  VStack,
+  Text,
+  Heading,
   Form,
+  useLanguage,
   type IFormElement,
   type IUseFormReturn,
 } from '@lmb/kitsconcerto';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import * as Yup from 'yup';
 import authService from '../api/auth.service';
+import type {AuthStackParamList} from '@src/routes/AuthNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 interface IForgotPasswordForm {
   email: string;
 }
 
-interface ForgotPasswordScreenProps {
-  onNavigateLogin?: () => void;
-  onGoBack?: () => void;
-}
-
-const forgotPasswordElements: IFormElement<IForgotPasswordForm>[] = [
-  {
-    id: 'email',
-    type: 'Text',
-    label: 'Email or Phone',
-    placeholder: 'Enter your email or phone',
-    colSpan: 12,
-    schema: Yup.string()
-      .required('Email is required')
-      .email('Please enter a valid email'),
-  },
-];
-
-const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
-  onNavigateLogin,
-  onGoBack,
-}) => {
+const ForgotPasswordScreen: React.FC = () => {
+  const {t} = useLanguage();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const formRef = useRef<IUseFormReturn<IForgotPasswordForm>>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const formElements = useMemo(
+    (): IFormElement<IForgotPasswordForm>[] => [
+      {
+        id: 'email',
+        type: 'Text',
+        label: t('auth.emailOrPhone'),
+        placeholder: t('auth.emailOrPhonePlaceholder'),
+        colSpan: 12,
+        schema: Yup.string()
+          .required(t('auth.emailRequired'))
+          .email(t('auth.emailInvalid')),
+      },
+    ],
+    [t],
+  );
 
   const handleSubmit = useCallback(
     async (
@@ -53,59 +53,54 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
       setError(null);
       try {
         await authService.forgotPassword(data.email);
-        Alert.alert(
-          'Code Sent',
-          'A password reset code has been sent to your email.',
-        );
+        Alert.alert(t('auth.codeSent'), t('auth.codeSentMessage'));
       } catch (err: any) {
         const message =
-          err?.response?.data?.message || 'Something went wrong. Please try again.';
+          err?.response?.data?.message || t('auth.genericError');
         setError(message);
       } finally {
         setLoading(false);
         setIsSubmitting(false);
       }
     },
-    [],
+    [t],
   );
 
   return (
-    <Box w="full" h="full" bg="white" p="1.5rem" pt="3rem">
-      <VStack space="lg" w="full">
+    <AlphaLayout>
+      <Flex flex={1} px={24} pt={12} pb={32} flexDirection="column" gap={20}>
         {/* Header */}
-        <Box mb="0.5rem">
-          <Flex flexDirection="row" gap="0.4rem" mb="0.5rem">
-            <Heading as="h3" fontWeight="800">
-              Forgot
+        <Flex flexDirection="column" gap={8}>
+          <Heading as="h1" bold color="text-primary">
+            {t('auth.forgotTitle')}{' '}
+            <Heading as="h1" bold color="primary">
+              {t('auth.forgotTitleAccent')}
             </Heading>
-            <Heading as="h3" fontWeight="800" fontColor="primary">
-              Password?
-            </Heading>
-          </Flex>
-          <Text fontSize="sm" fontColor="secondary">
-            Don't worry! Enter your email or phone to reset your password and
-            access your account.
+          </Heading>
+          <Text fontSize={14} color="text-subtle" lineHeight={20}>
+            {t('auth.forgotSubtitle')}
           </Text>
-        </Box>
+        </Flex>
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
-          <Box
-            bg="red.50"
-            p="0.75rem"
-            borderRadius="8px"
-            border="1px solid"
-            borderColor="danger">
-            <Text fontSize="sm" fontColor="danger">
+          <Flex
+            p={12}
+            flexDirection="column"
+            backgroundColor="red.50"
+            borderWidth={1}
+            borderColor="red.200"
+            borderRadius={10}>
+            <Text fontSize={13} color="danger">
               {error}
             </Text>
-          </Box>
+          </Flex>
         )}
 
         {/* Form */}
         <Form<IForgotPasswordForm>
           ref={formRef}
-          elements={forgotPasswordElements}
+          elements={formElements}
           onSubmit={handleSubmit}
           outputFormat="Json"
           submitButtonProps="none"
@@ -113,28 +108,28 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
 
         {/* Send Code button */}
         <Button
-          label="Send Code"
+          label="auth.sendCode"
           w="full"
-          rounded
+          severity="primary"
           loading={loading}
-          onPress={() => formRef.current?.onFormSubmit()}
+          onClick={() => formRef.current?.onFormSubmit()}
         />
 
         {/* Go back to Sign In */}
-        <Flex
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          gap="0.25rem">
-          <Text fontSize="sm" fontColor="secondary">
-            Go back to
+        <Flex justifyContent="center" alignItems="center">
+          <Text fontSize={14} color="text-subtle">
+            {t('auth.goBackTo')}{' '}
           </Text>
-          <Text fontSize="sm" fontColor="primary" bold onPress={onNavigateLogin}>
-            Sign In
-          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Login')}
+            activeOpacity={0.6}>
+            <Text fontSize={14} color="primary" fontWeight="600" textDecoration="underline">
+              {t('auth.signIn')}
+            </Text>
+          </TouchableOpacity>
         </Flex>
-      </VStack>
-    </Box>
+      </Flex>
+    </AlphaLayout>
   );
 };
 

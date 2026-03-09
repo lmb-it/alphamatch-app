@@ -56,6 +56,8 @@ require('../../../../../apps/mobile/src/ui/toast/index.cjs');
 require('../../../../../apps/mobile/src/ui/tooltip/index.cjs');
 require('../../../../../apps/mobile/src/ui/vstack/index.cjs');
 require('react-native-reanimated');
+var style = require('../../../../../apps/mobile/src/Factory/helpers/style.cjs');
+require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('react-icons/fa');
 require('react-icons/ai');
 require('react-icons/io');
@@ -82,28 +84,31 @@ require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 require('axios');
 require('../../../UI/Flex/index.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
+var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
 require('primereact/tooltip');
 require('primereact/skeleton');
 require('../../KitsSelect/SelectContext.cjs');
 var label_native = require('../Label/label.cjs');
 
-const KitsContainer = ({
-  id,
-  helperText,
-  className,
-  children,
-  rightAddon,
-  leftAddon,
-  errors,
-  invalid,
-  required,
-  hideError,
-  additionalClassName,
-  label,
-  isFloatedLabel,
-  containerStyle,
-  disabled
-}) => {
+const KitsContainer = (rawProps) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("FormContainer", rawProps);
+  const {
+    id,
+    helperText,
+    className,
+    children,
+    rightAddon,
+    leftAddon,
+    errors,
+    invalid,
+    required,
+    hideError,
+    additionalClassName,
+    label,
+    isFloatedLabel,
+    containerStyle,
+    disabled
+  } = props;
   const elementId = id ? `${id}_element` : _.uniqueId("element_");
   const placement = React.useMemo(() => {
     if (label && typeof label === "object" && "placement" in label) {
@@ -115,6 +120,14 @@ const KitsContainer = ({
   const isBottom = placement === "B";
   const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { isFormControl: true, label, elementId }) : null;
   const contentElement = /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { additionalClassName, leftAddon, rightAddon, invalid, children });
+  const themeRnStyle = React.useMemo(
+    () => themeStyle && Object.keys(themeStyle).length ? style.style(themeStyle) : {},
+    [themeStyle]
+  );
+  const containerRnStyle = React.useMemo(
+    () => containerStyle && Object.keys(containerStyle).length ? style.style(containerStyle) : {},
+    [containerStyle]
+  );
   return /* @__PURE__ */ jsxRuntime.jsxs(
     index.FormControl,
     {
@@ -123,7 +136,7 @@ const KitsContainer = ({
       isDisabled: disabled,
       isReadOnly: disabled,
       isRequired: required,
-      style: { width: "100%", gap: 4 },
+      style: { width: "100%", gap: 4, ...themeRnStyle, ...containerRnStyle },
       children: [
         isHorizontal ? /* @__PURE__ */ jsxRuntime.jsxs(reactNative.View, { style: { flexDirection: "row", alignItems: "center", gap: 8, width: "100%" }, children: [
           labelElement,

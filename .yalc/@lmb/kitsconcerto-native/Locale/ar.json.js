@@ -129,6 +129,34 @@ var emptySearchMessage = "لا تتوفر بيانات";
 var emptyMessage = "لا توجد نتيجة";
 var emptyFileUploadMessage = "مسيك وزت ملفات للتحميل";
 var password = "كلمة المرور";
+var openMenu = "فتح القائمة";
+var toggleColorMode = "تبديل وضع الألوان";
+var signOut = "تسجيل الخروج";
+var profile = "الملف الشخصي";
+var filesSelected = "{0} ملفات مختارة";
+var dragFilesHere = "اسحب الملفات هنا أو انقر للتصفح";
+var filesBeingDropped = "جاري إسقاط الملفات";
+var typeNotSupported = "هذا النوع غير مدعوم";
+var maximumAllowedFiles = "الحد الأقصى للملفات المسموح بها {0} ملفات";
+var remove = "إزالة";
+var edit = "تعديل";
+var save = "حفظ";
+var generatePhoto = "إنشاء صورة";
+var settings = "الإعدادات";
+var addCategory = "إضافة فئة";
+var addItem = "إضافة عنصر";
+var any = "أي";
+var chooseFile = "اختر ملف";
+var greaterThan = "أكبر من";
+var greaterThanOrEqualTo = "أكبر من أو يساوي";
+var lessThan = "أقل من";
+var lessThanOrEqualTo = "أقل من أو يساوي";
+var between = "بين";
+var include = "يتضمن";
+var equal = "يساوي";
+var after = "بعد";
+var before = "قبل";
+var not = "ليس";
 var aria = {
 	trueLabel: "صحيح",
 	falseLabel: "خطأ",
@@ -251,8 +279,37 @@ var ar = {
 	emptyMessage: emptyMessage,
 	emptyFileUploadMessage: emptyFileUploadMessage,
 	password: password,
+	openMenu: openMenu,
+	toggleColorMode: toggleColorMode,
+	signOut: signOut,
+	profile: profile,
+	filesSelected: filesSelected,
+	dragFilesHere: dragFilesHere,
+	filesBeingDropped: filesBeingDropped,
+	typeNotSupported: typeNotSupported,
+	maximumAllowedFiles: maximumAllowedFiles,
+	remove: remove,
+	edit: edit,
+	save: save,
+	generatePhoto: generatePhoto,
+	settings: settings,
+	addCategory: addCategory,
+	addItem: addItem,
+	"delete": "حذف",
+	any: any,
+	chooseFile: chooseFile,
+	greaterThan: greaterThan,
+	greaterThanOrEqualTo: greaterThanOrEqualTo,
+	lessThan: lessThan,
+	lessThanOrEqualTo: lessThanOrEqualTo,
+	between: between,
+	include: include,
+	equal: equal,
+	after: after,
+	before: before,
+	not: not,
 	aria: aria
 };
 
-export { accept, addRule, am, apply, aria, cancel, choose, chooseDate, chooseMonth, chooseYear, clear, completed, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, ar as default, emptyFileUploadMessage, emptyFilterMessage, emptyMessage, emptySearchMessage, emptySelectionMessage, endsWith, equals, fileSizeTypes, filter, firstDayOfWeek, gt, gte, lt, lte, matchAll, matchAny, medium, monthNames, monthNamesShort, nextDecade, nextHour, nextMinute, nextMonth, nextSecond, nextYear, noFilter, notContains, notEquals, now, password, passwordPrompt, pending, pm, prevDecade, prevHour, prevMinute, prevMonth, prevSecond, prevYear, reject, removeRule, searchMessage, selectionMessage, showMonthAfterYear, startsWith, strong, today, upload, weak, weekHeader };
+export { accept, addCategory, addItem, addRule, after, am, any, apply, aria, before, between, cancel, choose, chooseDate, chooseFile, chooseMonth, chooseYear, clear, completed, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, ar as default, dragFilesHere, edit, emptyFileUploadMessage, emptyFilterMessage, emptyMessage, emptySearchMessage, emptySelectionMessage, endsWith, equal, equals, fileSizeTypes, filesBeingDropped, filesSelected, filter, firstDayOfWeek, generatePhoto, greaterThan, greaterThanOrEqualTo, gt, gte, include, lessThan, lessThanOrEqualTo, lt, lte, matchAll, matchAny, maximumAllowedFiles, medium, monthNames, monthNamesShort, nextDecade, nextHour, nextMinute, nextMonth, nextSecond, nextYear, noFilter, not, notContains, notEquals, now, openMenu, password, passwordPrompt, pending, pm, prevDecade, prevHour, prevMinute, prevMonth, prevSecond, prevYear, profile, reject, remove, removeRule, save, searchMessage, selectionMessage, settings, showMonthAfterYear, signOut, startsWith, strong, today, toggleColorMode, typeNotSupported, upload, weak, weekHeader };
 //# sourceMappingURL=ar.json.js.map

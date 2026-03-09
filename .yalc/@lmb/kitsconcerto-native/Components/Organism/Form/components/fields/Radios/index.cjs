@@ -8,7 +8,7 @@ require('axios');
 require('../../../../../../Contexts/DialogContext.cjs');
 var radio_native = require('../../../../../Molecules/Form/Buttons/RadioButton/radio.cjs');
 require('../../../../../Molecules/Form/KitsSelect/SelectContext.cjs');
-var index = require('../../../../../Molecules/UI/Flex/index.cjs');
+require('../../../../../Molecules/UI/Flex/index.cjs');
 require('primereact/tooltip');
 require('primereact/skeleton');
 
@@ -26,40 +26,33 @@ const Radios = ({
     isRequired,
     helperText,
     hideError,
-    list
+    list,
+    attached
   } = fieldLogic;
   const checkboxElement = element;
   const { vertical } = checkboxElement;
   return /* @__PURE__ */ jsxRuntime.jsx(
-    index.default,
+    radio_native.default,
     {
-      alignSelf: "center",
-      flexWrap: "wrap",
-      gap: 2,
-      flexDirection: vertical ? "column" : "row",
-      children: /* @__PURE__ */ jsxRuntime.jsx(
-        radio_native.default,
-        {
-          ...field,
-          onChange: (checked, event) => {
-            field.onChange({
-              target: {
-                value: event.value
-              }
-            });
-          },
-          id: field.name,
-          label,
-          hideError,
-          disabled: isDisabled,
-          required: isRequired,
-          invalid: fieldState.invalid,
-          errors: fieldState.error?.message,
-          helperText,
-          item: list,
-          appearanceMode: vertical ? "vertical" : "horizontal"
-        }
-      )
+      ...field,
+      onChange: (checked, event) => {
+        field.onChange({
+          target: {
+            value: event.value
+          }
+        });
+      },
+      id: field.name,
+      label,
+      hideError,
+      disabled: isDisabled,
+      required: isRequired,
+      invalid: fieldState.invalid,
+      errors: fieldState.error?.message,
+      helperText,
+      item: list,
+      attached,
+      appearanceMode: vertical ? "vertical" : "horizontal"
     }
   );
 };

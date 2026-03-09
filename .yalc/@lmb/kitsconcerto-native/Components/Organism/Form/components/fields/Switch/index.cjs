@@ -24,7 +24,8 @@ const Switch = ({
     label,
     isDisabled,
     isRequired,
-    helperText
+    helperText,
+    attached
   } = fieldLogic;
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
@@ -37,6 +38,7 @@ const Switch = ({
       invalid: fieldState.invalid,
       errors: fieldState.error?.message,
       helperText,
+      attached,
       checked: !!field.value
     }
   );

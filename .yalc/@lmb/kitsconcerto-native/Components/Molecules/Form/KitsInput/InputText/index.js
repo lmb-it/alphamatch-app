@@ -52,13 +52,13 @@ import '../../../../../apps/mobile/src/ui/toast/index.js';
 import '../../../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../../../apps/mobile/src/ui/vstack/index.js';
 import 'react-native-reanimated';
-import { style } from '../../../../../apps/mobile/src/Factory/helpers/style.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';
 import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -79,6 +79,7 @@ import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import Addons from '../../Helpers/Addons/index.js';
 import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
+import { useFocusStyles } from '../../../../../Hooks/useFocusStyles.js';
 
 const KitsInputText = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults("InputText", rawProps, "Input");
@@ -109,6 +110,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
     String(defaultValue ?? "")
   );
   const [isFocused, setFocused] = React.useState(false);
+  const focusResolvedStyle = useFocusStyles(themeStyle, isFocused);
   React.useEffect(() => {
     if (isControlled) {
       setInternalValue(String(value ?? ""));
@@ -131,7 +133,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
       ...localProps,
       isDisabled: !!disabled,
       isInvalid: !!invalid,
-      style: { width: "100%", ...Object.keys(themeStyle).length ? style(themeStyle) : {} },
+      style: { width: "100%", ...focusResolvedStyle },
       ...rest,
       children: /* @__PURE__ */ jsx(
         InputField,

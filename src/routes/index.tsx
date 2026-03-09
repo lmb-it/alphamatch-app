@@ -14,9 +14,9 @@ export default function Routes() {
   const getNavigator = () => {
     // If we have a token and are authenticated, route to specific role
     if (isAuthenticated && token && user) {
-      if (user.userType === 'customer') {
+      if (user.accountType === 'customer') {
         return <CustomerNavigator />;
-      } else if (user.userType === 'worker') {
+      } else if (user.accountType === 'worker') {
         return <WorkerNavigator />;
       }
     }

@@ -26,8 +26,9 @@ const InputNumber = ({
     isDisabled,
     isRequired,
     helperText,
-    keyFilter
+    keyFilter,
     // The hook can resolve this dynamic prop
+    attached
   } = fieldLogic;
   const numberElement = element;
   const { localProps } = numberElement;
@@ -50,6 +51,7 @@ const InputNumber = ({
       invalid: fieldState.invalid,
       errors: fieldState.error?.message,
       helperText,
+      attached,
       localProps
     }
   );

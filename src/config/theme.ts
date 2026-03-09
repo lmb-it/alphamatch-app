@@ -4,44 +4,65 @@
 import {extendTheme} from '@lmb/kitsconcerto';
 
 export const alphaMatchTheme = extendTheme({
+  severity:{
+
+  },
   colors: {
+    primary: {
+      50: '#E0F7F8',
+      100: '#B2EBF2',
+      200: '#80DEEA',
+      300: '#4DD0E1',
+      400: '#26C6DA',
+      500: '#20AAB0',
+      600: '#1B9399',
+      700: '#157C82',
+      800: '#10656B',
+      900: '#0A4E54',
+    },
     brand: {
-      50: '#E0F2F1',
-      100: '#B2DFDB',
-      200: '#80CBC4',
-      300: '#4DB6AC',
-      400: '#26A69A',
-      500: '#00ACC1', // Approximate primary from button
-      600: '#0097A7',
-      700: '#00838F',
-      800: '#006064',
-      900: '#004D40',
+      50: '#E0F7F8',
+      100: '#B2EBF2',
+      200: '#80DEEA',
+      300: '#4DD0E1',
+      400: '#26C6DA',
+      500: '#20AAB0',
+      600: '#1B9399',
+      700: '#157C82',
+      800: '#10656B',
+      900: '#0A4E54',
     },
   },
   semanticTokens: {
     light: {
-      primary: '#00ACC1',
-      secondary: 'gray.600',
-      'text-primary': '#111827', // Dark gray for high contrast text
+      primary: '#20AAB0',
+      secondary: '#6B7280',
+      danger: '#EF4444',
+      'text-primary': '#111827',
       'text-subtle': '#6B7280',
+      'text-muted': '#9CA3AF',
       'border-default': '#E5E7EB',
+      divider: '#E5E7EB',
       text: '#111827',
       bg: '#FFFFFF',
-      border: 'gray.200',
+      border: '#E5E7EB',
     },
     dark: {
-      primary: 'brand.400',
-      secondary: 'gray.400',
-      'text-primary': 'gray.50',
-      'text-subtle': 'gray.400',
-      'border-default': 'gray.700',
-      text: 'gray.50',
-      bg: 'gray.900',
-      border: 'gray.700',
+      primary: '#20AAB0',
+      secondary: '#9CA3AF',
+      danger: '#F87171',
+      'text-primary': '#F9FAFB',
+      'text-subtle': '#9CA3AF',
+      'text-muted': '#6B7280',
+      'border-default': '#374151',
+      divider: '#374151',
+      text: '#F9FAFB',
+      bg: '#111827',
+      border: '#374151',
     },
   },
   fonts: {
-    heading: 'System', // Often standard System/Roboto/SF Pro on mobile Native
+    heading: 'System',
     body: 'System',
     mono: 'System',
   },
@@ -49,27 +70,32 @@ export const alphaMatchTheme = extendTheme({
     Button: {
       props: {
         rounded: true,
-        size: 'md',
+        size: 'lg',
         severity: 'primary',
       },
       style: {
-        borderRadius: 24, // Pill shape for main buttons
-        fontWeight: 'bold', // Typically '700' or 'bold'
-        paddingHorizontal: 24,
-        paddingVertical: 14,
+        borderRadius: 28,
+        fontWeight: '600',
+        // paddingHorizontal: 24,
+        height: 52,
+        // minHeight: 52,
       },
     },
     Input: {
       props: {
-        inputSize: 'md',
+        inputSize: 'lg',
       },
       style: {
-        borderRadius: 20, // Rounded inputs
+        borderRadius: 50,
         borderWidth: 1,
-        borderColor: '#E5E7EB', // Approx gray.200
-        paddingHorizontal: 16, 
-        paddingVertical: 12, 
-        backgroundColor: '#FCFCFD', // slightly off-white bg or white depending on mode
+        borderColor: '#E5E7EB',
+        paddingHorizontal: 16,
+        // paddingVertical:30,
+        height: 52,
+        minHeight: 52,
+        backgroundColor: '#FFFFFF',
+        fontSize: 15,
+        color: '#111827',
       },
     },
     Card: {
@@ -77,16 +103,16 @@ export const alphaMatchTheme = extendTheme({
         variant: 'elevated',
       },
       style: {
-        borderRadius: 16, 
-        padding: 16, 
-        backgroundColor: 'bg',
+        borderRadius: 16,
+        padding: 16,
+        backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#F3F4F6', // Lighter border
+        borderColor: '#F3F4F6',
       },
     },
   },
   config: {
     initialColorMode: 'light',
-    useSystemColorMode: true,
+    useSystemColorMode: false,
   },
 });

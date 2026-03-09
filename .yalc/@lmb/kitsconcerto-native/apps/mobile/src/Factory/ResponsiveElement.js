@@ -50,6 +50,7 @@ import '../ui/toast/index.js';
 import '../ui/tooltip/index.js';
 import { VStack } from '../ui/vstack/index.js';
 import { style } from './helpers/style.js';
+import { useStyleContext } from './DimensionsContext.js';
 import { enteringPresets, exitingPresets } from './animationPresets.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
@@ -110,9 +111,10 @@ const ResponsiveElement = ({
   ref
   // directly available in React 19+
 }) => {
+  const styleCtx = useStyleContext();
   const combinedStyles = useMemo(() => {
-    return [style({ ...additionalStyles, ...cssProps, ...nativeProps?.style })];
-  }, [cssProps, additionalStyles, nativeProps?.style]);
+    return [style({ ...additionalStyles, ...cssProps, ...nativeProps?.style }, styleCtx)];
+  }, [cssProps, additionalStyles, nativeProps?.style, styleCtx]);
   const Component = as ? COMPONENT_MAP[as] || View : View;
   const isText = (typeof children === "string" || typeof children === "number") && (as !== "Heading" && as !== "Text");
   const hasAnimation = !!(entering || exiting);

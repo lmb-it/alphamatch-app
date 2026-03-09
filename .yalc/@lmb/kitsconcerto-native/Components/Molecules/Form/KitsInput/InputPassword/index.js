@@ -1,6 +1,9 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useState } from 'react';
 import KitsContainer from '../../Helpers/FormContainer/index.js';
+import useSeparator from '../../../../../apps/mobile/src/Factory/useSeparator.js';
+import 'react-native';
+import 'react-native-reanimated';
 import '../../../../../apps/mobile/src/ui/accordion/index.js';
 import '../../../../../apps/mobile/src/ui/actionsheet/index.js';
 import '../../../../../apps/mobile/src/ui/alert/index.js';
@@ -16,7 +19,6 @@ import '../../../../../apps/mobile/src/ui/checkbox/index.js';
 import '../../../../../apps/mobile/src/ui/divider/index.js';
 import '../../../../../apps/mobile/src/ui/drawer/index.js';
 import '../../../../../apps/mobile/src/ui/fab/index.js';
-import 'react-native';
 import '../../../../../apps/mobile/src/ui/form-control/index.js';
 import '../../../../../apps/mobile/src/ui/gluestack-ui-provider/config.js';
 import '@gluestack-ui/core/overlay/creator';
@@ -49,14 +51,13 @@ import '../../../../../apps/mobile/src/ui/textarea/index.js';
 import '../../../../../apps/mobile/src/ui/toast/index.js';
 import '../../../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../../../apps/mobile/src/ui/vstack/index.js';
-import 'react-native-reanimated';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';
 import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
-import useSeparator from '../../../../../apps/mobile/src/Factory/useSeparator.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -66,7 +67,7 @@ import '../../../../../apps/mobile/src/Core/Trees/components/CoreTree.js';
 import '../../../../../apps/mobile/src/Core/Trees/components/CoreTreeSelect.js';
 import '../../../../../apps/mobile/src/Core/Trees/components/CoreToolbar.js';
 import '../../../../../apps/mobile/src/Core/Paginator/index.js';
-import 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import '../../../../../apps/mobile/src/Core/SelectButton/index.js';
 import '../../../../../apps/mobile/src/Core/DataTable/DataTable.js';
 import '../../../../../apps/mobile/src/Core/Tag/index.js';
@@ -77,14 +78,9 @@ import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import Addons from '../../Helpers/Addons/index.js';
 import { useFormInputController } from '../../Helpers/useFormInputController/useFormInputController.js';
 import Auth0PasswordStrength from './Strengthen.js';
-import 'axios';
 import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
-import '../../KitsSelect/SelectContext.js';
-import '../../../UI/Flex/index.js';
-import Text from '../../../UI/Text/index.js';
-import 'primereact/tooltip';
-import 'primereact/skeleton';
+import { useFocusStyles } from '../../../../../Hooks/useFocusStyles.js';
 
 const KitsInputPassword = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults("InputPassword", rawProps, "Input");
@@ -113,6 +109,8 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
     defaultValue,
     onChange,
     schema,
+    eyeIcon,
+    eyeSlashIcon,
     inputSize,
     ...rest
   } = props;
@@ -124,6 +122,8 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
   });
   const [secure, setSecure] = useState(true);
   const toggleSecure = () => setSecure(!secure);
+  const [isFocused, setFocused] = useState(false);
+  const focusResolvedStyle = useFocusStyles(themeStyle, isFocused);
   return /* @__PURE__ */ jsxs(
     KitsContainer,
     {
@@ -146,7 +146,7 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
             ...rest,
             isDisabled: !!disabled,
             isInvalid: !!invalid,
-            style: { width: "100%", ...themeStyle },
+            style: { width: "100%", ...focusResolvedStyle },
             children: [
               /* @__PURE__ */ jsx(Addons, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsx(
                 InputField,
@@ -156,10 +156,18 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
                   onChangeText: (txt) => emitChange(txt),
                   secureTextEntry: secure,
                   editable: !disabled,
-                  placeholder: promptLabel
+                  placeholder: promptLabel,
+                  onFocus: (e) => {
+                    setFocused(true);
+                    rest?.onFocus?.(e);
+                  },
+                  onBlur: (e) => {
+                    setFocused(false);
+                    rest?.onBlur?.(e);
+                  }
                 }
               ) }),
-              toggleEye && /* @__PURE__ */ jsx(InputSlot, { onPress: toggleSecure, children: /* @__PURE__ */ jsx(Text, { children: secure ? "Show" : "Hide" }) })
+              toggleEye && /* @__PURE__ */ jsx(InputSlot, { onPress: toggleSecure, style: { paddingHorizontal: 12 }, children: secure ? eyeIcon ?? /* @__PURE__ */ jsx(Eye, { size: 20, color: "#6B7280" }) : eyeSlashIcon ?? /* @__PURE__ */ jsx(EyeOff, { size: 20, color: "#6B7280" }) })
             ]
           }
         ),

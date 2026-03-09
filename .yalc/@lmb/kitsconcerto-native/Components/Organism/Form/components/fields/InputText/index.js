@@ -29,6 +29,7 @@ const InputText = ({
     keyFilter,
     layout,
     hideError,
+    attached,
     isShown,
     localProps = {}
   } = fieldLogic;
@@ -48,6 +49,7 @@ const InputText = ({
         leftAddon,
         rightAddon,
         label,
+        attached,
         ...localProps
       }
     );
@@ -66,6 +68,7 @@ const InputText = ({
         rightAddon,
         keyFilter,
         label,
+        attached,
         errors: fieldState.error?.message,
         invalid: fieldState.invalid,
         ...localProps

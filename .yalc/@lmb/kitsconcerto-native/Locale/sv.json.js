@@ -93,6 +93,34 @@ var strong = "Starkt";
 var passwordPrompt = "Fyll i lösenord";
 var emptyFilterMessage = "Inga tillgängliga rader";
 var emptyMessage = "Inga resultat hittades";
+var openMenu = "Open menu";
+var toggleColorMode = "Toggle color mode";
+var signOut = "Sign out";
+var profile = "Profile";
+var filesSelected = "{0} Files Selected";
+var dragFilesHere = "Drag Files Here or click for browse";
+var filesBeingDropped = "Files Being Dropped";
+var typeNotSupported = "This type is not supported";
+var maximumAllowedFiles = "Maximum allowed files {0} files";
+var remove = "Remove";
+var edit = "Edit";
+var save = "Save";
+var generatePhoto = "Generate Photo";
+var settings = "Settings";
+var addCategory = "Add Category";
+var addItem = "Add Item";
+var any = "Any";
+var chooseFile = "Choose file";
+var greaterThan = "Greater than";
+var greaterThanOrEqualTo = "Greater than or equal to";
+var lessThan = "Less than";
+var lessThanOrEqualTo = "Less than or equal to";
+var between = "Between";
+var include = "Include";
+var equal = "Equal";
+var after = "After";
+var before = "Before";
+var not = "Not";
 var aria = {
 	trueLabel: "Sant",
 	falseLabel: "Falskt",
@@ -153,8 +181,37 @@ var sv = {
 	passwordPrompt: passwordPrompt,
 	emptyFilterMessage: emptyFilterMessage,
 	emptyMessage: emptyMessage,
+	openMenu: openMenu,
+	toggleColorMode: toggleColorMode,
+	signOut: signOut,
+	profile: profile,
+	filesSelected: filesSelected,
+	dragFilesHere: dragFilesHere,
+	filesBeingDropped: filesBeingDropped,
+	typeNotSupported: typeNotSupported,
+	maximumAllowedFiles: maximumAllowedFiles,
+	remove: remove,
+	edit: edit,
+	save: save,
+	generatePhoto: generatePhoto,
+	settings: settings,
+	addCategory: addCategory,
+	addItem: addItem,
+	"delete": "Delete",
+	any: any,
+	chooseFile: chooseFile,
+	greaterThan: greaterThan,
+	greaterThanOrEqualTo: greaterThanOrEqualTo,
+	lessThan: lessThan,
+	lessThanOrEqualTo: lessThanOrEqualTo,
+	between: between,
+	include: include,
+	equal: equal,
+	after: after,
+	before: before,
+	not: not,
 	aria: aria
 };
 
-export { accept, addRule, apply, aria, cancel, choose, clear, close, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, sv as default, emptyFilterMessage, emptyMessage, endsWith, equals, filter, firstDayOfWeek, gt, gte, lt, lte, matchAll, matchAny, medium, monthNames, monthNamesShort, noFilter, notContains, notEquals, passwordPrompt, reject, removeRule, showMonthAfterYear, startsWith, strong, today, upload, weak, weekHeader };
+export { accept, addCategory, addItem, addRule, after, any, apply, aria, before, between, cancel, choose, chooseFile, clear, close, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, sv as default, dragFilesHere, edit, emptyFilterMessage, emptyMessage, endsWith, equal, equals, filesBeingDropped, filesSelected, filter, firstDayOfWeek, generatePhoto, greaterThan, greaterThanOrEqualTo, gt, gte, include, lessThan, lessThanOrEqualTo, lt, lte, matchAll, matchAny, maximumAllowedFiles, medium, monthNames, monthNamesShort, noFilter, not, notContains, notEquals, openMenu, passwordPrompt, profile, reject, remove, removeRule, save, settings, showMonthAfterYear, signOut, startsWith, strong, today, toggleColorMode, typeNotSupported, upload, weak, weekHeader };
 //# sourceMappingURL=sv.json.js.map

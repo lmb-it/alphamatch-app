@@ -5,6 +5,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var jsxRuntime = require('react/jsx-runtime');
 var React = require('react');
 var index_native = require('../../Helpers/FormContainer/index.cjs');
+var useSeparator = require('../../../../../apps/mobile/src/Factory/useSeparator.cjs');
+require('react-native');
+require('react-native-reanimated');
 require('../../../../../apps/mobile/src/ui/accordion/index.cjs');
 require('../../../../../apps/mobile/src/ui/actionsheet/index.cjs');
 require('../../../../../apps/mobile/src/ui/alert/index.cjs');
@@ -20,7 +23,6 @@ require('../../../../../apps/mobile/src/ui/checkbox/index.cjs');
 require('../../../../../apps/mobile/src/ui/divider/index.cjs');
 require('../../../../../apps/mobile/src/ui/drawer/index.cjs');
 require('../../../../../apps/mobile/src/ui/fab/index.cjs');
-require('react-native');
 require('../../../../../apps/mobile/src/ui/form-control/index.cjs');
 require('../../../../../apps/mobile/src/ui/gluestack-ui-provider/config.cjs');
 require('@gluestack-ui/core/overlay/creator');
@@ -53,14 +55,13 @@ require('../../../../../apps/mobile/src/ui/textarea/index.cjs');
 require('../../../../../apps/mobile/src/ui/toast/index.cjs');
 require('../../../../../apps/mobile/src/ui/tooltip/index.cjs');
 require('../../../../../apps/mobile/src/ui/vstack/index.cjs');
-require('react-native-reanimated');
 require('react-icons/fa');
 require('react-icons/ai');
 require('react-icons/io');
 require('../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
 require('yup');
 require('../../../../../packages/types/src/Css/map/index.cjs');
-var useSeparator = require('../../../../../apps/mobile/src/Factory/useSeparator.cjs');
+require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
 require('react-i18next');
 require('../../../../../apps/mobile/src/Core/AutoComplete/index.cjs');
@@ -70,7 +71,7 @@ require('../../../../../apps/mobile/src/Core/Trees/components/CoreTree.cjs');
 require('../../../../../apps/mobile/src/Core/Trees/components/CoreTreeSelect.cjs');
 require('../../../../../apps/mobile/src/Core/Trees/components/CoreToolbar.cjs');
 require('../../../../../apps/mobile/src/Core/Paginator/index.cjs');
-require('lucide-react-native');
+var lucideReactNative = require('lucide-react-native');
 require('../../../../../apps/mobile/src/Core/SelectButton/index.cjs');
 require('../../../../../apps/mobile/src/Core/DataTable/DataTable.cjs');
 require('../../../../../apps/mobile/src/Core/Tag/index.cjs');
@@ -81,14 +82,9 @@ require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var index$1 = require('../../Helpers/Addons/index.cjs');
 var useFormInputController_native = require('../../Helpers/useFormInputController/useFormInputController.cjs');
 var Strengthen = require('./Strengthen.cjs');
-require('axios');
 require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
-require('../../KitsSelect/SelectContext.cjs');
-require('../../../UI/Flex/index.cjs');
-var index_native$1 = require('../../../UI/Text/index.cjs');
-require('primereact/tooltip');
-require('primereact/skeleton');
+var useFocusStyles_native = require('../../../../../Hooks/useFocusStyles.cjs');
 
 const KitsInputPassword = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults.default("InputPassword", rawProps, "Input");
@@ -117,6 +113,8 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
     defaultValue,
     onChange,
     schema,
+    eyeIcon,
+    eyeSlashIcon,
     inputSize,
     ...rest
   } = props;
@@ -128,6 +126,8 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
   });
   const [secure, setSecure] = React.useState(true);
   const toggleSecure = () => setSecure(!secure);
+  const [isFocused, setFocused] = React.useState(false);
+  const focusResolvedStyle = useFocusStyles_native.useFocusStyles(themeStyle, isFocused);
   return /* @__PURE__ */ jsxRuntime.jsxs(
     index_native.default,
     {
@@ -150,7 +150,7 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
             ...rest,
             isDisabled: !!disabled,
             isInvalid: !!invalid,
-            style: { width: "100%", ...themeStyle },
+            style: { width: "100%", ...focusResolvedStyle },
             children: [
               /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { leftAddon, rightAddon, invalid: !!invalid, children: /* @__PURE__ */ jsxRuntime.jsx(
                 index.InputField,
@@ -160,10 +160,18 @@ const KitsInputPassword = ({ ref, ...rawProps }) => {
                   onChangeText: (txt) => emitChange(txt),
                   secureTextEntry: secure,
                   editable: !disabled,
-                  placeholder: promptLabel
+                  placeholder: promptLabel,
+                  onFocus: (e) => {
+                    setFocused(true);
+                    rest?.onFocus?.(e);
+                  },
+                  onBlur: (e) => {
+                    setFocused(false);
+                    rest?.onBlur?.(e);
+                  }
                 }
               ) }),
-              toggleEye && /* @__PURE__ */ jsxRuntime.jsx(index.InputSlot, { onPress: toggleSecure, children: /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { children: secure ? "Show" : "Hide" }) })
+              toggleEye && /* @__PURE__ */ jsxRuntime.jsx(index.InputSlot, { onPress: toggleSecure, style: { paddingHorizontal: 12 }, children: secure ? eyeIcon ?? /* @__PURE__ */ jsxRuntime.jsx(lucideReactNative.Eye, { size: 20, color: "#6B7280" }) : eyeSlashIcon ?? /* @__PURE__ */ jsxRuntime.jsx(lucideReactNative.EyeOff, { size: 20, color: "#6B7280" }) })
             ]
           }
         ),

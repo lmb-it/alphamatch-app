@@ -4,6 +4,7 @@ import Box from '../UI/Box/index.js';
 import HStack from '../UI/HStack/index.js';
 import Flex from '../UI/Flex/index.js';
 import Text from '../UI/Text/index.js';
+import { useLanguage } from '../../../Hooks/locale.js';
 import '../../../Contexts/DialogContext.js';
 import Heading from '../UI/Heading/index.js';
 import { Button } from '../Button/Button.js';
@@ -23,6 +24,7 @@ const DetailList = ({
   headerActions,
   itemActions
 }) => {
+  const { t } = useLanguage();
   const [editingField, setEditingField] = useState(null);
   const [draftValue, setDraftValue] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -162,7 +164,7 @@ const DetailList = ({
                   item.editable && !isEditing && /* @__PURE__ */ jsx(
                     Button,
                     {
-                      label: "Edit",
+                      label: t("edit"),
                       icon: "pencil",
                       severity: "contrast",
                       outlined: true,
@@ -177,7 +179,7 @@ const DetailList = ({
                         severity: "success",
                         loading: isSaving,
                         onClick: () => handleSave(item),
-                        "aria-label": "Save"
+                        "aria-label": t("save")
                       }
                     ),
                     /* @__PURE__ */ jsx(
@@ -187,7 +189,7 @@ const DetailList = ({
                         severity: "secondary",
                         disabled: isSaving,
                         onClick: handleCancel,
-                        "aria-label": "Cancel"
+                        "aria-label": t("cancel")
                       }
                     )
                   ] })

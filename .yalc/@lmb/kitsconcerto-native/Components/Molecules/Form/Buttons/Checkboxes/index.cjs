@@ -30,7 +30,9 @@ const KitsCheckbox = ({
   limit,
   appearanceMode = "vertical",
   disabled,
-  invalid
+  invalid,
+  attached,
+  containerStyle
 }) => {
   const lastToggledIndex = React.useRef(null);
   const controller = useSelectionController.default(checked != void 0 ? {
@@ -45,6 +47,40 @@ const KitsCheckbox = ({
     onChange
   });
   const direction = appearanceMode === "horizontal" ? "row" : "column";
+  const Element = /* @__PURE__ */ jsxRuntime.jsxs(index.default, { id, flexDirection: direction, gap: "1rem", children: [
+    !Array.isArray(item) && /* @__PURE__ */ jsxRuntime.jsx(
+      checkbox_native.default,
+      {
+        item,
+        selected: !!checked,
+        disabled,
+        isInvalid: invalid,
+        onToggle: () => {
+          controller.onChange(item);
+        }
+      },
+      String(item.value)
+    ),
+    Array.isArray(item) && item.map((it, index) => {
+      return /* @__PURE__ */ jsxRuntime.jsx(
+        checkbox_native.default,
+        {
+          item: it,
+          selected: controller.isSelected(it),
+          disabled,
+          isInvalid: invalid,
+          onToggle: () => {
+            lastToggledIndex.current = index;
+            controller.onChange(it);
+          }
+        },
+        String(it.value)
+      );
+    })
+  ] });
+  if (attached) {
+    return Element;
+  }
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -57,37 +93,8 @@ const KitsCheckbox = ({
       hideError,
       required,
       disabled,
-      children: /* @__PURE__ */ jsxRuntime.jsxs(index.default, { id, flexDirection: direction, gap: "1rem", children: [
-        !Array.isArray(item) && /* @__PURE__ */ jsxRuntime.jsx(
-          checkbox_native.default,
-          {
-            item,
-            selected: !!checked,
-            disabled,
-            isInvalid: invalid,
-            onToggle: () => {
-              controller.onChange(item);
-            }
-          },
-          String(item.value)
-        ),
-        Array.isArray(item) && item.map((it, index) => {
-          return /* @__PURE__ */ jsxRuntime.jsx(
-            checkbox_native.default,
-            {
-              item: it,
-              selected: controller.isSelected(it),
-              disabled,
-              isInvalid: invalid,
-              onToggle: () => {
-                lastToggledIndex.current = index;
-                controller.onChange(it);
-              }
-            },
-            String(it.value)
-          );
-        })
-      ] })
+      containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle },
+      children: Element
     }
   );
 };

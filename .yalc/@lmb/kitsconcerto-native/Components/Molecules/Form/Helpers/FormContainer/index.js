@@ -52,6 +52,8 @@ import '../../../../../apps/mobile/src/ui/toast/index.js';
 import '../../../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../../../apps/mobile/src/ui/vstack/index.js';
 import 'react-native-reanimated';
+import { style } from '../../../../../apps/mobile/src/Factory/helpers/style.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';
@@ -78,28 +80,31 @@ import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import 'axios';
 import '../../../UI/Flex/index.js';
 import '../../../../../Contexts/DialogContext.js';
+import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
 import 'primereact/tooltip';
 import 'primereact/skeleton';
 import '../../KitsSelect/SelectContext.js';
 import Label from '../Label/label.js';
 
-const KitsContainer = ({
-  id,
-  helperText,
-  className,
-  children,
-  rightAddon,
-  leftAddon,
-  errors,
-  invalid,
-  required,
-  hideError,
-  additionalClassName,
-  label,
-  isFloatedLabel,
-  containerStyle,
-  disabled
-}) => {
+const KitsContainer = (rawProps) => {
+  const { mergedProps: props, themeStyle } = useComponentDefaults("FormContainer", rawProps);
+  const {
+    id,
+    helperText,
+    className,
+    children,
+    rightAddon,
+    leftAddon,
+    errors,
+    invalid,
+    required,
+    hideError,
+    additionalClassName,
+    label,
+    isFloatedLabel,
+    containerStyle,
+    disabled
+  } = props;
   const elementId = id ? `${id}_element` : uniqueId("element_");
   const placement = useMemo(() => {
     if (label && typeof label === "object" && "placement" in label) {
@@ -111,6 +116,14 @@ const KitsContainer = ({
   const isBottom = placement === "B";
   const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsx(Label, { isFormControl: true, label, elementId }) : null;
   const contentElement = /* @__PURE__ */ jsx(Addons, { additionalClassName, leftAddon, rightAddon, invalid, children });
+  const themeRnStyle = useMemo(
+    () => themeStyle && Object.keys(themeStyle).length ? style(themeStyle) : {},
+    [themeStyle]
+  );
+  const containerRnStyle = useMemo(
+    () => containerStyle && Object.keys(containerStyle).length ? style(containerStyle) : {},
+    [containerStyle]
+  );
   return /* @__PURE__ */ jsxs(
     FormControl,
     {
@@ -119,7 +132,7 @@ const KitsContainer = ({
       isDisabled: disabled,
       isReadOnly: disabled,
       isRequired: required,
-      style: { width: "100%", gap: 4 },
+      style: { width: "100%", gap: 4, ...themeRnStyle, ...containerRnStyle },
       children: [
         isHorizontal ? /* @__PURE__ */ jsxs(View, { style: { flexDirection: "row", alignItems: "center", gap: 8, width: "100%" }, children: [
           labelElement,

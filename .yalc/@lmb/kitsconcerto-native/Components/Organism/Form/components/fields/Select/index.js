@@ -24,7 +24,8 @@ const Select = ({
     isRequired,
     helperText,
     watchedValues,
-    list
+    list,
+    attached
   } = fieldLogic;
   const shapeMap = {
     Select: "dropdown",
@@ -74,6 +75,7 @@ const Select = ({
       helperText,
       list,
       hideError,
+      attached,
       labelKey,
       valueKey,
       outputValueKey,

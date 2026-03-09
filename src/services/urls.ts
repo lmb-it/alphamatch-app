@@ -7,8 +7,8 @@ export const URLs = {
     register: '/auth/register',
     logout: '/auth/logout',
     me: '/auth/me',
-    forgotPassword: '/auth/forgot-password',
-    resetPassword: '/auth/reset-password',
+    forgotPassword: '/auth/request-reset',
+    resetPassword: '/auth/reset',
     refresh: '/auth/refresh',
   },
   jobs: {

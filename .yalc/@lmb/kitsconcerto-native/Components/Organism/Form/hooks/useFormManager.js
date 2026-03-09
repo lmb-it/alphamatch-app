@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { checkNameDuplication, getDefaultValues } from '../utils/helpers.js';
+import { checkNameDuplication, getDefaultValues, getCombinedChildIds } from '../utils/helpers.js';
 import { schemaBuilder } from '../utils/schemaBuilder.js';
 
 const useFormManager = ({
@@ -23,6 +23,17 @@ const useFormManager = ({
   }, [elements]);
   const defaultValues = useMemo(() => getDefaultValues(elements), [elements]);
   const schema = useMemo(() => schemaBuilder(elements), [elements]);
+  const combinedChildIds = useMemo(() => getCombinedChildIds(elements), [elements]);
+  const stripCombinedChildren = useCallback((data) => {
+    if (combinedChildIds.size === 0) return data;
+    const filtered = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (!combinedChildIds.has(key)) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  }, [combinedChildIds]);
   const formMethods = useForm({
     resolver: yupResolver(schema),
     defaultValues,
@@ -32,7 +43,8 @@ const useFormManager = ({
     // ... (defaultValues logic remains the same)
   });
   const onValidSubmit = useCallback(
-    (data) => {
+    (rawData) => {
+      const data = stripCombinedChildren(rawData);
       if (outputFormat === "FormData") {
         const formData = new FormData();
         for (const [key, value] of Object.entries(data)) {
@@ -65,7 +77,7 @@ const useFormManager = ({
         onSubmit && onSubmit(data, setIsSubmitting, formMethods);
       }
     },
-    [outputFormat, onSubmit, setIsSubmitting, formMethods]
+    [outputFormat, onSubmit, setIsSubmitting, formMethods, stripCombinedChildren]
   );
   const handleSubmitWrapper = useCallback(() => {
     formMethods.handleSubmit(onValidSubmit, (errors) => {
@@ -81,14 +93,16 @@ const useFormManager = ({
   }
   useEffect(() => {
     const subscription = formMethods.watch((currentValues, { name, type }) => {
-      onChange?.(currentValues);
+      onChange?.(stripCombinedChildren(currentValues));
       if (onChangeSingleValue && name && type === "change") {
-        const value = getValueByPath(currentValues, name);
-        onChangeSingleValue(name, value);
+        if (!combinedChildIds.has(name)) {
+          const value = getValueByPath(currentValues, name);
+          onChangeSingleValue(name, value);
+        }
       }
     });
     return () => subscription.unsubscribe();
-  }, [formMethods.watch, onChange, onChangeSingleValue]);
+  }, [formMethods.watch, onChange, onChangeSingleValue, stripCombinedChildren, combinedChildIds]);
   return {
     formMethods,
     // The original object for FormProvider

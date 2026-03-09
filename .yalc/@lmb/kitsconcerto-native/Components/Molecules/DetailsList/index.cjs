@@ -8,6 +8,7 @@ var index = require('../UI/Box/index.cjs');
 var index_native = require('../UI/HStack/index.cjs');
 var index$1 = require('../UI/Flex/index.cjs');
 var index_native$2 = require('../UI/Text/index.cjs');
+var locale = require('../../../Hooks/locale.cjs');
 require('../../../Contexts/DialogContext.cjs');
 var index_native$1 = require('../UI/Heading/index.cjs');
 var Button_native = require('../Button/Button.cjs');
@@ -27,6 +28,7 @@ const DetailList = ({
   headerActions,
   itemActions
 }) => {
+  const { t } = locale.useLanguage();
   const [editingField, setEditingField] = React.useState(null);
   const [draftValue, setDraftValue] = React.useState(null);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -166,7 +168,7 @@ const DetailList = ({
                   item.editable && !isEditing && /* @__PURE__ */ jsxRuntime.jsx(
                     Button_native.Button,
                     {
-                      label: "Edit",
+                      label: t("edit"),
                       icon: "pencil",
                       severity: "contrast",
                       outlined: true,
@@ -181,7 +183,7 @@ const DetailList = ({
                         severity: "success",
                         loading: isSaving,
                         onClick: () => handleSave(item),
-                        "aria-label": "Save"
+                        "aria-label": t("save")
                       }
                     ),
                     /* @__PURE__ */ jsxRuntime.jsx(
@@ -191,7 +193,7 @@ const DetailList = ({
                         severity: "secondary",
                         disabled: isSaving,
                         onClick: handleCancel,
-                        "aria-label": "Cancel"
+                        "aria-label": t("cancel")
                       }
                     )
                   ] })

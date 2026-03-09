@@ -195,8 +195,8 @@ const parseBorderSide = (resolved, side) => {
   if (parsed.borderStyle) styles[`${side}Style`] = parsed.borderStyle;
   return styles;
 };
-const style = (props) => {
-  const ctx = createStyleContext();
+const style = (props, externalCtx) => {
+  const ctx = externalCtx ?? createStyleContext();
   const finalStyles = {};
   const transforms = [];
   const apply = (key, value) => {

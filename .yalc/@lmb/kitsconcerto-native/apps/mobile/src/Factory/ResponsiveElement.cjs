@@ -54,6 +54,7 @@ require('../ui/toast/index.cjs');
 require('../ui/tooltip/index.cjs');
 var index = require('../ui/vstack/index.cjs');
 var style = require('./helpers/style.cjs');
+var DimensionsContext = require('./DimensionsContext.cjs');
 var animationPresets = require('./animationPresets.cjs');
 require('react-icons/fa');
 require('react-icons/ai');
@@ -114,9 +115,10 @@ const ResponsiveElement = ({
   ref
   // directly available in React 19+
 }) => {
+  const styleCtx = DimensionsContext.useStyleContext();
   const combinedStyles = React.useMemo(() => {
-    return [style.style({ ...additionalStyles, ...cssProps, ...nativeProps?.style })];
-  }, [cssProps, additionalStyles, nativeProps?.style]);
+    return [style.style({ ...additionalStyles, ...cssProps, ...nativeProps?.style }, styleCtx)];
+  }, [cssProps, additionalStyles, nativeProps?.style, styleCtx]);
   const Component = as ? COMPONENT_MAP[as] || reactNative.View : reactNative.View;
   const isText = (typeof children === "string" || typeof children === "number") && (as !== "Heading" && as !== "Text");
   const hasAnimation = !!(entering || exiting);

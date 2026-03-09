@@ -63,6 +63,7 @@ require('react-icons/io');
 require('../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
 require('yup');
 require('../../../../../packages/types/src/Css/map/index.cjs');
+require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
 require('react-i18next');
 require('../../../../../apps/mobile/src/Core/AutoComplete/index.cjs');
@@ -97,7 +98,7 @@ const Label = ({ label, className, isFormControl = false, elementId }) => {
     return "";
   }, [label]);
   const labelClasses = React.useMemo(() => {
-    const classes = ["p-12", "label-position", "w-full"];
+    const classes = ["label-position", "w-full"];
     if (className) {
       classes.push(className);
     }
@@ -122,7 +123,7 @@ const Label = ({ label, className, isFormControl = false, elementId }) => {
       }
     );
   }
-  return /* @__PURE__ */ jsxRuntime.jsx(index.FormControlLabel, { className: labelClasses, children: /* @__PURE__ */ jsxRuntime.jsx(index.FormControlLabelText, { children: renderLabel }) });
+  return /* @__PURE__ */ jsxRuntime.jsx(index.FormControlLabel, { className: labelClasses, style: { padding: 0 }, children: /* @__PURE__ */ jsxRuntime.jsx(index.FormControlLabelText, { style: { padding: 0 }, children: renderLabel }) });
 };
 
 exports.default = Label;

@@ -84,7 +84,7 @@ const checkNameDuplication = (fields) => {
     if (!("displayOnly" in item) || !item.displayOnly) {
       formNames.push(itemId);
     }
-    if ((item.type === "Group" || item.type === "Object") && "elements" in item) {
+    if ((item.type === "Group" || item.type === "Object" || item.type === "Combined") && "elements" in item) {
       const elements = item.elements;
       if (typeof elements == "function") ; else {
         checkNameDuplication(elements);
@@ -97,6 +97,17 @@ const getDefaultValues = (fields) => {
   fields.forEach((element) => {
     const elementId = element.id;
     if ("displayOnly" in element && element.displayOnly) return;
+    if (element.type === "Combined" && "elements" in element) {
+      const childElements = element.elements;
+      if (Array.isArray(childElements)) {
+        const childDefaults = getDefaultValues(childElements);
+        Object.assign(defaultFormValues, childDefaults);
+      }
+      if ("initialValue" in element && element.initialValue !== void 0) {
+        defaultFormValues[elementId] = element.initialValue;
+      }
+      return;
+    }
     if ((element.type === "Group" || element.type === "Object") && "elements" in element) {
       const elements = element.elements;
       if (typeof elements == "function") ; else {
@@ -132,9 +143,29 @@ const getDefaultValues = (fields) => {
   });
   return defaultFormValues;
 };
+const getCombinedChildIds = (fields) => {
+  const childIds = /* @__PURE__ */ new Set();
+  fields.forEach((element) => {
+    if (element.type === "Combined" && "elements" in element) {
+      const children = element.elements;
+      if (Array.isArray(children)) {
+        children.forEach((child) => childIds.add(child.id));
+      }
+    }
+    if ((element.type === "Group" || element.type === "Object") && "elements" in element) {
+      const nested = element.elements;
+      if (typeof nested !== "function") {
+        const nestedIds = getCombinedChildIds(nested);
+        nestedIds.forEach((id) => childIds.add(id));
+      }
+    }
+  });
+  return childIds;
+};
 
 exports.checkNameDuplication = checkNameDuplication;
 exports.formFileValidation = formFileValidation;
+exports.getCombinedChildIds = getCombinedChildIds;
 exports.getDefaultValues = getDefaultValues;
 exports.getPropertyByPath = getPropertyByPath;
 //# sourceMappingURL=helpers.cjs.map

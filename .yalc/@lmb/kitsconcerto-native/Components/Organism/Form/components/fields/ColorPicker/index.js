@@ -19,7 +19,8 @@ const ColorPicker = ({
     fieldState,
     label,
     isDisabled,
-    isRequired
+    isRequired,
+    attached
   } = fieldLogic;
   const colorPickerElement = element;
   const { colorFormat, inline } = colorPickerElement;
@@ -33,6 +34,7 @@ const ColorPicker = ({
       required: isRequired,
       invalid: fieldState.invalid,
       errors: fieldState.error?.message,
+      attached,
       colorFormat,
       inline
     }

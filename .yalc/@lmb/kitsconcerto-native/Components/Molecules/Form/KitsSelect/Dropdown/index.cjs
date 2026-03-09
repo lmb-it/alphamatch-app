@@ -54,6 +54,7 @@ require('../../../../../apps/mobile/src/ui/tooltip/index.cjs');
 require('../../../../../apps/mobile/src/ui/vstack/index.cjs');
 require('react-native-reanimated');
 var style = require('../../../../../apps/mobile/src/Factory/helpers/style.cjs');
+require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('react-icons/fa');
 require('react-icons/ai');
 require('react-icons/io');

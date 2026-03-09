@@ -1,70 +1,52 @@
-import React, {useRef, useCallback} from 'react';
+import React, {useRef, useCallback, useMemo, useState} from 'react';
+import {TouchableOpacity} from 'react-native';
 import {
-  Box,
-  Text,
-  Heading,
   Button,
   Flex,
-  VStack,
+  Text,
+  Heading,
+  Icon,
+  Divider,
   Form,
-  type IFormElement,
+  useLanguage,
+  useKitsTheme,
   type IUseFormReturn,
 } from '@lmb/kitsconcerto';
-import * as Yup from 'yup';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
-import {authActions} from '../store/auth.slice';
-import {selectAuthLoading, selectAuthError} from '../store/auth.selectors';
-import type {ILoginPayload} from '../models/auth.types';
-
-interface ILoginForm {
-  email: string;
-  password: string;
-}
+import {authActions, selectAuthLoading, selectAuthError, selectUser} from '@src/modules/Auth';
+import {getLoginFormElements, type ILoginForm} from '../constants/loginFormElements';
+import type {ILoginPayload} from '@src/modules/Auth';
+import type {AuthStackParamList} from '@src/routes/AuthNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
+import GoogleIcon from '../components/GoogleIcon';
+import AppleIcon from '../components/AppleIcon';
 
 interface LoginScreenProps {
-  onNavigateRegister?: () => void;
-  onNavigateForgotPassword?: () => void;
-  onGoBack?: () => void;
+  onGoogleLogin?: () => void;
+  onAppleLogin?: () => void;
 }
 
-const loginElements: IFormElement<ILoginForm>[] = [
-  {
-    id: 'email',
-    type: 'Text',
-    label: 'Email or Phone',
-    placeholder: 'Enter your email or phone',
-    colSpan: 12,
-    schema: Yup.string()
-      .required('Email is required')
-      .email('Please enter a valid email'),
-  },
-  {
-    id: 'password',
-    type: 'Password',
-    label: 'Password',
-    placeholder: 'Enter your password',
-    colSpan: 12,
-    schema: Yup.string()
-      .required('Password is required')
-      .min(6, 'Password must be at least 6 characters'),
-  },
-];
-
-const LoginScreen: React.FC<LoginScreenProps> = ({
-  onNavigateRegister,
-  onNavigateForgotPassword,
-  onGoBack,
-}) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) => {
+  const {t} = useLanguage();
+  const {resolveToken} = useKitsTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch();
   const loading = useSelector(selectAuthLoading);
   const error = useSelector(selectAuthError);
+  const cachedUser = useSelector(selectUser);
   const formRef = useRef<IUseFormReturn<ILoginForm>>(null);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const isReturningUser = !!cachedUser;
+  const formElements = useMemo(() => getLoginFormElements(t), [t]);
 
   const handleSubmit = useCallback(
     (data: ILoginForm, setIsSubmitting: (v: boolean) => void) => {
       const payload: ILoginPayload = {
-        email: data.email,
-        password: data.password,
+        contactEmail: data.identifier,
+        secret: data.password,
       };
       dispatch(authActions.login(payload));
       setIsSubmitting(false);
@@ -73,127 +55,147 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   );
 
   return (
-    <Box w="full" h="full" bg="white" p="1.5rem" pt="3rem">
-      <VStack space="lg" w="full">
+    <AlphaLayout>
+      <Flex flex={1} px={24} mt={80} pb={32} flexDirection="column" gap={50}>
         {/* Header */}
-        <Box mb="0.5rem">
-          <Flex flexDirection="row" gap="0.4rem" mb="0.5rem">
-            <Heading as="h3" fontWeight="800">
-              Welcome
+        <Flex flexDirection="column" gap={8}>
+          {isReturningUser ? (
+            <Heading as="h1" bold color="text-primary">
+              {t('auth.welcomeBack')}{' '}
+              <Heading as="h1" bold color="primary">
+                {cachedUser.displayName ?? t('auth.back')}
+              </Heading>
             </Heading>
-            <Heading as="h3" fontWeight="800" fontColor="primary">
-              Back!
+          ) : (
+            <Heading as="h1" bold color="text-primary">
+              {t('auth.welcomeTo')}{' '}
+              <Heading as="h1" bold color="primary">
+                {t('auth.appName')}
+              </Heading>
             </Heading>
-          </Flex>
-          <Text fontSize="sm" fontColor="secondary">
-            Welcome back! Log in to access your account and continue where you
-            left off.
+          )}
+          <Text fontSize={14} color="text-subtle" lineHeight={20}>
+            {isReturningUser ? t('auth.loginSubtitle') : t('auth.loginSubtitleNew')}
           </Text>
-        </Box>
+        </Flex>
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
-          <Box
-            bg="red.50"
-            p="0.75rem"
-            borderRadius="8px"
-            border="1px solid"
-            borderColor="danger">
-            <Text fontSize="sm" fontColor="danger">
+          <Flex
+            p={12}
+            flexDirection="column"
+            backgroundColor="red.50"
+            borderWidth={1}
+            borderColor="red.200"
+            borderRadius={10}>
+            <Text fontSize={13} color="danger">
               {error}
             </Text>
-          </Box>
+          </Flex>
         )}
 
-        {/* Login form */}
+        {/* Form */}
         <Form<ILoginForm>
           ref={formRef}
-          elements={loginElements}
+          elements={formElements}
           onSubmit={handleSubmit}
           outputFormat="Json"
           submitButtonProps="none"
         />
 
-        {/* Remember me + Forgot password row */}
-        <Flex
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mt="-0.5rem">
-          <Text fontSize="sm" fontColor="secondary">
-            Remember me
-          </Text>
-          <Text
-            fontSize="sm"
-            fontColor="primary"
-            bold
-            onPress={onNavigateForgotPassword}>
-            Forgot Password
-          </Text>
+        {/* Remember me + Forgot password */}
+        <Flex justifyContent="space-between" alignItems="center">
+          <TouchableOpacity
+            onPress={() => setRememberMe(!rememberMe)}
+            activeOpacity={0.7}
+            style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+            <Flex
+              w={22}
+              h={22}
+              alignItems="center"
+              justifyContent="center"
+              borderRadius={11}
+              borderWidth={1.5}
+              borderColor={rememberMe ? resolveToken('primary') : resolveToken('gray.300')}
+              backgroundColor={rememberMe ? resolveToken('primary') : 'transparent'}>
+              {rememberMe && <Icon name="check" size="xs" color={resolveToken('bg')} />}
+            </Flex>
+            <Text fontSize={14} color="text-subtle">
+              {t('auth.rememberMe')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPassword')}
+            activeOpacity={0.6}>
+            <Text fontSize={14} color="primary" fontWeight="600">
+              {t('auth.forgotPassword')}
+            </Text>
+          </TouchableOpacity>
         </Flex>
 
-        {/* Sign In button */}
+        {/* Sign In */}
         <Button
-          label="Sign In"
+          label="auth.signIn"
           w="full"
-          rounded
+          severity="brand"
           loading={loading}
-          onPress={() => formRef.current?.onFormSubmit()}
+          onClick={() => formRef.current?.onFormSubmit()}
         />
 
         {/* Sign Up link */}
-        <Flex
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          gap="0.25rem">
-          <Text fontSize="sm" fontColor="secondary">
-            Don't have an account?
+        <Flex justifyContent="center" alignItems="center">
+          <Text fontSize={14} color="text-subtle">
+            {t('auth.noAccount')}{' '}
           </Text>
-          <Text fontSize="sm" fontColor="primary" bold onPress={onNavigateRegister}>
-            Sign Up
-          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Register')}
+            activeOpacity={0.6}>
+            <Text fontSize={14} color="primary" fontWeight="600" textDecoration="underline">
+              {t('auth.signUp')}
+            </Text>
+          </TouchableOpacity>
         </Flex>
 
         {/* Divider */}
-        <Flex flexDirection="row" alignItems="center" gap="0.75rem">
-          <Box flex={1} h="1px" bg="gray.200" />
-          <Text fontSize="sm" fontColor="secondary">
-            or
-          </Text>
-          <Box flex={1} h="1px" bg="gray.200" />
-        </Flex>
+        <Divider align="center">
+          {t('auth.or')}
+        </Divider>
 
-        {/* Google button */}
-        <Button
-          label="Continue with Google"
-          w="full"
-          rounded
-          outlined
-          severity="secondary"
-        />
+        {/* Social buttons */}
+        <Flex flexDirection="column" gap={12}>
+          <Button
+            icon={GoogleIcon}
+            label="auth.continueWithGoogle"
+            severity="secondary"
+            outlined
+            w="full"
+            onClick={onGoogleLogin}
+          />
+
+          <Button
+            icon={AppleIcon}
+            label="auth.continueWithApple"
+            severity="secondary"
+            outlined
+            w="full"
+            onClick={onAppleLogin}
+          />
+        </Flex>
 
         {/* Terms */}
-        <Flex
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="center"
-          gap="0.2rem">
-          <Text fontSize="xs" fontColor="secondary">
-            By continuing, I agree to the
+        <Text fontSize={12} textAlign="center" color="text-muted" lineHeight={18} px={8}>
+          {t('auth.termsPrefix')}{' '}
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+            {t('auth.termsAndConditions')}
           </Text>
-          <Text fontSize="xs" fontColor="primary" bold>
-            Terms & Conditions
+          {' '}{t('auth.and')}{' '}
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+            {t('auth.privacyPolicy')}
           </Text>
-          <Text fontSize="xs" fontColor="secondary">
-            and
-          </Text>
-          <Text fontSize="xs" fontColor="primary" bold>
-            Privacy Policy.
-          </Text>
-        </Flex>
-      </VStack>
-    </Box>
+        </Text>
+      </Flex>
+    </AlphaLayout>
   );
 };
 

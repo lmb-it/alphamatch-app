@@ -23,8 +23,9 @@ const DateField = ({
     isRequired,
     helperText,
     leftAddon,
-    rightAddon
+    rightAddon,
     // The hook now resolves addons
+    attached
   } = fieldLogic;
   const dateElement = element;
   const { localProps } = dateElement;
@@ -34,6 +35,7 @@ const DateField = ({
       id: field.name,
       label,
       value: field.value,
+      onChange: field.onChange,
       onBlur: field.onBlur,
       placeholder,
       disabled: isDisabled,
@@ -44,6 +46,7 @@ const DateField = ({
       hideError: element.hideError,
       leftAddon,
       rightAddon,
+      attached,
       localProps: {
         ...localProps
       }

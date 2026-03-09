@@ -50,6 +50,7 @@ import '../../../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../../../apps/mobile/src/ui/vstack/index.js';
 import 'react-native-reanimated';
 import { style } from '../../../../../apps/mobile/src/Factory/helpers/style.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';

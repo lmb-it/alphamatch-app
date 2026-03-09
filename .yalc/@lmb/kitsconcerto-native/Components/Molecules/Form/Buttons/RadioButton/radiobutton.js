@@ -62,6 +62,7 @@ import 'react-icons/io';
 import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
