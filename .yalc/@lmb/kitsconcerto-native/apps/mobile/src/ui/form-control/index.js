@@ -157,7 +157,7 @@ const formControlLabelTextStyle = tva({
   }
 });
 const formControlLabelAstrickStyle = tva({
-  base: "font-medium text-typography-900",
+  base: "font-medium text-error-700",
   variants: {
     isTruncated: {
       true: "web:truncate"

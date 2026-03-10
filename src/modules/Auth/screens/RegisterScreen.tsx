@@ -13,7 +13,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
-import {authActions, selectAuthLoading, selectAuthError} from '@src/modules/Auth';
+import {authActions, selectAuthLoading} from '@src/modules/Auth';
+import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import {
   getRegisterFormElements,
   type IRegisterForm,
@@ -29,10 +30,18 @@ const RegisterScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch();
   const loading = useSelector(selectAuthLoading);
-  const error = useSelector(selectAuthError);
   const formRef = useRef<IUseFormReturn<IRegisterForm>>(null);
+  useAuthErrorToast();
 
   const formElements = useMemo(() => getRegisterFormElements(t), [t]);
+
+  const handleGoogleLogin = useCallback(() => {
+    dispatch(authActions.socialLogin({providerName: 'google', providerToken: ''}));
+  }, [dispatch]);
+
+  const handleAppleLogin = useCallback(() => {
+    dispatch(authActions.socialLogin({providerName: 'apple', providerToken: ''}));
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (data: IRegisterForm, setIsSubmitting: (v: boolean) => void) => {
@@ -49,12 +58,12 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <AlphaLayout>
-      <Flex flex={1} px={24} pt={12} pb={32} flexDirection="column" gap={20}>
+      <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
         {/* Header */}
         <Flex flexDirection="column" gap={8}>
-          <Heading as="h1" bold color="text-primary">
+          <Heading as="h2" bold color="text-primary" style={{ fontSize: 24, lineHeight: 32 }}>
             {t('auth.createAn')}{' '}
-            <Heading as="h1" bold color="primary">
+            <Heading as="h2" bold color="primary" style={{ fontSize: 24, lineHeight: 32 }}>
               {t('auth.account')}
             </Heading>
           </Heading>
@@ -63,35 +72,22 @@ const RegisterScreen: React.FC = () => {
           </Text>
         </Flex>
 
-        {/* Error */}
-        {error && (
-          <Flex
-            p={12}
-            flexDirection="column"
-            backgroundColor="red.50"
-            borderWidth={1}
-            borderColor="red.200"
-            borderRadius={10}>
-            <Text fontSize={13} color="danger">
-              {error}
-            </Text>
-          </Flex>
-        )}
-
         {/* Form */}
-        <Form<IRegisterForm>
-          ref={formRef}
-          elements={formElements}
-          onSubmit={handleSubmit}
-          outputFormat="Json"
-          submitButtonProps="none"
-        />
+        <Flex flexDirection="column" gap={16}>
+          <Form<IRegisterForm>
+            ref={formRef}
+            elements={formElements}
+            onSubmit={handleSubmit}
+            outputFormat="Json"
+            submitButtonProps="none"
+          />
+        </Flex>
 
         {/* Sign Up button */}
         <Button
           label="auth.signUp"
           w="full"
-          severity="primary"
+          severity="brand"
           loading={loading}
           onClick={() => formRef.current?.onFormSubmit()}
         />
@@ -111,18 +107,23 @@ const RegisterScreen: React.FC = () => {
         </Flex>
 
         {/* Divider */}
-        <Divider align="center">
-          {t('auth.or')}
-        </Divider>
+        <Flex alignItems="center" gap={5}>
+          <Flex flex={1} h={1} backgroundColor="border-default" />
+          <Text fontSize={16} lineHeight={24} color="text-muted">
+            {t('auth.or')}
+          </Text>
+          <Flex flex={1} h={1} backgroundColor="border-default" />
+        </Flex>
 
         {/* Social buttons */}
-        <Flex flexDirection="column" gap={12}>
+        <Flex flexDirection="column" gap={16}>
           <Button
             icon={GoogleIcon}
             label="auth.continueWithGoogle"
             severity="secondary"
             outlined
             w="full"
+            onClick={handleGoogleLogin}
           />
 
           <Button
@@ -131,17 +132,18 @@ const RegisterScreen: React.FC = () => {
             severity="secondary"
             outlined
             w="full"
+            onClick={handleAppleLogin}
           />
         </Flex>
 
         {/* Terms */}
-        <Text fontSize={12} textAlign="center" color="text-muted" lineHeight={18} px={8}>
+        <Text fontSize={12} textAlign="center" color="text-muted" lineHeight={20} px={8}>
           {t('auth.termsPrefix')}{' '}
-          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={20}>
             {t('auth.termsAndConditions')}
           </Text>
           {' '}{t('auth.and')}{' '}
-          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={20}>
             {t('auth.privacyPolicy')}
           </Text>
         </Text>

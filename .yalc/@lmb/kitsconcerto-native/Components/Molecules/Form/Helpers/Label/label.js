@@ -78,7 +78,7 @@ import '../../../../../apps/mobile/src/Core/ProgressBar/index.js';
 import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 
-const Label = ({ label, className, isFormControl = false, elementId }) => {
+const Label = ({ label, className, isFormControl = false, elementId, required }) => {
   const { isRTL } = useLanguage();
   const renderLabel = useMemo(() => {
     if (!label) return "";

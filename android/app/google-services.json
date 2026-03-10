@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "264396539269",
+    "project_id": "alpha-match-437700",
+    "storage_bucket": "alpha-match-437700.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264396539269:android:b67d098a9338faf91ab0ec",
+        "android_client_info": {
+          "package_name": "com.lmb.alphamatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "264396539269-8eglja3go7qko952embmkg5ck4e7bugo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMz24T6UeJB2cvDpNIhiv90KzUhaMtLDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "264396539269-8eglja3go7qko952embmkg5ck4e7bugo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

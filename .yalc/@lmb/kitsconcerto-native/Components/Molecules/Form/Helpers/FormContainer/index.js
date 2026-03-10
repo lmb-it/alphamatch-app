@@ -114,7 +114,7 @@ const KitsContainer = (rawProps) => {
   }, [label]);
   const isHorizontal = placement === "RL";
   const isBottom = placement === "B";
-  const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsx(Label, { isFormControl: true, label, elementId }) : null;
+  const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsx(Label, { isFormControl: true, label, elementId, required }) : null;
   const contentElement = /* @__PURE__ */ jsx(Addons, { additionalClassName, leftAddon, rightAddon, invalid, children });
   const themeRnStyle = useMemo(
     () => themeStyle && Object.keys(themeStyle).length ? style(themeStyle) : {},

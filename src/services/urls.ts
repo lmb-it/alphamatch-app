@@ -10,6 +10,11 @@ export const URLs = {
     forgotPassword: '/auth/request-reset',
     resetPassword: '/auth/reset',
     refresh: '/auth/refresh',
+    verifyEmail: '/auth/verify-email',
+    resendCode: '/auth/resend-code',
+    verifyResetCode: '/auth/verify-reset-code',
+    socialLogin: '/auth/social-login',
+    phoneLogin: '/auth/phone-login',
   },
   jobs: {
     feed: '/jobs',

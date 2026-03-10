@@ -118,7 +118,7 @@ const KitsContainer = (rawProps) => {
   }, [label]);
   const isHorizontal = placement === "RL";
   const isBottom = placement === "B";
-  const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { isFormControl: true, label, elementId }) : null;
+  const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { isFormControl: true, label, elementId, required }) : null;
   const contentElement = /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { additionalClassName, leftAddon, rightAddon, invalid, children });
   const themeRnStyle = React.useMemo(
     () => themeStyle && Object.keys(themeStyle).length ? style.style(themeStyle) : {},

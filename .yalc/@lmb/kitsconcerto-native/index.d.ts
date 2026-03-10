@@ -2768,6 +2768,7 @@ export interface ILabelProps {
     className?:string;
     elementId: string; // kept for API parity, unused on native
     as?: ITextComponent['as'] | IHeadingComponent['as']
+    required?: boolean;
 }
 
 export interface IKitsContainer

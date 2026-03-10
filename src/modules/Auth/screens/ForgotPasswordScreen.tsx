@@ -1,5 +1,5 @@
 import React, {useRef, useCallback, useMemo, useState} from 'react';
-import {Alert, TouchableOpacity} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {
   Button,
   Flex,
@@ -7,6 +7,7 @@ import {
   Heading,
   Form,
   useLanguage,
+  useDialog,
   type IFormElement,
   type IUseFormReturn,
 } from '@lmb/kitsconcerto';
@@ -14,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import * as Yup from 'yup';
 import authService from '../api/auth.service';
+import {parseApiError} from '@src/services/apiError';
 import type {AuthStackParamList} from '@src/routes/AuthNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 
@@ -24,9 +26,9 @@ interface IForgotPasswordForm {
 const ForgotPasswordScreen: React.FC = () => {
   const {t} = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const {toast} = useDialog();
   const formRef = useRef<IUseFormReturn<IForgotPasswordForm>>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const formElements = useMemo(
     (): IFormElement<IForgotPasswordForm>[] => [
@@ -50,14 +52,11 @@ const ForgotPasswordScreen: React.FC = () => {
       setIsSubmitting: (v: boolean) => void,
     ) => {
       setLoading(true);
-      setError(null);
       try {
-        await authService.forgotPassword(data.email);
-        Alert.alert(t('auth.codeSent'), t('auth.codeSentMessage'));
+        await authService.forgotPassword({contactInfo: data.email});
+        toast('success', t('auth.codeSent'), t('auth.codeSentMessage'));
       } catch (err: any) {
-        const message =
-          err?.response?.data?.message || t('auth.genericError');
-        setError(message);
+        toast('error', parseApiError(err).message);
       } finally {
         setLoading(false);
         setIsSubmitting(false);
@@ -68,12 +67,12 @@ const ForgotPasswordScreen: React.FC = () => {
 
   return (
     <AlphaLayout>
-      <Flex flex={1} px={24} pt={12} pb={32} flexDirection="column" gap={20}>
+      <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
         {/* Header */}
         <Flex flexDirection="column" gap={8}>
-          <Heading as="h1" bold color="text-primary">
+          <Heading as="h2" bold color="text-primary" style={{ fontSize: 24, lineHeight: 32 }}>
             {t('auth.forgotTitle')}{' '}
-            <Heading as="h1" bold color="primary">
+            <Heading as="h2" bold color="primary" style={{ fontSize: 24, lineHeight: 32 }}>
               {t('auth.forgotTitleAccent')}
             </Heading>
           </Heading>
@@ -82,35 +81,22 @@ const ForgotPasswordScreen: React.FC = () => {
           </Text>
         </Flex>
 
-        {/* Error */}
-        {error && (
-          <Flex
-            p={12}
-            flexDirection="column"
-            backgroundColor="red.50"
-            borderWidth={1}
-            borderColor="red.200"
-            borderRadius={10}>
-            <Text fontSize={13} color="danger">
-              {error}
-            </Text>
-          </Flex>
-        )}
-
         {/* Form */}
-        <Form<IForgotPasswordForm>
-          ref={formRef}
-          elements={formElements}
-          onSubmit={handleSubmit}
-          outputFormat="Json"
-          submitButtonProps="none"
-        />
+        <Flex flexDirection="column" gap={16}>
+          <Form<IForgotPasswordForm>
+            ref={formRef}
+            elements={formElements}
+            onSubmit={handleSubmit}
+            outputFormat="Json"
+            submitButtonProps="none"
+          />
+        </Flex>
 
         {/* Send Code button */}
         <Button
           label="auth.sendCode"
           w="full"
-          severity="primary"
+          severity="brand"
           loading={loading}
           onClick={() => formRef.current?.onFormSubmit()}
         />

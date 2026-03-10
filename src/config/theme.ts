@@ -88,14 +88,18 @@ export const alphaMatchTheme = extendTheme({
       style: {
         borderRadius: 50,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: '#EEEEEE',
         paddingHorizontal: 16,
-        // paddingVertical:30,
         height: 52,
         minHeight: 52,
-        backgroundColor: '#FFFFFF',
-        fontSize: 15,
-        color: '#111827',
+        backgroundColor: '#F9FAFC',
+        fontSize: 14,
+        color: '#263238',
+      },
+    },
+    FormContainer: {
+      style: {
+        gap: 8,
       },
     },
     Card: {

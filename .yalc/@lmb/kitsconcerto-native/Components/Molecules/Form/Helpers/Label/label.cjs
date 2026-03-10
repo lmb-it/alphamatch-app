@@ -82,7 +82,7 @@ require('../../../../../apps/mobile/src/Core/ProgressBar/index.cjs');
 require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 
-const Label = ({ label, className, isFormControl = false, elementId }) => {
+const Label = ({ label, className, isFormControl = false, elementId, required }) => {
   const { isRTL } = locale.useLanguage();
   const renderLabel = React.useMemo(() => {
     if (!label) return "";

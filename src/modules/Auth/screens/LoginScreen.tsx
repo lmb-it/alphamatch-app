@@ -15,7 +15,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
-import {authActions, selectAuthLoading, selectAuthError, selectUser} from '@src/modules/Auth';
+import {authActions, selectAuthLoading, selectUser} from '@src/modules/Auth';
+import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import {getLoginFormElements, type ILoginForm} from '../constants/loginFormElements';
 import type {ILoginPayload} from '@src/modules/Auth';
 import type {AuthStackParamList} from '@src/routes/AuthNavigator';
@@ -23,21 +24,24 @@ import AlphaLayout from '@src/layouts/AlphaLayout';
 import GoogleIcon from '../components/GoogleIcon';
 import AppleIcon from '../components/AppleIcon';
 
-interface LoginScreenProps {
-  onGoogleLogin?: () => void;
-  onAppleLogin?: () => void;
-}
-
-const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) => {
+const LoginScreen: React.FC = () => {
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch();
   const loading = useSelector(selectAuthLoading);
-  const error = useSelector(selectAuthError);
   const cachedUser = useSelector(selectUser);
+  useAuthErrorToast();
   const formRef = useRef<IUseFormReturn<ILoginForm>>(null);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const handleGoogleLogin = useCallback(() => {
+    dispatch(authActions.socialLogin({providerName: 'google', providerToken: ''}));
+  }, [dispatch]);
+
+  const handleAppleLogin = useCallback(() => {
+    dispatch(authActions.socialLogin({providerName: 'apple', providerToken: ''}));
+  }, [dispatch]);
 
   const isReturningUser = !!cachedUser;
   const formElements = useMemo(() => getLoginFormElements(t), [t]);
@@ -56,20 +60,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) 
 
   return (
     <AlphaLayout>
-      <Flex flex={1} px={24} mt={80} pb={32} flexDirection="column" gap={50}>
+      <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
         {/* Header */}
         <Flex flexDirection="column" gap={8}>
           {isReturningUser ? (
-            <Heading as="h1" bold color="text-primary">
+            <Heading as="h2" bold color="text-primary" style={{ fontSize: 24, lineHeight: 32 }}>
               {t('auth.welcomeBack')}{' '}
-              <Heading as="h1" bold color="primary">
+              <Heading as="h2" bold color="primary" style={{ fontSize: 24, lineHeight: 32 }}>
                 {cachedUser.displayName ?? t('auth.back')}
               </Heading>
             </Heading>
           ) : (
-            <Heading as="h1" bold color="text-primary">
+            <Heading as="h2" bold color="text-primary" style={{ fontSize: 24, lineHeight: 32 }}>
               {t('auth.welcomeTo')}{' '}
-              <Heading as="h1" bold color="primary">
+              <Heading as="h2" bold color="primary" style={{ fontSize: 24, lineHeight: 32 }}>
                 {t('auth.appName')}
               </Heading>
             </Heading>
@@ -79,29 +83,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) 
           </Text>
         </Flex>
 
-        {/* Error */}
-        {error && (
-          <Flex
-            p={12}
-            flexDirection="column"
-            backgroundColor="red.50"
-            borderWidth={1}
-            borderColor="red.200"
-            borderRadius={10}>
-            <Text fontSize={13} color="danger">
-              {error}
-            </Text>
-          </Flex>
-        )}
-
         {/* Form */}
-        <Form<ILoginForm>
-          ref={formRef}
-          elements={formElements}
-          onSubmit={handleSubmit}
-          outputFormat="Json"
-          submitButtonProps="none"
-        />
+        <Flex flexDirection="column" gap={16}>
+          <Form<ILoginForm>
+            ref={formRef}
+            elements={formElements}
+            onSubmit={handleSubmit}
+            outputFormat="Json"
+            submitButtonProps="none"
+          />
+        </Flex>
 
         {/* Remember me + Forgot password */}
         <Flex justifyContent="space-between" alignItems="center">
@@ -158,19 +149,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) 
         </Flex>
 
         {/* Divider */}
-        <Divider align="center">
-          {t('auth.or')}
-        </Divider>
+        <Flex alignItems="center" gap={5}>
+          <Divider>
+            {t('auth.or')}
+          </Divider>
+        </Flex>
 
         {/* Social buttons */}
-        <Flex flexDirection="column" gap={12}>
+        <Flex flexDirection="column" gap={16}>
           <Button
             icon={GoogleIcon}
             label="auth.continueWithGoogle"
             severity="secondary"
             outlined
             w="full"
-            onClick={onGoogleLogin}
+            onClick={handleGoogleLogin}
           />
 
           <Button
@@ -179,18 +172,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onGoogleLogin, onAppleLogin}) 
             severity="secondary"
             outlined
             w="full"
-            onClick={onAppleLogin}
+            onClick={handleAppleLogin}
           />
         </Flex>
 
         {/* Terms */}
-        <Text fontSize={12} textAlign="center" color="text-muted" lineHeight={18} px={8}>
+        <Text fontSize={12} textAlign="center" color="text-muted" lineHeight={20} px={8}>
           {t('auth.termsPrefix')}{' '}
-          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={20}>
             {t('auth.termsAndConditions')}
           </Text>
           {' '}{t('auth.and')}{' '}
-          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={18}>
+          <Text fontSize={12} color="primary" fontWeight="500" lineHeight={20}>
             {t('auth.privacyPolicy')}
           </Text>
         </Text>

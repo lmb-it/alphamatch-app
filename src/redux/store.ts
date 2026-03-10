@@ -3,15 +3,34 @@
  */
 import {configureStore} from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
-import {persistStore, persistReducer} from 'redux-persist';
+import {
+  persistStore,
+  persistReducer,
+  createTransform,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import logger from 'redux-logger';
 import rootReducer from './rootReducer';
 import rootSaga from './rootSaga';
+
+// Strip transient fields (error, loading) from auth on rehydration
+const authTransform = createTransform(
+  null, // inbound: persist as-is
+  (outbound: any) => ({...outbound, error: null, loading: false, pendingVerification: null, resetContact: null}), // outbound: reset transient fields
+  {whitelist: ['auth']},
+);
 
 const persistConfig = {
   key: 'alphamatch',
   storage: AsyncStorage,
-  whitelist: ['auth'], // Only persist auth state for session restoration
+  whitelist: ['auth'],
+  transforms: [authTransform],
 };
 
 const sagaMiddleware = createSagaMiddleware();
@@ -21,10 +40,11 @@ const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore redux-persist actions
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(sagaMiddleware),
+    })
+      .concat(sagaMiddleware)
+      .concat(__DEV__ ? logger : []),
 });
 
 sagaMiddleware.run(rootSaga);
