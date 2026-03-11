@@ -1,5 +1,5 @@
 export default {
-  'app.name': 'Alpha Match',
+  'app.name': 'AlphaMatch',
   'app.tagline': 'Find the right professional',
   save: 'Save',
   cancel: 'Cancel',
@@ -8,6 +8,7 @@ export default {
   back: 'Back',
   next: 'Next',
   submit: 'Submit',
+  continue: 'Continue',
   loading: 'Loading...',
   error: 'Something went wrong',
   retry: 'Retry',
@@ -19,4 +20,13 @@ export default {
   send: 'Send',
   close: 'Close',
   search: 'Search',
+  searchPlaceholder: 'Search...',
+  or: 'OR',
+  required: 'Required',
+  optional: 'Optional',
+  active: 'Active',
+  uploaded: 'Uploaded',
+  pending: 'Pending',
+  user: 'User',
+  personal: 'Personal',
 };

@@ -72,4 +72,13 @@ export default {
     return res.data;
   },
 
+  validatePhone: async (data: {phone: string; context: 'login' | 'register'}) => {
+    const res = await api.post(URLs.auth.validatePhone, data);
+    return res.data;
+  },
+
+  verifyOtp: async (data: {phone: string; firebaseToken: string; context: 'login' | 'register'}) => {
+    const res = await api.post(URLs.auth.verifyOtp, data);
+    return res.data;
+  },
 };

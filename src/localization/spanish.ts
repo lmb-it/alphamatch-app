@@ -2,6 +2,7 @@ import general from './En/general';
 import auth from './En/auth';
 import navigation from './En/navigation';
 import jobs from './En/jobs';
+import profile from './En/profile';
 
 export default {
   lang: 'es',
@@ -10,6 +11,7 @@ export default {
     ...auth,
     ...navigation,
     ...jobs,
+    ...profile,
   },
   isDefault: false,
 };

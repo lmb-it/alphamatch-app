@@ -129,6 +129,41 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
 
+    // ── Send OTP (Firebase Phone Auth) ──
+    sendOtp(state, _action: PayloadAction<{phone: string; context: 'login' | 'register'}>) {
+      state.loading = true;
+      state.error = null;
+    },
+    sendOtpSuccess(state, action: PayloadAction<{phone: string; context: 'login' | 'register'}>) {
+      state.loading = false;
+      state.pendingVerification = {
+        contactEmail: action.payload.phone,
+        context: 'emailVerification',
+      };
+    },
+    sendOtpFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // ── Verify OTP (Firebase confirm + backend verify) ──
+    verifyOtp(state, _action: PayloadAction<{phone: string; code: string; context: 'login' | 'register'}>) {
+      state.loading = true;
+      state.error = null;
+    },
+    verifyOtpSuccess(state, action: PayloadAction<{user: IUser; token: string}>) {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      state.loading = false;
+      state.error = null;
+      state.pendingVerification = null;
+    },
+    verifyOtpFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
     // ── Forgot Password ──
     forgotPassword(state, _action: PayloadAction<IForgotPasswordPayload>) {
       state.loading = true;

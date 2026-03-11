@@ -1,7 +1,7 @@
 /**
  * AlphaMatch brand theme — extends KitsConcerto defaults
  */
-import {extendTheme} from '@lmb/kitsconcerto';
+import {extendTheme} from '@lmb-it/kitsconcerto';
 
 export const alphaMatchTheme = extendTheme({
   severity:{

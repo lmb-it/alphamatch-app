@@ -15,6 +15,8 @@ export const URLs = {
     verifyResetCode: '/auth/verify-reset-code',
     socialLogin: '/auth/social-login',
     phoneLogin: '/auth/phone-login',
+    validatePhone: '/auth/validate-phone',
+    verifyOtp: '/auth/verify-otp',
   },
   jobs: {
     feed: '/jobs',
@@ -38,10 +40,21 @@ export const URLs = {
     send: '/chat/rooms/:ref/messages',
   },
   profile: {
-    me: '/profile',
+    me: '/profile/me',
     update: '/profile',
     view: '/profile/:ref',
     portfolio: '/profile/portfolio',
+    switchWorkspace: '/profile/switch-workspace',
+  },
+  tradingAccounts: {
+    index: '/trading-accounts',
+    aiAnalyze: '/trading-accounts/ai-analyze',
+    careers: '/trading-accounts/careers',
+    create: '/trading-accounts/create',
+    submitFormAnswers: '/trading-accounts/:ref/form-answers',
+    finalize: '/trading-accounts/:ref/finalize',
+    requiredDocuments: '/trading-accounts/:ref/required-documents',
+    show: '/trading-accounts/:ref',
   },
   payments: {
     methods: '/payments/methods',
@@ -52,7 +65,8 @@ export const URLs = {
   },
   subscriptions: {
     plans: '/subscriptions/plans',
-    subscribe: '/subscriptions',
+    subscribe: '/subscriptions/subscribe',
+    setupIntent: '/subscriptions/setup-intent',
     mySubscriptions: '/subscriptions/my',
     cancel: '/subscriptions/:ref/cancel',
   },

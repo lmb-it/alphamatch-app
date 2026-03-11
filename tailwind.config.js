@@ -6,7 +6,7 @@ module.exports = {
   content: [
     './App.tsx',
     './src/**/*.{js,jsx,ts,tsx}',
-    './node_modules/@lmb/kitsconcerto-native/**/*.{js,jsx,ts,tsx}',
+    './node_modules/@lmb-it/kitsconcerto-native/**/*.{js,jsx,ts,tsx}',
   ],
   presets: [require('nativewind/preset')],
   important: 'html',

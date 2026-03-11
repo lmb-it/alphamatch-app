@@ -7,12 +7,8 @@ require Pod::Executable.execute_command('node', ['-p',
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
-
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+use_frameworks! :linkage => :static
+$RNFirebaseAsStaticFramework = true
 
 target 'AlphaMatch' do
   config = use_native_modules!
@@ -39,6 +35,27 @@ target 'AlphaMatch' do
         ldflags = config.build_settings['OTHER_LDFLAGS']
         if ldflags.is_a?(Array)
           config.build_settings['OTHER_LDFLAGS'] = ldflags.uniq
+        end
+      end
+    end
+
+    # Fix Xcode 26: duplicate modulemap definitions cause
+    # "Redefinition of module" build errors. Deduplicate by replacing
+    # the secondary modulemap with a symlink to the primary one.
+    dedup = [
+      # [directory, primary_prefix, secondary_prefix]
+      ['react_runtime', 'React-RuntimeCore', 'React-jsitooling'],
+      ['ReactCommon',   'ReactCommon',        'React-RuntimeApple'],
+    ]
+    dedup.each do |dir_name, primary, secondary|
+      dir = File.join(installer.sandbox.root, 'Headers', 'Public', dir_name)
+      next unless File.directory?(dir)
+      %w[.modulemap -umbrella.h].each do |ext|
+        src = File.join(dir, "#{primary}#{ext}")
+        dup = File.join(dir, "#{secondary}#{ext}")
+        if File.exist?(dup) && File.exist?(src)
+          File.delete(dup)
+          File.symlink(src, dup)
         end
       end
     end

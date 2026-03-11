@@ -2,7 +2,7 @@
  * Login form field configuration.
  * Labels must be pre-translated — KitsConcerto native Form does NOT auto-translate.
  */
-import {type IFormElement} from '@lmb/kitsconcerto';
+import {type IFormElement} from '@lmb-it/kitsconcerto';
 import * as Yup from 'yup';
 
 export interface ILoginForm {
@@ -16,7 +16,15 @@ export const getLoginFormElements = (
   {
     id: 'identifier',
     type: 'Text',
-    label: t('auth.emailOrPhone'),
+    label: ([], values, formContext)=>{
+      const value = formContext.getValues('identifier');
+      if(/^\d/.test(value)){
+        return t('auth.phone')
+      }else if(!!value){
+        return t('auth.email')
+      }
+      return t('auth.emailOrPhone')
+    },
     placeholder: t('auth.emailOrPhonePlaceholder'),
     colSpan: 12,
     schema: Yup.string().required(t('auth.emailRequired')),

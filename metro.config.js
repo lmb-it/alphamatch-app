@@ -37,8 +37,8 @@ const config = mergeConfig(base, {
         moduleName.startsWith('pusher-js') ||
         moduleName.startsWith('react-responsive') ||
         moduleName.startsWith('@react-hook/') ||
-        ((originPath.includes('@lmb/kitsconcerto') || originPath.includes('dist/web')) && moduleName.endsWith('.css')) ||
-        (moduleName.includes('@lmb/kitsconcerto') && moduleName.endsWith('.css'));
+        ((originPath.includes('@lmb-it/kitsconcerto') || originPath.includes('dist/web')) && moduleName.endsWith('.css')) ||
+        (moduleName.includes('@lmb-it/kitsconcerto') && moduleName.endsWith('.css'));
 
       if (isWebDep) {
         return {
@@ -49,7 +49,7 @@ const config = mergeConfig(base, {
       return context.resolveRequest(context, moduleName, platform);
     },
     extraNodeModules: {
-      '@lmb/kitsconcerto': path.resolve(projectRoot, 'node_modules/@lmb/kitsconcerto'),
+      '@lmb-it/kitsconcerto': path.resolve(projectRoot, 'node_modules/@lmb-it/kitsconcerto'),
       'lucide-react': require.resolve('lucide-react-native'),
     },
     sourceExts: [

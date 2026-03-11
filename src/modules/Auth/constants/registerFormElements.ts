@@ -3,7 +3,7 @@
  * Labels must be pre-translated — KitsConcerto native Form does NOT auto-translate.
  * Additional profile fields (name, phone) are collected in onboarding.
  */
-import {type IFormElement} from '@lmb/kitsconcerto';
+import {type IFormElement} from '@lmb-it/kitsconcerto';
 import * as Yup from 'yup';
 
 export interface IRegisterForm {

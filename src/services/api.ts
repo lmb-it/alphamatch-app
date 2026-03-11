@@ -16,12 +16,20 @@ api.interceptors.request.use(
   async config => {
     const token = await AsyncStorage.getItem('auth_token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // Use .set() — direct property assignment (config.headers.Authorization)
+      // does not work reliably with AxiosHeaders on Hermes engine
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
     return config;
   },
   error => Promise.reject(error),
 );
+
+// Callback for 401 handling — set by app bootstrap to dispatch Redux logout
+let onUnauthorized: (() => void) | null = null;
+export function setOnUnauthorized(cb: () => void) {
+  onUnauthorized = cb;
+}
 
 // Response interceptor — handle 401
 api.interceptors.response.use(
@@ -29,7 +37,7 @@ api.interceptors.response.use(
   async error => {
     if (error.response?.status === 401) {
       await AsyncStorage.removeItem('auth_token');
-      // Redux store will handle navigation to login
+      onUnauthorized?.();
     }
     return Promise.reject(error);
   },

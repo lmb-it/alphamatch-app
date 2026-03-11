@@ -9,7 +9,7 @@ import {
   Form,
   useLanguage,
   type IUseFormReturn,
-} from '@lmb/kitsconcerto';
+} from '@lmb-it/kitsconcerto';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
@@ -45,15 +45,21 @@ const RegisterScreen: React.FC = () => {
 
   const handleSubmit = useCallback(
     (data: IRegisterForm, setIsSubmitting: (v: boolean) => void) => {
-      const payload: IRegisterPayload = {
-        contactEmail: data.email,
-        secret: data.password,
-        secret_confirmation: data.passwordConfirmation,
-      };
-      dispatch(authActions.register(payload));
+      const isPhone = /^\d/.test(data.email);
+      if (isPhone) {
+        dispatch(authActions.sendOtp({phone: data.email, context: 'register'}));
+        navigation.navigate('VerifyOTP', {phone: data.email, context: 'register'});
+      } else {
+        const payload: IRegisterPayload = {
+          contactEmail: data.email,
+          secret: data.password,
+          secret_confirmation: data.passwordConfirmation,
+        };
+        dispatch(authActions.register(payload));
+      }
       setIsSubmitting(false);
     },
-    [dispatch],
+    [dispatch, navigation],
   );
 
   return (

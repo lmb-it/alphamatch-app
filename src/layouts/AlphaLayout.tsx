@@ -11,7 +11,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {ImageKey, Images} from '@src/config/demo-ui-images.ts';
-import {Icon, useKitsTheme} from '@lmb/kitsconcerto';
+import {Icon, useKitsTheme} from '@lmb-it/kitsconcerto';
 import Svg, { LinearGradient, Defs, Stop, Circle } from 'react-native-svg';
 
 interface AlphaLayoutProps {

@@ -26,11 +26,18 @@ const authTransform = createTransform(
   {whitelist: ['auth']},
 );
 
+// Strip transient fields from profile on rehydration
+const profileTransform = createTransform(
+  null,
+  (outbound: any) => ({...outbound, error: null, loading: false}),
+  {whitelist: ['profile']},
+);
+
 const persistConfig = {
   key: 'alphamatch',
   storage: AsyncStorage,
-  whitelist: ['auth'],
-  transforms: [authTransform],
+  whitelist: ['auth', 'profile'],
+  transforms: [authTransform, profileTransform],
 };
 
 const sagaMiddleware = createSagaMiddleware();

@@ -6,8 +6,10 @@
  */
 import {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useDialog} from '@lmb/kitsconcerto';
+import {useDialog} from '@lmb-it/kitsconcerto';
 import {selectAuthError, authActions} from '@src/modules/Auth';
+import {selectTAError, tradingAccountActions} from '@src/modules/TradingAccount';
+import {selectProfileError, profileActions} from '@src/modules/Profile';
 
 export function useAuthErrorToast() {
   const dispatch = useDispatch();
@@ -18,8 +20,37 @@ export function useAuthErrorToast() {
   useEffect(() => {
     if (error && error !== prevError.current) {
       toast('error', error);
-      // Clear the error so it won't re-trigger on re-mount
       dispatch(authActions.clearError());
+    }
+    prevError.current = error;
+  }, [error, toast, dispatch]);
+}
+
+export function useTradingAccountErrorToast() {
+  const dispatch = useDispatch();
+  const error = useSelector(selectTAError);
+  const {toast} = useDialog();
+  const prevError = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (error && error !== prevError.current) {
+      toast('error', error);
+      dispatch(tradingAccountActions.clearError());
+    }
+    prevError.current = error;
+  }, [error, toast, dispatch]);
+}
+
+export function useProfileErrorToast() {
+  const dispatch = useDispatch();
+  const error = useSelector(selectProfileError);
+  const {toast} = useDialog();
+  const prevError = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (error && error !== prevError.current) {
+      toast('error', error);
+      dispatch(profileActions.clearError());
     }
     prevError.current = error;
   }, [error, toast, dispatch]);

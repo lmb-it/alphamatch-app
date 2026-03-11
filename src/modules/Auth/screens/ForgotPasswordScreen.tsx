@@ -10,7 +10,7 @@ import {
   useDialog,
   type IFormElement,
   type IUseFormReturn,
-} from '@lmb/kitsconcerto';
+} from '@lmb-it/kitsconcerto';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import * as Yup from 'yup';

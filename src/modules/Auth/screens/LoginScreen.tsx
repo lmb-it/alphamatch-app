@@ -11,7 +11,7 @@ import {
   useLanguage,
   useKitsTheme,
   type IUseFormReturn,
-} from '@lmb/kitsconcerto';
+} from '@lmb-it/kitsconcerto';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
@@ -48,14 +48,20 @@ const LoginScreen: React.FC = () => {
 
   const handleSubmit = useCallback(
     (data: ILoginForm, setIsSubmitting: (v: boolean) => void) => {
-      const payload: ILoginPayload = {
-        contactEmail: data.identifier,
-        secret: data.password,
-      };
-      dispatch(authActions.login(payload));
+      const isPhone = /^\d/.test(data.identifier);
+      if (isPhone) {
+        dispatch(authActions.sendOtp({phone: data.identifier, context: 'login'}));
+        navigation.navigate('VerifyOTP', {phone: data.identifier, context: 'login'});
+      } else {
+        const payload: ILoginPayload = {
+          contactEmail: data.identifier,
+          secret: data.password,
+        };
+        dispatch(authActions.login(payload));
+      }
       setIsSubmitting(false);
     },
-    [dispatch],
+    [dispatch, navigation],
   );
 
   return (

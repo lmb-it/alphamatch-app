@@ -11,8 +11,8 @@
     "baseUrl": ".",
     "types": ["react", "react-native"],
     "paths": {
-      "@lmb/kitsconcerto": ["./node_modules/@lmb/kitsconcerto-native"],
-      "@lmb/kitsconcerto/*": ["./node_modules/@lmb/kitsconcerto-native/*"],
+      "@lmb-it/kitsconcerto": ["./node_modules/@lmb-it/kitsconcerto-native"],
+      "@lmb-it/kitsconcerto/*": ["./node_modules/@lmb-it/kitsconcerto-native/*"],
       "@/*": ["./*"],
       "@src/*": ["./src/*"],
       "tailwind.config": ["./tailwind.config.js"]

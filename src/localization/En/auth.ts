@@ -74,7 +74,8 @@ export default {
 
   // OTP Verification
   'auth.verifyTitle': 'Verify Your',
-  'auth.verifyTitleAccent': 'Email!',
+  'auth.verifyTitleAccent': 'Phone!',
+  'auth.verifyPhoneSubtitle': 'We have sent a 6-digit code to {{phone}}. Enter it below to continue.',
   'auth.verifySubtitle': 'We have sent a verification code to your email. Please enter the code below.',
   'auth.verifyCode': 'Verification Code',
   'auth.verify': 'Verify',
