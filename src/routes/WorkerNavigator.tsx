@@ -1,3 +1,8 @@
+/**
+ * @deprecated WorkerNavigator is replaced by MainTabNavigator (src/routes/MainTabNavigator.tsx).
+ * Kept for reference only — do not use or modify. Will be removed once MainTabNavigator is stable.
+ * [REF-ARCH-003]
+ */
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';

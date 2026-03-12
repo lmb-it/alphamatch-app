@@ -1,11 +1,16 @@
-import React from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Modal} from 'react-native';
-import {Text, useKitsTheme, useLanguage} from '@lmb-it/kitsconcerto';
-import {X, Check, Plus} from 'lucide-react-native';
-import type {ITradingAccountSummary} from '../models/profile.types';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
+import { Text, useKitsTheme, useLanguage } from '@lmb-it/kitsconcerto';
+import { X, Check, Plus } from 'lucide-react-native';
+import type { ITradingAccountSummary } from '../models/profile.types';
 
 interface WorkspaceSwitcherProps {
-  visible: boolean;
   onClose: () => void;
   personalName: string;
   personalAvatar?: string | null;
@@ -17,8 +22,9 @@ interface WorkspaceSwitcherProps {
   hasIncomplete?: boolean;
 }
 
+const ACCOUNT_COLORS = ['#14B8A6', '#8B5CF6', '#F59E0B', '#EF4444', '#3B82F6'];
+
 const WorkspaceSwitcher: React.FC<WorkspaceSwitcherProps> = ({
-  visible,
   onClose,
   personalName,
   personalAvatar,
@@ -29,100 +35,148 @@ const WorkspaceSwitcher: React.FC<WorkspaceSwitcherProps> = ({
   onAddAccount,
   hasIncomplete,
 }) => {
-  const {resolveToken} = useKitsTheme();
-  const {t} = useLanguage();
+  const { resolveToken } = useKitsTheme();
+  const { t } = useLanguage();
   const primaryColor = resolveToken('primary');
+  const slideAnim = useRef(new Animated.Value(500)).current;
+
+  // Slide in from bottom on mount
+  useEffect(() => {
+    Animated.spring(slideAnim, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 65,
+      friction: 11,
+    }).start();
+  }, [slideAnim]);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text fontSize={18} fontWeight="700" color="text-primary">{t('profile.account')}</Text>
-            <TouchableOpacity onPress={onClose} activeOpacity={0.6}>
-              <X color={resolveToken('text-primary')} size={22} />
-            </TouchableOpacity>
-          </View>
+    <>
+      {/* Transparent backdrop — tapping outside closes the sheet */}
+      <TouchableOpacity
+        style={StyleSheet.absoluteFill}
+        onPress={onClose}
+        activeOpacity={1}
+      />
 
-          {/* Personal account */}
-          <TouchableOpacity
-            style={styles.accountRow}
-            onPress={onSwitchPersonal}
-            activeOpacity={0.7}>
-            {personalAvatar ? (
-              <Image source={{uri: personalAvatar}} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                <Text fontSize={16} fontWeight="600" color="text-subtle">
-                  {personalName.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-            <Text fontSize={15} fontWeight="500" color="text-primary" style={styles.accountName}>
-              {personalName}
-            </Text>
-            {!activeWorkspace && (
-              <View style={[styles.checkCircle, {backgroundColor: primaryColor}]}>
-                <Check color="#FFFFFF" size={14} />
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {/* Trading accounts */}
-          {tradingAccounts.map(account => {
-            const isActive = activeWorkspace === account.identifier;
-            const initial = (account.accountName || account.careerName || '?').charAt(0).toUpperCase();
-            const colors = ['#14B8A6', '#8B5CF6', '#F59E0B', '#EF4444', '#3B82F6'];
-            const colorIndex = account.identifier.charCodeAt(0) % colors.length;
-            const bgColor = colors[colorIndex];
-
-            return (
-              <TouchableOpacity
-                key={account.identifier}
-                style={styles.accountRow}
-                onPress={() => onSwitchAccount(account.identifier, account.accountName || account.careerName || '', account.avatar || null)}
-                activeOpacity={0.7}>
-                {account.avatar ? (
-                  <Image source={{uri: account.avatar}} style={styles.avatar} />
-                ) : (
-                  <View style={[styles.avatar, {backgroundColor: bgColor}]}>
-                    <Text fontSize={16} fontWeight="700" color="white">{initial}</Text>
-                  </View>
-                )}
-                <Text fontSize={15} fontWeight="500" color="text-primary" style={styles.accountName}>
-                  {account.accountName || account.careerName}
-                </Text>
-                {isActive && (
-                  <View style={[styles.checkCircle, {backgroundColor: primaryColor}]}>
-                    <Check color="#FFFFFF" size={14} />
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-
-          {/* Add Account */}
-          <TouchableOpacity
-            style={[styles.addButton, hasIncomplete && {opacity: 0.5}]}
-            onPress={onAddAccount}
-            activeOpacity={0.7}
-            disabled={hasIncomplete}>
-            <Plus color={primaryColor} size={18} />
-            <Text fontSize={15} fontWeight="600" color="primary">{t('profile.addAccount')}</Text>
+      {/* Bottom sheet — slides up from bottom */}
+      <Animated.View
+        style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text fontSize={18} fontWeight="700" color="text-primary">
+            {t('profile.account')}
+          </Text>
+          <TouchableOpacity onPress={onClose} activeOpacity={0.6}>
+            <X color={resolveToken('text-primary')} size={22} />
           </TouchableOpacity>
         </View>
-      </View>
-    </Modal>
+
+        {/* Personal account */}
+        <TouchableOpacity
+          style={styles.accountRow}
+          onPress={onSwitchPersonal}
+          activeOpacity={0.7}
+        >
+          {personalAvatar ? (
+            <Image source={{ uri: personalAvatar }} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, styles.avatarPlaceholder]}>
+              <Text fontSize={16} fontWeight="600" color="text-subtle">
+                {personalName.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
+          <Text
+            fontSize={15}
+            fontWeight="500"
+            color="text-primary"
+            style={styles.accountName}
+          >
+            {personalName}
+          </Text>
+          {!activeWorkspace && (
+            <View
+              style={[styles.checkCircle, { backgroundColor: primaryColor }]}
+            >
+              <Check color="#FFFFFF" size={14} />
+            </View>
+          )}
+        </TouchableOpacity>
+
+        {/* Trading accounts */}
+        {tradingAccounts.map(account => {
+          const isActive = activeWorkspace === account.identifier;
+          const initial = (account.accountName || account.careerName || '?')
+            .charAt(0)
+            .toUpperCase();
+          const colorIndex =
+            account.identifier.charCodeAt(0) % ACCOUNT_COLORS.length;
+          const bgColor = ACCOUNT_COLORS[colorIndex];
+
+          return (
+            <TouchableOpacity
+              key={account.identifier}
+              style={styles.accountRow}
+              onPress={() =>
+                onSwitchAccount(
+                  account.identifier,
+                  account.accountName || account.careerName || '',
+                  account.avatar || null,
+                )
+              }
+              activeOpacity={0.7}
+            >
+              {account.avatar ? (
+                <Image source={{ uri: account.avatar }} style={styles.avatar} />
+              ) : (
+                <View style={[styles.avatar, { backgroundColor: bgColor }]}>
+                  <Text fontSize={16} fontWeight="700" color="white">
+                    {initial}
+                  </Text>
+                </View>
+              )}
+              <Text
+                fontSize={15}
+                fontWeight="500"
+                color="text-primary"
+                style={styles.accountName}
+              >
+                {account.accountName || account.careerName}
+              </Text>
+              {isActive && (
+                <View
+                  style={[
+                    styles.checkCircle,
+                    { backgroundColor: primaryColor },
+                  ]}
+                >
+                  <Check color="#FFFFFF" size={14} />
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+
+        {/* Add Account */}
+        <TouchableOpacity
+          style={[styles.addButton, hasIncomplete && styles.addButtonDisabled]}
+          onPress={onAddAccount}
+          activeOpacity={0.7}
+          disabled={hasIncomplete}
+        >
+          <Plus color={primaryColor} size={18} />
+          <Text fontSize={15} fontWeight="600" color="primary">
+            {t('profile.addAccount')}
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
   sheet: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
@@ -130,6 +184,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 36,
+    // Subtle shadow for depth without overlay
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
@@ -177,6 +237,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1.5,
     borderColor: '#14B8A6',
+  },
+  addButtonDisabled: {
+    opacity: 0.5,
   },
 });
 

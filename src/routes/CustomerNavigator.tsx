@@ -1,3 +1,8 @@
+/**
+ * @deprecated CustomerNavigator is replaced by MainTabNavigator (src/routes/MainTabNavigator.tsx).
+ * Kept for reference only — do not use or modify. Will be removed once MainTabNavigator is stable.
+ * [REF-ARCH-003]
+ */
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -7,10 +12,9 @@ import CustomerHomeScreen from '@src/screens/Customer/CustomerHomeScreen';
 import MyJobsScreen from '@src/screens/Jobs/MyJobsScreen';
 import ProfileScreen from '@src/modules/Profile/screens/ProfileScreen';
 import {Home, Briefcase, MessageSquare, User, Plus} from 'lucide-react-native';
-import {useNavigation, CompositeNavigationProp} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AppStackParamList} from './index';
 
 export type CustomerTabParamList = {
   CustomerHome: undefined;
@@ -27,10 +31,7 @@ export function CustomerNavigator() {
   const {t} = useTranslation();
   const primaryColor = resolveToken('primary');
   const navigation = useNavigation<
-    CompositeNavigationProp<
-      BottomTabNavigationProp<CustomerTabParamList, 'CustomerCreate'>,
-      NativeStackNavigationProp<AppStackParamList>
-    >
+    BottomTabNavigationProp<CustomerTabParamList, 'CustomerCreate'>
   >();
 
   return (
@@ -72,7 +73,7 @@ export function CustomerNavigator() {
           title: '',
           tabBarButton: ({onLongPress, testID}) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate('TradingAccountCreation')}
+              onPress={() => (navigation as any).navigate('TradingAccountCreation')}
               onLongPress={onLongPress ?? undefined}
               testID={testID}
               activeOpacity={0.8}

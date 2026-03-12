@@ -18,6 +18,7 @@ const LocaleContextProvider = ({
   const defaultLocal = useRef("");
   const [language, setLanguage] = useState(defaultLanguage);
   const [isRTL, setIsRTL] = useState(defaultLanguage === "ar");
+  const [isReady, setIsReady] = useState(false);
   const translationsList = () => {
     const l = {};
     Object.keys(localeFiles).forEach((key) => {
@@ -53,6 +54,7 @@ const LocaleContextProvider = ({
       setLanguage(lang);
       setIsRTL(lang === "ar");
       defaultLocal.current = defaultLanguage;
+      setIsReady(true);
     };
     void init();
   }, [defaultLanguage]);
@@ -83,7 +85,7 @@ const LocaleContextProvider = ({
         isRTL,
         isKeyExists
       },
-      children
+      children: isReady ? children : null
     }
   );
 };

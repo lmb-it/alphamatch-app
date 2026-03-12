@@ -1,5 +1,6 @@
 import React from 'react';
-import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Flex, Text, Heading, Button, useKitsTheme, useLanguage} from '@lmb-it/kitsconcerto';
 import {useNavigation} from '@react-navigation/native';
 import {CheckCircle2, ArrowLeft, ShieldCheck} from 'lucide-react-native';

@@ -30,9 +30,40 @@ export interface IPortfolioItem {
   createdAt: string;
 }
 
+/**
+ * Extended profile data returned by the API — includes display fields
+ * and workspace context used by the profile slice.
+ */
+export interface IProfileData extends IProfile {
+  displayName: string | null;
+  familyName: string | null;
+  activeWorkspace: string | null;
+  tradingAccounts: ITradingAccountSummary[];
+}
+
+/**
+ * Payload for switching the active workspace.
+ */
+export interface ISwitchWorkspacePayload {
+  workspaceRef: string;
+}
+
+/**
+ * Compact trading-account summary shown in profile lists and
+ * workspace switcher.
+ */
+export interface ITradingAccountSummary {
+  identifier: string;
+  accountName: string | null;
+  careerName: string | null;
+  careerModel: string | null;
+  avatar: string | null;
+  isActive: boolean;
+}
+
 export interface IProfileState {
-  profile: IProfile | null;
-  viewedProfile: IProfile | null;
+  data: IProfileData | null;
+  activeWorkspace: string | null;
   loading: boolean;
   error: string | null;
 }

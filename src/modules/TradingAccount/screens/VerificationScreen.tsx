@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
-import {View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';

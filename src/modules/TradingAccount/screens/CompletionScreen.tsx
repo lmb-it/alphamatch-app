@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
-import {View, StyleSheet, SafeAreaView} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Flex, Text, Heading, Button, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';

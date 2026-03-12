@@ -5,6 +5,8 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
 
+const { withSentryConfig } = require('@sentry/react-native/metro');
+
 const projectRoot = __dirname;
 const base = getDefaultConfig(__dirname);
 
@@ -37,8 +39,11 @@ const config = mergeConfig(base, {
         moduleName.startsWith('pusher-js') ||
         moduleName.startsWith('react-responsive') ||
         moduleName.startsWith('@react-hook/') ||
-        ((originPath.includes('@lmb-it/kitsconcerto') || originPath.includes('dist/web')) && moduleName.endsWith('.css')) ||
-        (moduleName.includes('@lmb-it/kitsconcerto') && moduleName.endsWith('.css'));
+        ((originPath.includes('@lmb-it/kitsconcerto') ||
+          originPath.includes('dist/web')) &&
+          moduleName.endsWith('.css')) ||
+        (moduleName.includes('@lmb-it/kitsconcerto') &&
+          moduleName.endsWith('.css'));
 
       if (isWebDep) {
         return {
@@ -49,17 +54,26 @@ const config = mergeConfig(base, {
       return context.resolveRequest(context, moduleName, platform);
     },
     extraNodeModules: {
-      '@lmb-it/kitsconcerto': path.resolve(projectRoot, 'node_modules/@lmb-it/kitsconcerto'),
+      '@lmb-it/kitsconcerto': path.resolve(
+        projectRoot,
+        'node_modules/@lmb-it/kitsconcerto',
+      ),
       'lucide-react': require.resolve('lucide-react-native'),
     },
     sourceExts: [
       ...base.resolver.sourceExts,
-      'native.ts', 'native.tsx', 'ts', 'tsx', 'js', 'jsx', 'json',
+      'native.ts',
+      'native.tsx',
+      'ts',
+      'tsx',
+      'js',
+      'jsx',
+      'json',
     ],
-    nodeModulesPaths: [
-      path.resolve(projectRoot, 'node_modules'),
-    ],
+    nodeModulesPaths: [path.resolve(projectRoot, 'node_modules')],
   },
 });
 
-module.exports = withNativeWind(config, { input: './global.css' });
+module.exports = withSentryConfig(
+  withNativeWind(config, { input: './global.css' }),
+);

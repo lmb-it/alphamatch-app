@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {View, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useSelector, useDispatch} from 'react-redux';
@@ -50,7 +51,7 @@ export default function CareerConfirmationScreen() {
     if (found) {
       return {
         name: found.title,
-        categoryName: found.category || 'Trading Category',
+        categoryName: found.categoryName || 'Trading Category',
         model: found.businessModel || 'flex',
         confidence: 1, // 100% since manually picked
       };

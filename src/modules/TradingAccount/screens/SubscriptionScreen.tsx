@@ -81,7 +81,7 @@ const SubscriptionScreen: React.FC = () => {
               const isSelected = selectedPlan?.identifier === plan.identifier;
               const badgeColor = modelBadgeColor(plan.cycle);
               const priceDisplay =
-                plan.cost === 0 || plan.cost === '0'
+                plan.cost === 0
                   ? t('trading.sub.free')
                   : `$${Number(plan.cost).toFixed(2)}`;
 

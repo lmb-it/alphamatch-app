@@ -22,97 +22,97 @@ import type {
   ISubscribePayload,
 } from '../models/tradingAccount.types';
 
-function* fetchMyAccountsSaga() {
+function* fetchMyAccountsSaga(): Generator {
   try {
     const accounts = yield call(listTradingAccountsApi);
-    yield put(tradingAccountActions.fetchMyAccountsSuccess(accounts));
+    yield put(tradingAccountActions.fetchMyAccountsSuccess(accounts as any));
   } catch (e) {
     yield put(tradingAccountActions.fetchMyAccountsFailure(parseApiError(e).message));
   }
 }
 
-function* aiAnalyzeSaga(action: PayloadAction<IAIAnalyzePayload>) {
+function* aiAnalyzeSaga(action: PayloadAction<IAIAnalyzePayload>): Generator {
   try {
     const result = yield call(aiAnalyzeApi, action.payload.description, action.payload.formTypeRef);
-    yield put(tradingAccountActions.aiAnalyzeSuccess(result));
+    yield put(tradingAccountActions.aiAnalyzeSuccess(result as any));
   } catch (e) {
     yield put(tradingAccountActions.aiAnalyzeFailure(parseApiError(e).message));
   }
 }
 
-function* fetchCareersSaga() {
+function* fetchCareersSaga(): Generator {
   try {
     const careers = yield call(fetchCareersApi);
-    yield put(tradingAccountActions.fetchCareersSuccess(careers));
+    yield put(tradingAccountActions.fetchCareersSuccess(careers as any));
   } catch (e) {
     yield put(tradingAccountActions.fetchCareersFailure(parseApiError(e).message));
   }
 }
 
-function* createAccountSaga(action: PayloadAction<ICreateTradingAccountPayload>) {
+function* createAccountSaga(action: PayloadAction<ICreateTradingAccountPayload>): Generator {
   try {
     const account = yield call(createTradingAccountApi, action.payload);
-    yield put(tradingAccountActions.createAccountSuccess(account));
+    yield put(tradingAccountActions.createAccountSuccess(account as any));
   } catch (e) {
     yield put(tradingAccountActions.createAccountFailure(parseApiError(e).message));
   }
 }
 
-function* submitFormAnswersSaga(action: PayloadAction<ISubmitFormAnswersPayload>) {
+function* submitFormAnswersSaga(action: PayloadAction<ISubmitFormAnswersPayload>): Generator {
   try {
     const account = yield call(submitFormAnswersApi, action.payload);
-    yield put(tradingAccountActions.submitFormAnswersSuccess(account));
+    yield put(tradingAccountActions.submitFormAnswersSuccess(account as any));
   } catch (e) {
     yield put(tradingAccountActions.submitFormAnswersFailure(parseApiError(e).message));
   }
 }
 
-function* finalizeAccountSaga(action: PayloadAction<IFinalizeTradingAccountPayload>) {
+function* finalizeAccountSaga(action: PayloadAction<IFinalizeTradingAccountPayload>): Generator {
   try {
     const result = yield call(finalizeTradingAccountApi, action.payload);
-    yield put(tradingAccountActions.finalizeAccountSuccess(result));
+    yield put(tradingAccountActions.finalizeAccountSuccess(result as any));
   } catch (e) {
     yield put(tradingAccountActions.finalizeAccountFailure(parseApiError(e).message));
   }
 }
 
-function* fetchPlansSaga(action: PayloadAction<string>) {
+function* fetchPlansSaga(action: PayloadAction<string>): Generator {
   try {
     const plans = yield call(fetchPlansApi, action.payload);
-    yield put(tradingAccountActions.fetchPlansSuccess(plans));
+    yield put(tradingAccountActions.fetchPlansSuccess(plans as any));
   } catch (e) {
     yield put(tradingAccountActions.fetchPlansFailure(parseApiError(e).message));
   }
 }
 
-function* fetchDocumentsSaga(action: PayloadAction<string>) {
+function* fetchDocumentsSaga(action: PayloadAction<string>): Generator {
   try {
     const docs = yield call(fetchRequiredDocumentsApi, action.payload);
-    yield put(tradingAccountActions.fetchDocumentsSuccess(docs));
+    yield put(tradingAccountActions.fetchDocumentsSuccess(docs as any));
   } catch (e) {
     yield put(tradingAccountActions.fetchDocumentsFailure(parseApiError(e).message));
   }
 }
 
-function* fetchSetupIntentSaga() {
+function* fetchSetupIntentSaga(): Generator {
   try {
     const result = yield call(fetchSetupIntentApi);
-    yield put(tradingAccountActions.fetchSetupIntentSuccess(result));
+    yield put(tradingAccountActions.fetchSetupIntentSuccess(result as any));
   } catch (e) {
     yield put(tradingAccountActions.fetchSetupIntentFailure(parseApiError(e).message));
   }
 }
 
-function* subscribeSaga(action: PayloadAction<ISubscribePayload>) {
+function* subscribeSaga(action: PayloadAction<ISubscribePayload>): Generator {
   try {
     const account = yield call(subscribeApi, action.payload);
-    yield put(tradingAccountActions.subscribeSuccess(account));
+    yield put(tradingAccountActions.subscribeSuccess(account as any));
   } catch (e) {
     yield put(tradingAccountActions.subscribeFailure(parseApiError(e).message));
   }
 }
 
-export default function* tradingAccountSaga() {
+export default function* tradingAccountSaga(): Generator {
   yield takeLatest(tradingAccountActions.fetchMyAccounts.type, fetchMyAccountsSaga);
   yield takeLatest(tradingAccountActions.aiAnalyze.type, aiAnalyzeSaga);
   yield takeLatest(tradingAccountActions.fetchCareers.type, fetchCareersSaga);

@@ -4,7 +4,7 @@ const buildTree = (data, allowIndependentItems = false, parentKey = null) => {
   const fetchedData = Array.from(data.values());
   const categorized = fetchedData.filter(({ parentId }) => parentId === parentKey).map((item, index) => {
     return {
-      key: item.value,
+      key: item.value.toString(),
       label: item.label,
       data: item,
       id: item.value.toString(),

@@ -1,7 +1,7 @@
 /**
  * Redux store configuration with persistence
  */
-import {configureStore} from '@reduxjs/toolkit';
+import {configureStore, type Middleware} from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import {
   persistStore,
@@ -36,22 +36,28 @@ const profileTransform = createTransform(
 const persistConfig = {
   key: 'alphamatch',
   storage: AsyncStorage,
-  whitelist: ['auth', 'profile'],
+  whitelist: ['auth', 'profile', 'workspace'],
   transforms: [authTransform, profileTransform],
 };
 
 const sagaMiddleware = createSagaMiddleware();
 
+const persistedReducer = persistReducer(persistConfig, rootReducer as any);
+
 const store = configureStore({
-  reducer: persistReducer(persistConfig, rootReducer) as any,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
+  reducer: persistedReducer as any,
+  middleware: getDefaultMiddleware => {
+    const middlewares = getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    })
-      .concat(sagaMiddleware)
-      .concat(__DEV__ ? logger : []),
+    }).concat(sagaMiddleware as Middleware);
+
+    if (__DEV__) {
+      return middlewares.concat(logger as Middleware);
+    }
+    return middlewares;
+  },
 });
 
 sagaMiddleware.run(rootSaga);

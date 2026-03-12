@@ -7,10 +7,10 @@ import {Text, useKitsTheme} from '@lmb-it/kitsconcerto';
 import {useLanguage} from '@lmb-it/kitsconcerto';
 import Svg, {Circle as SvgCircle} from 'react-native-svg';
 import {profileActions, selectProfileLoading, selectProfileError} from '@src/modules/Profile';
-import type {AppStackParamList} from '@src/routes';
+import type {ProfileStackParamList} from '@src/routes/ProfileStackNavigator';
 
-type Nav = NativeStackNavigationProp<AppStackParamList>;
-type Route = RouteProp<AppStackParamList, 'WorkspaceSwitching'>;
+type Nav = NativeStackNavigationProp<ProfileStackParamList>;
+type Route = RouteProp<ProfileStackParamList, 'WorkspaceSwitching'>;
 
 const AVATAR_SIZE = 100;
 const RING_SIZE = 120;
@@ -81,7 +81,7 @@ const WorkspaceSwitchingScreen: React.FC = () => {
           useNativeDriver: true,
         }),
       ]).start(() => {
-        navigation.reset({index: 0, routes: [{name: 'MainTabs'}]});
+        navigation.reset({index: 0, routes: [{name: 'Profile'}]});
       });
     }, remaining);
   }, [loading, error, exitScale, exitOpacity, navigation]);
