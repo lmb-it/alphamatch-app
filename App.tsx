@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MainContextProvider } from '@lmb-it/kitsconcerto';
 import { Provider } from 'react-redux';
@@ -9,6 +10,10 @@ import { alphaMatchTheme } from '@src/config/theme';
 import Routes from '@src/routes';
 import { setOnUnauthorized } from '@src/services/api';
 import { authActions } from '@src/modules/Auth/store/auth.slice';
+import { tradingAccountActions } from '@src/modules/TradingAccount';
+import { profileActions } from '@src/modules/Profile';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import Config from 'react-native-config';
 import './global.css';
 import * as Sentry from '@sentry/react-native';
 
@@ -39,18 +44,76 @@ setOnUnauthorized(() => {
   store.dispatch(authActions.fetchMeFailure());
 });
 
+const STALE_THRESHOLD = 5 * 60 * 1000; // 5 minutes
+
+function refreshDataIfAuthenticated() {
+  const state = store.getState();
+  if (!state.auth.isAuthenticated || !state.auth.token) return;
+
+  const lastFetched = state.tradingAccount.lastFetched;
+  const isStale = !lastFetched || Date.now() - lastFetched > STALE_THRESHOLD;
+
+  if (isStale) {
+    store.dispatch(tradingAccountActions.fetchMyAccounts());
+    store.dispatch(profileActions.fetchProfile());
+  }
+}
+
 function App() {
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
+  const handleAppStateChange = useCallback((nextState: AppStateStatus) => {
+    if (appStateRef.current.match(/inactive|background/) && nextState === 'active') {
+      refreshDataIfAuthenticated();
+    }
+    appStateRef.current = nextState;
+  }, []);
+
+  // Refresh after redux-persist rehydration, listen for resume, and run periodic sync
+  useEffect(() => {
+    // Wait for persist rehydration before attempting to refresh
+    const unsubscribe = persistor.subscribe(() => {
+      const { bootstrapped } = persistor.getState();
+      if (bootstrapped) {
+        unsubscribe();
+        refreshDataIfAuthenticated();
+      }
+    });
+    // If already bootstrapped (e.g. fast rehydration), fire immediately
+    if (persistor.getState().bootstrapped) {
+      unsubscribe();
+      refreshDataIfAuthenticated();
+    }
+
+    const sub = AppState.addEventListener('change', handleAppStateChange);
+
+    // Background periodic sync — silently refresh every 5 minutes while app is active
+    const syncInterval = setInterval(() => {
+      if (appStateRef.current === 'active') {
+        refreshDataIfAuthenticated();
+      }
+    }, STALE_THRESHOLD);
+
+    return () => {
+      unsubscribe();
+      sub.remove();
+      clearInterval(syncInterval);
+    };
+  }, [handleAppStateChange]);
+
   return (
     <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <MainContextProvider
-            languages={languages}
-            defaultLanguage="en"
-            kitsTheme={alphaMatchTheme}
-          >
-            <Routes />
-          </MainContextProvider>
+          <StripeProvider publishableKey={Config.STRIPE_PUBLISHABLE_KEY || ''}>
+            <MainContextProvider
+              languages={languages}
+              defaultLanguage="en"
+              kitsTheme={alphaMatchTheme}
+            >
+              <Routes />
+            </MainContextProvider>
+          </StripeProvider>
         </PersistGate>
       </Provider>
     </SafeAreaProvider>

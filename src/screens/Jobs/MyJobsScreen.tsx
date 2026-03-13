@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,15 @@ import {
   TextInput,
   FlatList,
   SafeAreaView,
+  RefreshControl,
 } from 'react-native';
 import {ArrowLeft, Search} from 'lucide-react-native';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
 import {MyJobCard} from '../../components/MyJobCard';
 import {useKitsTheme, useLanguage} from '@lmb-it/kitsconcerto';
+import {tradingAccountActions} from '@src/modules/TradingAccount';
+import {profileActions} from '@src/modules/Profile';
 
 type TabKey = 'all' | 'pending' | 'active' | 'completed' | 'cancelled';
 
@@ -22,8 +26,18 @@ export default function MyJobsScreen() {
   const {resolveToken} = useKitsTheme();
   const primaryColor = resolveToken('primary');
 
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(tradingAccountActions.fetchMyAccounts());
+    dispatch(profileActions.fetchProfile());
+    // TODO: dispatch job-specific refresh when jobs slice is built
+    setTimeout(() => setRefreshing(false), 1000);
+  }, [dispatch]);
 
   const tabs: {key: TabKey; label: string}[] = [
     {key: 'all', label: t('jobs.tabs.all')},
@@ -81,7 +95,10 @@ export default function MyJobsScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.backButton}>
+            style={styles.backButton}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Go back">
             <ArrowLeft color="#263238" size={24} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('jobs.myJob')}</Text>
@@ -99,7 +116,11 @@ export default function MyJobsScreen() {
                 <TouchableOpacity
                   key={tab.key}
                   style={[styles.tabItem, isActive && styles.tabItemActive]}
-                  onPress={() => setActiveTab(tab.key)}>
+                  onPress={() => setActiveTab(tab.key)}
+                  accessible
+                  accessibilityRole="tab"
+                  accessibilityLabel={tab.label}
+                  accessibilityState={{selected: isActive}}>
                   <Text
                     style={[
                       styles.tabText,
@@ -122,6 +143,9 @@ export default function MyJobsScreen() {
             placeholderTextColor="#9CA3AF"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            accessible
+            accessibilityLabel="Search jobs"
+            accessibilityHint="Filter jobs by title"
           />
         </View>
 
@@ -131,6 +155,9 @@ export default function MyJobsScreen() {
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           renderItem={({item}) => (
             <MyJobCard
               style={styles.cardMargin}

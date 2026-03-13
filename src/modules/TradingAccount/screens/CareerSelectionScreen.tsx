@@ -15,6 +15,7 @@ import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCr
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 // Assuming selectCareers provides a list of objects like { identifier, title, category, businessModel }
 import {selectCareers, selectCareersLoading, tradingAccountActions} from '@src/modules/TradingAccount';
+import type {ICareerOption} from '../models/tradingAccount.types';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 
@@ -28,7 +29,7 @@ export default function CareerSelectionScreen() {
   const allCareers = useSelector(selectCareers) || [];
   const careersLoading = useSelector(selectCareersLoading);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCareer, setSelectedCareer] = useState<any>(null);
+  const [selectedCareer, setSelectedCareer] = useState<ICareerOption | null>(null);
 
   // Fetch careers on mount
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function CareerSelectionScreen() {
       );
     }
 
-    const grouped = list.reduce((acc, career: any) => {
+    const grouped = list.reduce((acc, career) => {
       const cat = career.categoryName || 'Other';
       if (!acc[cat]) acc[cat] = [];
       acc[cat].push(career);
@@ -54,7 +55,7 @@ export default function CareerSelectionScreen() {
     return grouped;
   }, [allCareers, searchQuery]);
 
-  const handleSelect = (career: any) => {
+  const handleSelect = (career: ICareerOption) => {
     setSelectedCareer(career);
   };
 
@@ -82,6 +83,9 @@ export default function CareerSelectionScreen() {
               placeholderTextColor="#9CA3AF"
               value={searchQuery}
               onChangeText={setSearchQuery}
+              accessible
+              accessibilityLabel="Search careers"
+              accessibilityHint="Type to filter the list of available careers"
             />
           </View>
         </View>
@@ -93,7 +97,7 @@ export default function CareerSelectionScreen() {
                 {category}
               </Text>
               
-              {careers.map((career: any) => {
+              {careers.map((career) => {
                 const isSelected = selectedCareer?.identifier === career.identifier;
                 const isPro = career.businessModel === 'pro';
                 
@@ -105,7 +109,11 @@ export default function CareerSelectionScreen() {
                       isSelected && {borderColor: primaryColor, backgroundColor: `${primaryColor}05`}
                     ]}
                     activeOpacity={0.7}
-                    onPress={() => handleSelect(career)}>
+                    onPress={() => handleSelect(career)}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={`${career.title}, ${isPro ? 'Alpha Pro' : 'Alpha Flex'}`}
+                    accessibilityState={{selected: isSelected}}>
                     <View style={styles.iconCircle}>
                       <Briefcase color={isSelected ? primaryColor : '#6B7280'} size={20} />
                     </View>

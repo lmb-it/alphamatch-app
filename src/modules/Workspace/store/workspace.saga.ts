@@ -7,11 +7,13 @@
 import {takeLatest, put, select} from 'redux-saga/effects';
 import {workspaceActions} from './workspace.slice';
 import {selectMyAccounts} from '@src/modules/TradingAccount';
+import {selectActiveWorkspaceId} from './workspace.selectors';
 import type {IWorkspaceItem} from '../models/workspace.types';
 
 /**
  * Build workspace list from trading accounts.
  * The personal workspace is always prepended.
+ * If the active workspace no longer exists in the new list, fall back to personal.
  */
 function* syncWorkspaceListSaga(): Generator {
   const myAccounts = (yield select(selectMyAccounts)) as any[];
@@ -36,6 +38,13 @@ function* syncWorkspaceListSaga(): Generator {
   ];
 
   yield put(workspaceActions.setWorkspaceList(workspaceItems));
+
+  // If persisted activeWorkspaceId points to a deleted account, reset to personal
+  const activeId = (yield select(selectActiveWorkspaceId)) as string;
+  const stillExists = workspaceItems.some(w => w.id === activeId);
+  if (!stillExists) {
+    yield put(workspaceActions.switchToPersonal());
+  }
 }
 
 export default function* workspaceSaga(): Generator {

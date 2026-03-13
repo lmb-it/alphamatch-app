@@ -8,3 +8,8 @@ export const API_CONFIG = {
     Accept: 'application/json',
   },
 };
+
+/** Form type reference IDs — sourced from form_types table */
+export const FORM_TYPE_REFS = {
+  providerProfile: Config.PROVIDER_PROFILE_FORM_TYPE_REF || 'FOR-Y1JAJIHT',
+};

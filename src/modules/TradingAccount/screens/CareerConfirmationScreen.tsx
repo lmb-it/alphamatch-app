@@ -33,12 +33,18 @@ export default function CareerConfirmationScreen() {
 
   const primaryColor = resolveToken('primary');
 
-  // Navigate when account is created
+  // Navigate when account is created — track identity to avoid firing on mount
+  const prevAccountRef = useRef(createdAccount);
   useEffect(() => {
-    if (createdAccount && didSubmit.current) {
+    if (
+      didSubmit.current &&
+      createdAccount &&
+      createdAccount !== prevAccountRef.current
+    ) {
       didSubmit.current = false;
       navigation.navigate('TAMissingQuestions');
     }
+    prevAccountRef.current = createdAccount;
   }, [createdAccount, navigation]);
 
   // Determine which career we are confirming (AI detected vs Manually selected)
@@ -46,26 +52,27 @@ export default function CareerConfirmationScreen() {
     if (aiResult?.detectedCareer) {
       return aiResult.detectedCareer;
     }
-    // Fallback search through redux state or dummy data for manual flow
+    // Manual flow: find from loaded careers list
     const found = allCareers.find(c => c.identifier === selectedCareerRef);
     if (found) {
       return {
         name: found.title,
-        categoryName: found.categoryName || 'Trading Category',
+        categoryName: found.categoryName || '',
         model: found.businessModel || 'flex',
-        confidence: 1, // 100% since manually picked
+        confidence: 1,
       };
     }
-    // Deep fallback if Redux was emptied for UI demo
-    return {
-      name: 'Electrician',
-      categoryName: 'Construction & Trade',
-      model: 'flex',
-      confidence: 1,
-    };
+    return null;
   }, [aiResult, selectedCareerRef, allCareers]);
 
   const isPro = careerToConfirm?.model?.toLowerCase() === 'pro';
+
+  // If no career data available (shouldn't happen), go back to selection
+  useEffect(() => {
+    if (!careerToConfirm && !loading) {
+      navigation.navigate('TACareerSelection');
+    }
+  }, [careerToConfirm, loading, navigation]);
 
   const handleContinue = useCallback(() => {
     const careerRef = aiResult?.detectedCareer?.identifier || selectedCareerRef;
@@ -88,11 +95,13 @@ export default function CareerConfirmationScreen() {
     navigation.navigate('TACareerSelection');
   }, [navigation]);
 
+  if (!careerToConfirm) return null;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg">
         <ScrollView contentContainerStyle={styles.container}>
-          
+
           <Heading as="h2" bold color="text-primary" style={styles.heading}>
             {aiResult ? t('trading.confirm.aiTitle') : t('trading.confirm.manualTitle')}
           </Heading>

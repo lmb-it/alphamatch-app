@@ -11,14 +11,13 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {Flex, Text, Heading, Button, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
-import {tradingAccountActions, selectAnalyzing, selectAIResult, selectTAError} from '@src/modules/TradingAccount';
+import {tradingAccountActions, selectAnalyzing, selectAIResult, selectTAError, selectBasicInfo, selectStepData} from '@src/modules/TradingAccount';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
 import {Sparkles} from 'lucide-react-native';
+import {FORM_TYPE_REFS} from '@src/config/api.config';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 const MAX_CHARS = 2000;
-// TODO: Replace with actual form_types.reference_id from DB
-const PROVIDER_PROFILE_FORM_TYPE_REF = 'FOR-Y1JAJIHT';
 
 export default function AIInputScreen() {
   const {t} = useLanguage();
@@ -28,9 +27,19 @@ export default function AIInputScreen() {
   const analyzing = useSelector(selectAnalyzing);
   const aiResult = useSelector(selectAIResult);
   const error = useSelector(selectTAError);
-  const [description, setDescription] = useState('');
+  const basicInfo = useSelector(selectBasicInfo);
+  const stepData = useSelector(selectStepData);
+  const [description, setDescription] = useState(stepData.aiDescription ?? '');
   const didSubmit = useRef(false);
   const primaryColor = resolveToken('primary');
+
+  // Save description to Redux when leaving this screen (back button preservation)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      dispatch(tradingAccountActions.saveStepData({aiDescription: description}));
+    });
+    return unsubscribe;
+  }, [navigation, dispatch, description]);
 
   // Navigate to career confirmation when AI result arrives
   useEffect(() => {
@@ -45,9 +54,10 @@ export default function AIInputScreen() {
     didSubmit.current = true;
     dispatch(tradingAccountActions.aiAnalyze({
       description: description.trim(),
-      formTypeRef: PROVIDER_PROFILE_FORM_TYPE_REF,
+      formTypeRef: FORM_TYPE_REFS.providerProfile,
+      countryId: basicInfo?.country_id,
     }));
-  }, [description, dispatch]);
+  }, [description, dispatch, basicInfo]);
 
   const handleManual = useCallback(() => {
     // Navigate straight to manual form, bypassing AI processing
@@ -85,11 +95,14 @@ export default function AIInputScreen() {
               multiline
               textAlignVertical="top"
               maxLength={MAX_CHARS}
+              accessible
+              accessibilityLabel="Describe your profession or services"
+              accessibilityHint="Enter at least 10 characters to enable AI analysis"
             />
             <Text fontSize={12} color="text-subtle" textAlign="right" mt={8}>
               {description.length}/{MAX_CHARS}
             </Text>
-            {error && didSubmit.current && (
+            {error && (
               <Text fontSize={13} color="#EF4444" mt={8}>
                 {error}
               </Text>
@@ -112,7 +125,15 @@ export default function AIInputScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            <TouchableOpacity onPress={handleManual} activeOpacity={0.6} style={styles.manualButton}>
+            <TouchableOpacity
+              onPress={handleManual}
+              activeOpacity={0.6}
+              style={styles.manualButton}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Select career manually"
+              accessibilityHint="Skip AI analysis and browse careers yourself"
+            >
               <Text fontSize={15} color="text-primary" fontWeight="600" textAlign="center">
                 {t('trading.profile.manualMode')}
               </Text>

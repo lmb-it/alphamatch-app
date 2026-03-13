@@ -4,6 +4,7 @@ declare module 'react-native-config' {
     GOOGLE_AUTH_CLIENT_ID: string;
     APPLE_AUTH_CLIENT_ID: string;
     GOOGLE_MAPS_API_KEY: string;
+    STRIPE_PUBLISHABLE_KEY: string;
     FIREBASE_API_KEY: string;
     FIREBASE_PROJECT_ID: string;
     FIREBASE_STORAGE_BUCKET: string;

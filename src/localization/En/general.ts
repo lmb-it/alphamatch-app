@@ -29,4 +29,7 @@ export default {
   pending: 'Pending',
   user: 'User',
   personal: 'Personal',
+  comingSoon: 'Coming Soon',
+  verified: 'Verified',
+  declined: 'Declined',
 };

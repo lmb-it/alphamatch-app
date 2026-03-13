@@ -2,6 +2,7 @@ import type {RootState} from '@src/redux';
 
 export const selectTradingAccountState = (state: RootState) => state.tradingAccount;
 export const selectBasicInfo = (state: RootState) => state.tradingAccount.basicInfo;
+export const selectStepData = (state: RootState) => state.tradingAccount.stepData;
 export const selectAIResult = (state: RootState) => state.tradingAccount.aiResult;
 export const selectAnalyzing = (state: RootState) => state.tradingAccount.analyzing;
 export const selectCareers = (state: RootState) => state.tradingAccount.careers;
@@ -10,9 +11,17 @@ export const selectSelectedCareerRef = (state: RootState) => state.tradingAccoun
 export const selectCreatedAccount = (state: RootState) => state.tradingAccount.createdAccount;
 export const selectMyAccounts = (state: RootState) => state.tradingAccount.myAccounts;
 export const selectPlans = (state: RootState) => state.tradingAccount.plans;
+export const selectFormFields = (state: RootState) => state.tradingAccount.formFields;
 export const selectRequiredDocuments = (state: RootState) => state.tradingAccount.requiredDocuments;
+export const selectDocumentsChecked = (state: RootState) => state.tradingAccount.documentsChecked;
 export const selectStripeClientSecret = (state: RootState) => state.tradingAccount.stripeClientSecret;
 export const selectStripeEphemeralKey = (state: RootState) => state.tradingAccount.stripeEphemeralKey;
 export const selectStripeCustomerId = (state: RootState) => state.tradingAccount.stripeCustomerId;
+export const selectStripePublishableKey = (state: RootState) => state.tradingAccount.stripePublishableKey;
+export const selectLastFetched = (state: RootState) => state.tradingAccount.lastFetched;
 export const selectTALoading = (state: RootState) => state.tradingAccount.loading;
 export const selectTAError = (state: RootState) => state.tradingAccount.error;
+export const selectDocumentFormFields = (state: RootState) => state.tradingAccount.documentFormFields;
+export const selectDocumentFormLoading = (state: RootState) => state.tradingAccount.documentFormLoading;
+export const selectDocumentFormSubmitting = (state: RootState) => state.tradingAccount.documentFormSubmitting;
+export const selectDocumentFormSuccess = (state: RootState) => state.tradingAccount.documentFormSuccess;

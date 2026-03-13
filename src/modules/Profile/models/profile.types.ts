@@ -8,6 +8,7 @@ export interface IProfile {
   email: string;
   phone: string | null;
   avatar: string | null;
+  coverImage: string | null;
   bio: string | null;
   location: {
     country: string;
@@ -55,10 +56,24 @@ export interface ISwitchWorkspacePayload {
 export interface ITradingAccountSummary {
   identifier: string;
   accountName: string | null;
+  careerRef: string | null;
   careerName: string | null;
   careerModel: string | null;
   avatar: string | null;
   isActive: boolean;
+}
+
+/**
+ * Payload for updating basic user details.
+ */
+export interface IUpdateProfilePayload {
+  displayName?: string;
+  familyName?: string;
+  contactPhone?: string;
+  shortBio?: string;
+  nationality?: string;
+  gender?: 'male' | 'female';
+  birthDate?: string;
 }
 
 export interface IProfileState {

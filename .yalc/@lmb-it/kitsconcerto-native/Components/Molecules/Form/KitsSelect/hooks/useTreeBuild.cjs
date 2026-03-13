@@ -4,6 +4,20 @@ var React = require('react');
 var utils = require('../../../../Organism/TreeView/utils.cjs');
 var SelectContext = require('../SelectContext.cjs');
 
+const collectNonSelectableKeys = (nodes) => {
+  const keys = /* @__PURE__ */ new Set();
+  for (const node of nodes) {
+    if (node.selectable === false && node.key != null) {
+      keys.add(String(node.key));
+    }
+    if (node.children?.length) {
+      for (const k of collectNonSelectableKeys(node.children)) {
+        keys.add(k);
+      }
+    }
+  }
+  return keys;
+};
 const useTreeBuild = (props) => {
   const { isStructured, ref } = props;
   const { list, onChange, selectedValue } = SelectContext.useSelect();
@@ -41,8 +55,19 @@ const useTreeBuild = (props) => {
     build();
   }, [list]);
   React.useImperativeHandle(ref, () => ({}));
+  const nonSelectableKeys = React.useCallback(() => collectNonSelectableKeys(nodes), [nodes]);
   const handleChange = (e) => {
     setValue(e.value);
+    if (e.value && typeof e.value === "object" && !Array.isArray(e.value)) {
+      const blocked = nonSelectableKeys();
+      if (blocked.size > 0) {
+        const filtered = Object.fromEntries(
+          Object.entries(e.value).filter(([key]) => !blocked.has(key))
+        );
+        onChange && onChange({ ...e, value: filtered });
+        return;
+      }
+    }
     onChange && onChange(e);
   };
   return {

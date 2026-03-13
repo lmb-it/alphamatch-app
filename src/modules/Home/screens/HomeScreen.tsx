@@ -16,9 +16,10 @@ import {
   StyleSheet,
   Animated,
   Image,
+  RefreshControl,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {Sparkles, ImagePlus, X} from 'lucide-react-native';
 import {
@@ -33,6 +34,8 @@ import {
   selectActiveWorkspaceType,
   selectActiveWorkspaceItem,
 } from '@src/modules/Workspace';
+import {tradingAccountActions} from '@src/modules/TradingAccount';
+import {profileActions} from '@src/modules/Profile';
 import {JobCard} from '@src/components/shared/JobCard';
 import {WorkspaceBadge} from '@src/components/shared/WorkspaceBadge';
 import {WorkspaceSwitcherSheet} from '@src/components/shared/WorkspaceSwitcherSheet';
@@ -145,12 +148,22 @@ const SUGGESTIONS = ['Plumbing', 'Cleaning', 'Graphic Design', 'Electrical'];
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeStackNavigationProp>();
+  const dispatch = useDispatch();
   const activeType = useSelector(selectActiveWorkspaceType);
   const activeItem = useSelector(selectActiveWorkspaceItem);
   const isTradeMode = activeType === 'trading_account';
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const primaryColor = resolveToken('primary');
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(tradingAccountActions.fetchMyAccounts());
+    dispatch(profileActions.fetchProfile());
+    // TODO: dispatch job feed refresh when jobs slice is built
+    setTimeout(() => setRefreshing(false), 1000);
+  }, [dispatch]);
 
   const formRef = useRef<IUseFormReturn<any>>(null);
 
@@ -268,7 +281,10 @@ const HomeScreen: React.FC = () => {
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.greeting}>

@@ -7599,15 +7599,14 @@ export interface FileValidationProps {
     minKB?: number;
     maxKB?: number;
 }
-export interface FileValidationProps {
-    min?: number;
-    max?: number;
-    minKB?: number;
-    maxKB?: number;
-}
 /**
  * A custom Yup validation test for file and image uploads.
- * Handles single or multiple files, validating count, size, and format (File or URL).
+ *
+ * Handles all output shapes produced by KitsFilePicker:
+ *   - string URL              — existing server file (defaultValue / initialUri)
+ *   - {base64, filename, type}  — JSON output (isJsonOutput=true, native & web)
+ *   - {uri, name, type?, size?} — FormData output on native
+ *   - DOM File instance         — FormData output on web
  */
 declare const formFileValidation: ({ min, max, minKB, maxKB }?: FileValidationProps) => Yup.MixedSchema<any, AnyObject, any>;
 /**

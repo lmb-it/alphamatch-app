@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -6,6 +6,8 @@ import {Flex, Text, Heading, Button, useLanguage, useKitsTheme} from '@lmb-it/ki
 import {Briefcase, Star, CreditCard} from 'lucide-react-native';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
+import {useDispatch} from 'react-redux';
+import {tradingAccountActions} from '../store/tradingAccount.slice';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 
@@ -13,7 +15,13 @@ const IntroScreen: React.FC = () => {
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const navigation = useNavigation<Nav>();
+  const dispatch = useDispatch();
   const primaryColor = resolveToken('primary');
+
+  // Clear any stale creation state from a previous flow
+  useEffect(() => {
+    dispatch(tradingAccountActions.resetCreationFlow());
+  }, [dispatch]);
 
   const benefits = [
     {icon: Briefcase, text: t('ta.introBenefit1')},
@@ -35,9 +43,9 @@ const IntroScreen: React.FC = () => {
 
           <View style={styles.benefitsList}>
             {benefits.map((item, index) => (
-              <View key={index} style={styles.benefitRow}>
+              <View key={index} style={styles.benefitRow} accessible accessibilityLabel={item.text}>
                 <View style={[styles.iconCircle, {backgroundColor: primaryColor + '15'}]}>
-                  <item.icon color={primaryColor} size={20} />
+                  <item.icon color={primaryColor} size={20} accessibilityElementsHidden />
                 </View>
                 <Text fontSize={14} color="text-primary" style={styles.benefitText}>
                   {item.text}

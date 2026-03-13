@@ -11,8 +11,9 @@
 import React, {useCallback} from 'react';
 import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {useTranslation} from 'react-i18next';
+import {useLanguage} from '@lmb-it/kitsconcerto';
 import {Home, Briefcase, MessageSquare, User} from 'lucide-react-native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {HomeStackNavigator} from './HomeStackNavigator';
@@ -45,6 +46,9 @@ const TAB_NAME_MAP: Record<keyof MainTabParamList, WorkspaceTab> = {
   ProfileTab: 'Profile',
 };
 
+// ── Screens that should hide the bottom tab bar ─────────────────────────────
+const HIDE_TAB_BAR_ROUTES = ['TradingAccountCreation', 'EditProfile'];
+
 // ── Navigator ────────────────────────────────────────────────────────────────
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -53,7 +57,7 @@ const ACTIVE_TINT = '#00A8B1';
 const INACTIVE_TINT = '#75808E';
 
 export function MainTabNavigator() {
-  const {t} = useTranslation();
+  const {t} = useLanguage();
   const dispatch = useDispatch();
   const lastTab = useSelector(selectLastActiveTab);
 
@@ -119,7 +123,14 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
-        options={{title: t('nav.profile')}}
+        options={({route}) => {
+          const focusedRoute = getFocusedRouteNameFromRoute(route);
+          const shouldHide = focusedRoute && HIDE_TAB_BAR_ROUTES.includes(focusedRoute);
+          return {
+            title: t('nav.profile'),
+            ...(shouldHide && {tabBarStyle: {display: 'none' as const}}),
+          };
+        }}
       />
     </Tab.Navigator>
   );

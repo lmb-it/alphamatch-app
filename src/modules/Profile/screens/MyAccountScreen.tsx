@@ -1,17 +1,22 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View, StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native';
-import {useSelector} from 'react-redux';
+import {View, StyleSheet, Image, TouchableOpacity, TextInput, StatusBar, Alert} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 import {Text, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
-import {Wallet, Clock, FileCheck, Upload, Plus} from 'lucide-react-native';
-import DocumentPicker from 'react-native-document-picker';
-import {selectProfileData, selectActiveWorkspace} from '@src/modules/Profile';
+import {Wallet, Clock, Plus, Camera, Pen, Settings, Share2} from 'lucide-react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
+import LinearGradient from 'react-native-linear-gradient';
+import {selectProfileData, selectActiveWorkspace, selectTradingAccounts, profileActions} from '@src/modules/Profile';
+import {uploadAvatarApi, uploadCoverApi} from '../api/profile.service';
 import {fetchRequiredDocumentsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount';
+import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
+import {DocumentVerificationList} from '@src/components/shared/DocumentVerificationList';
 import MenuItem from '../components/MenuItem';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 
-const COVER_HEIGHT = 160;
-const AVATAR_SIZE = 90;
+const COVER_HEIGHT = 180;
+const AVATAR_SIZE = 100;
 
 type TabKey = 'account' | 'portfolio' | 'documents';
 
@@ -19,51 +24,82 @@ const MyAccountScreen: React.FC = () => {
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const primaryColor = resolveToken('primary');
+  const navigation = useNavigation<ProfileStackNavigationProp>();
+  const dispatch = useDispatch();
   const profileData = useSelector(selectProfileData);
   const activeWorkspace = useSelector(selectActiveWorkspace);
+  const tradingAccounts = useSelector(selectTradingAccounts);
 
   const [activeTab, setActiveTab] = useState<TabKey>('account');
   const [requiredDocs, setRequiredDocs] = useState<IDocumentRequirement[]>([]);
-  const [pickedFiles, setPickedFiles] = useState<Record<string, string>>({});
+  const [docsLoading, setDocsLoading] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [projectName, setProjectName] = useState('');
 
+  // Resolve careerRef from the active trading account
+  const careerRef = useMemo(() => {
+    if (!activeWorkspace) return null;
+    const account = tradingAccounts.find(a => a.identifier === activeWorkspace);
+    return account?.careerRef ?? null;
+  }, [activeWorkspace, tradingAccounts]);
+
   useEffect(() => {
-    if (activeWorkspace) {
-      fetchRequiredDocumentsApi(activeWorkspace)
+    if (careerRef) {
+      setDocsLoading(true);
+      fetchRequiredDocumentsApi('provider', careerRef, 14)
         .then(setRequiredDocs)
-        .catch(() => setRequiredDocs([]));
+        .catch(() => setRequiredDocs([]))
+        .finally(() => setDocsLoading(false));
     } else {
       setRequiredDocs([]);
     }
-  }, [activeWorkspace]);
+  }, [careerRef]);
 
-  const handlePickDocument = useCallback(async (docIdentifier: string) => {
-    try {
-      const result = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-      });
-      setPickedFiles(prev => ({...prev, [docIdentifier]: result.name || 'file'}));
-      // TODO: Upload to backend when endpoint is available
-    } catch (err) {
-      if (!DocumentPicker.isCancel(err)) {
-        console.error('Document picker error:', err);
+  const handlePickAvatar = useCallback(async () => {
+    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
+    if (result.assets?.[0]?.uri) {
+      try {
+        await uploadAvatarApi(result.assets[0].uri);
+        dispatch(profileActions.fetchProfile());
+      } catch {
+        Alert.alert(t('error'), t('profile.uploadFailed'));
       }
     }
-  }, []);
+  }, [dispatch, t]);
+
+  const handlePickCover = useCallback(async () => {
+    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
+    if (result.assets?.[0]?.uri) {
+      try {
+        await uploadCoverApi(result.assets[0].uri);
+        dispatch(profileActions.fetchProfile());
+      } catch {
+        Alert.alert(t('error'), t('profile.uploadFailed'));
+      }
+    }
+  }, [dispatch, t]);
+
+  const handleUploadDocument = useCallback(
+    (doc: IDocumentRequirement) => {
+      navigation.navigate('TradingAccountCreation', {
+        screen: 'TADocumentForm',
+        params: {documentRef: doc.identifier, documentName: doc.name},
+      } as any);
+    },
+    [navigation],
+  );
 
   const displayName = profileData
     ? `${profileData.displayName || ''} ${profileData.familyName || ''}`.trim()
     : '';
 
-  // Build available tabs — only show Documents when there are requirements
   const availableTabs = useMemo(() => {
     const tabs: TabKey[] = ['account', 'portfolio'];
-    if (requiredDocs.length > 0) {
+    if (careerRef) {
       tabs.push('documents');
     }
     return tabs;
-  }, [requiredDocs.length]);
+  }, [careerRef]);
 
   const tabLabelKey = (tab: TabKey) => {
     switch (tab) {
@@ -78,34 +114,83 @@ const MyAccountScreen: React.FC = () => {
 
   return (
     <AlphaLayout>
-      {/* Cover */}
-      <View style={[styles.cover, {backgroundColor: primaryColor}]}>
-        <View style={styles.coverOverlay} />
-      </View>
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
-      {/* Profile Avatar */}
-      <View style={styles.avatarWrapper}>
-        {profileData?.avatar ? (
-          <Image source={{uri: profileData.avatar}} style={styles.avatar} />
+      {/* Cover Image */}
+      <View style={styles.coverContainer}>
+        {profileData?.coverImage ? (
+          <Image source={{uri: profileData.coverImage}} style={styles.coverImage} />
         ) : (
-          <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <Text fontSize={28} fontWeight="700" color="text-subtle">
-              {displayName.charAt(0).toUpperCase() || '?'}
-            </Text>
-          </View>
+          <View style={[styles.coverImage, {backgroundColor: primaryColor}]} />
         )}
+        {/* Gradient fadeout merging into status bar */}
+        <LinearGradient
+          colors={['rgba(0,0,0,0.45)', 'transparent']}
+          style={styles.coverGradientTop}
+        />
+        {/* Bottom fade */}
+        <LinearGradient
+          colors={['transparent', 'rgba(249,250,252,0.6)']}
+          style={styles.coverGradientBottom}
+        />
+        {/* Change cover button */}
+        <TouchableOpacity
+          style={styles.changeCoverBtn}
+          onPress={handlePickCover}
+          activeOpacity={0.7}>
+          <Camera color="#FFFFFF" size={16} />
+        </TouchableOpacity>
       </View>
 
-      {/* Name */}
-      <Text
-        fontSize={20}
-        fontWeight="700"
-        color="text-primary"
-        textAlign="center"
-        mt={8}
-        mb={4}>
+      {/* Profile Avatar with camera badge */}
+      <View style={styles.avatarWrapper}>
+        <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8}>
+          {profileData?.avatar ? (
+            <Image source={{uri: profileData.avatar}} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, styles.avatarPlaceholder]}>
+              <Text fontSize={32} fontWeight="700" color="text-subtle">
+                {displayName.charAt(0).toUpperCase() || '?'}
+              </Text>
+            </View>
+          )}
+          <View style={[styles.cameraBadge, {backgroundColor: primaryColor}]}>
+            <Camera color="#FFFFFF" size={14} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Name + subtitle */}
+      <Text fontSize={20} fontWeight="700" color="text-primary" textAlign="center" mt={8}>
         {displayName || t('user')}
       </Text>
+      {profileData?.bio ? (
+        <Text fontSize={13} color="text-subtle" textAlign="center" mt={4} mx={32} numberOfLines={2}>
+          {profileData.bio}
+        </Text>
+      ) : null}
+
+      {/* Action buttons row */}
+      <View style={styles.actionRow}>
+        <TouchableOpacity
+          style={[styles.editProfileBtn, {borderColor: primaryColor}]}
+          onPress={() => navigation.navigate('EditProfile')}
+          activeOpacity={0.7}>
+          <Pen color={primaryColor} size={14} />
+          <Text fontSize={13} fontWeight="600" color="primary" ml={6}>
+            {t('profile.editProfile')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={() => navigation.navigate('Settings')}
+          activeOpacity={0.7}>
+          <Settings color="#374151" size={20} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconBtn} activeOpacity={0.7}>
+          <Share2 color="#374151" size={20} />
+        </TouchableOpacity>
+      </View>
 
       {/* Tab Bar */}
       <View style={styles.tabBar}>
@@ -139,8 +224,6 @@ const MyAccountScreen: React.FC = () => {
       {/* === Portfolio Tab === */}
       {activeTab === 'portfolio' && (
         <View style={styles.portfolioContainer}>
-          {/* TODO: render existing portfolio items from API here */}
-
           {!showPortfolioForm ? (
             <View style={styles.portfolioEmpty}>
               <Text fontSize={14} color="text-subtle" textAlign="center" mb={16}>
@@ -158,7 +241,6 @@ const MyAccountScreen: React.FC = () => {
             </View>
           ) : (
             <View style={styles.portfolioForm}>
-              {/* Project Name */}
               <Text fontSize={14} fontWeight="600" color="text-primary" mb={8}>
                 {t('profile.projectName')}
               </Text>
@@ -169,8 +251,6 @@ const MyAccountScreen: React.FC = () => {
                 value={projectName}
                 onChangeText={setProjectName}
               />
-
-              {/* Upload Area */}
               <TouchableOpacity style={styles.uploadArea} activeOpacity={0.7}>
                 <View style={[styles.uploadIcon, {borderColor: primaryColor}]}>
                   <Plus color={primaryColor} size={20} />
@@ -188,60 +268,13 @@ const MyAccountScreen: React.FC = () => {
       )}
 
       {/* === Documents Tab === */}
-      {activeTab === 'documents' && requiredDocs.length > 0 && (
+      {activeTab === 'documents' && (
         <View style={styles.docsContainer}>
-          <Text fontSize={16} fontWeight="700" color="text-primary" style={styles.sectionHeader}>
-            {t('profile.requiredDocuments')}
-          </Text>
-
-          <View style={styles.docsList}>
-            {requiredDocs.map(doc => {
-              const picked = pickedFiles[doc.identifier];
-              return (
-                <View key={doc.identifier} style={styles.docCard}>
-                  <View style={[styles.docIcon, {backgroundColor: `${primaryColor}15`}]}>
-                    <FileCheck color={primaryColor} size={20} />
-                  </View>
-                  <View style={styles.docInfo}>
-                    <Text fontSize={14} fontWeight="600" color="text-primary">
-                      {doc.documentName}
-                    </Text>
-                    <Text fontSize={12} color={doc.isMandatory ? '#EF4444' : 'text-subtle'}>
-                      {doc.isMandatory ? t('required') : t('optional')}
-                    </Text>
-                    {picked && (
-                      <Text fontSize={11} color="primary" mt={2}>
-                        {picked}
-                      </Text>
-                    )}
-                  </View>
-                  {doc.uploadStatus === 'uploaded' ? (
-                    <View style={[styles.docStatusBadge, styles.docUploaded]}>
-                      <Text fontSize={11} fontWeight="600" color="#059669">
-                        {t('uploaded')}
-                      </Text>
-                    </View>
-                  ) : picked ? (
-                    <View style={[styles.docStatusBadge, {backgroundColor: '#DBEAFE'}]}>
-                      <Text fontSize={11} fontWeight="600" color="#2563EB">
-                        {t('profile.readyToUpload')}
-                      </Text>
-                    </View>
-                  ) : (
-                    <TouchableOpacity
-                      style={[styles.uploadBtn, {borderColor: primaryColor}]}
-                      onPress={() => handlePickDocument(doc.identifier)}
-                      activeOpacity={0.7}>
-                      <Upload color={primaryColor} size={14} />
-                      <Text fontSize={12} fontWeight="600" color="primary" ml={4}>
-                        {t('profile.uploadDocument')}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              );
-            })}
-          </View>
+          <DocumentVerificationList
+            documents={requiredDocs}
+            loading={docsLoading}
+            onUpload={handleUploadDocument}
+          />
         </View>
       )}
     </AlphaLayout>
@@ -249,18 +282,39 @@ const MyAccountScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  cover: {
+  coverContainer: {
     height: COVER_HEIGHT,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
     marginHorizontal: -24,
     marginTop: -20,
   },
-  coverOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  coverGradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+  },
+  coverGradientBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 40,
+  },
+  changeCoverBtn: {
+    position: 'absolute',
+    right: 16,
+    bottom: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   avatarWrapper: {
     alignItems: 'center',
@@ -275,6 +329,43 @@ const styles = StyleSheet.create({
   },
   avatarPlaceholder: {
     backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 16,
+    marginBottom: 4,
+  },
+  editProfileBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 50,
+    borderWidth: 1.5,
+  },
+  iconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -296,15 +387,8 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 16,
   },
-  // Portfolio
-  portfolioContainer: {
-    marginTop: 16,
-    marginHorizontal: 20,
-  },
-  portfolioEmpty: {
-    alignItems: 'center',
-    paddingVertical: 32,
-  },
+  portfolioContainer: {marginTop: 16, marginHorizontal: 20},
+  portfolioEmpty: {alignItems: 'center', paddingVertical: 32},
   addProjectBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -313,9 +397,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
   },
-  portfolioForm: {
-    gap: 4,
-  },
+  portfolioForm: {gap: 4},
   textInput: {
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -345,55 +427,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // Documents
-  docsContainer: {
-    marginTop: 16,
-  },
-  sectionHeader: {
-    marginLeft: 24,
-    marginBottom: 12,
-  },
-  docsList: {
-    gap: 10,
-    marginHorizontal: 20,
-  },
-  docCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    padding: 14,
-  },
-  docIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  docInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  docStatusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  docUploaded: {
-    backgroundColor: '#D1FAE5',
-  },
-  uploadBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
+  docsContainer: {marginTop: 16, marginHorizontal: 20},
 });
 
 export default MyAccountScreen;

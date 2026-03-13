@@ -4,91 +4,91 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Flex, Text, Heading, Button, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
-import {CheckCircle2, Clock, Briefcase} from 'lucide-react-native';
+import {CheckCircle2, Clock, AlertCircle, Briefcase} from 'lucide-react-native';
 import {
-  tradingAccountActions, 
+  tradingAccountActions,
   selectCreatedAccount,
-  selectAIResult,
-  selectCareers,
-  selectSelectedCareerRef
 } from '@src/modules/TradingAccount';
 import {profileActions} from '@src/modules/Profile';
+
+type CompletionStatus = 'active' | 'pending_verification' | 'pending_subscription';
 
 export default function CompletionScreen() {
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  
+
   const createdAccount = useSelector(selectCreatedAccount);
-  const aiResult = useSelector(selectAIResult);
-  const selectedCareerRef = useSelector(selectSelectedCareerRef);
-  const allCareers = useSelector(selectCareers) || [];
   const primaryColor = resolveToken('primary');
 
-  const careerToConfirm = useMemo(() => {
-    if (aiResult?.detectedCareer) return aiResult.detectedCareer;
-    const found = allCareers.find(c => c.identifier === selectedCareerRef);
-    if (found) return { model: found.businessModel || 'flex' };
-    return { model: 'flex' };
-  }, [aiResult, selectedCareerRef, allCareers]);
+  const status: CompletionStatus = useMemo(() => {
+    const s = createdAccount?.setupStatus;
+    if (createdAccount?.isActive || s === 'active') return 'active';
+    if (s === 'pending_verification') return 'pending_verification';
+    return 'pending_subscription';
+  }, [createdAccount]);
 
-  const isFlex = careerToConfirm?.model?.toLowerCase() === 'flex';
-
-  const handleGoToProfile = useCallback(() => {
+  const navigateHome = useCallback((screen?: string) => {
     if (createdAccount) {
       dispatch(profileActions.switchWorkspace({workspaceRef: createdAccount.identifier}));
     }
+    // Refresh accounts list so workspace switcher is up-to-date
+    dispatch(tradingAccountActions.fetchMyAccounts());
     dispatch(tradingAccountActions.resetCreationFlow());
-    // In a real app we might navigate explicitly to an exact tab, here assuming CustomerProfile
     navigation.dispatch(
       CommonActions.reset({
-        index: 0, 
-        routes: [
-          {
-            name: 'MainTabs', 
-            // Attempt to deeply nest to customer profile tab if supported
-            params: { screen: 'CustomerProfile' }
-          }
-        ]
+        index: 0,
+        routes: [{name: 'MainTabs', params: screen ? {screen} : undefined}],
       }),
     );
   }, [createdAccount, dispatch, navigation]);
 
-  const handleGoToJobs = useCallback(() => {
-    if (createdAccount) {
-      dispatch(profileActions.switchWorkspace({workspaceRef: createdAccount.identifier}));
+  const statusConfig = useMemo(() => {
+    switch (status) {
+      case 'active':
+        return {
+          icon: <CheckCircle2 color="#10B981" size={48} />,
+          iconBg: '#D1FAE5',
+          title: t('trading.success.activeTitle'),
+          subtitle: t('trading.success.activeSubtitle'),
+          badge: t('trading.success.activeAccount'),
+          primaryButton: {label: t('trading.success.browseJobs'), action: () => navigateHome('CustomerJobs')},
+          secondaryButton: {label: t('trading.success.goToProfile'), action: () => navigateHome('CustomerProfile')},
+        };
+      case 'pending_verification':
+        return {
+          icon: <Clock color="#F59E0B" size={48} />,
+          iconBg: '#FEF3C7',
+          title: t('trading.success.proTitle'),
+          subtitle: t('trading.success.proSubtitle'),
+          badge: t('trading.success.proAccount'),
+          primaryButton: {label: t('trading.success.goToProfileVerify'), action: () => navigateHome('CustomerProfile')},
+          secondaryButton: {label: t('trading.success.doItLater'), action: () => navigateHome()},
+        };
+      case 'pending_subscription':
+        return {
+          icon: <AlertCircle color="#6366F1" size={48} />,
+          iconBg: '#E0E7FF',
+          title: t('trading.success.pendingSubTitle'),
+          subtitle: t('trading.success.pendingSubSubtitle'),
+          badge: t('trading.success.pendingSubAccount'),
+          primaryButton: {label: t('trading.success.goToProfile'), action: () => navigateHome('CustomerProfile')},
+          secondaryButton: {label: t('trading.success.browseJobs'), action: () => navigateHome('CustomerJobs')},
+        };
     }
-    dispatch(tradingAccountActions.resetCreationFlow());
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0, 
-        routes: [
-          {
-            name: 'MainTabs',
-            params: { screen: 'CustomerJobs' }
-          }
-        ]
-      }),
-    );
-  }, [createdAccount, dispatch, navigation]);
+  }, [status, t, navigateHome]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg" px={24} py={40} justifyContent="center" alignItems="center">
-        
-        {isFlex ? (
-          <View style={styles.iconCircleFlex}>
-            <CheckCircle2 color="#10B981" size={48} />
-          </View>
-        ) : (
-          <View style={styles.iconCirclePro}>
-            <Clock color="#F59E0B" size={48} />
-          </View>
-        )}
+
+        <View style={[styles.iconCircle, {backgroundColor: statusConfig.iconBg}]} accessible accessibilityLabel={`Status: ${statusConfig.badge}`}>
+          {statusConfig.icon}
+        </View>
 
         <Heading as="h2" bold color="text-primary" textAlign="center" mt={32} style={styles.heading}>
-          {isFlex ? t('trading.success.flexTitle') : t('trading.success.proTitle')}
+          {statusConfig.title}
         </Heading>
 
         <Text
@@ -98,48 +98,36 @@ export default function CompletionScreen() {
           lineHeight={24}
           mt={16}
           px={12}>
-          {isFlex
-            ? t('trading.success.flexSubtitle')
-            : t('trading.success.proSubtitle')}
+          {statusConfig.subtitle}
         </Text>
 
-        <View style={styles.workspaceCard}>
+        <View style={styles.workspaceCard} accessible accessibilityLabel={`Workspace: ${createdAccount?.accountName || createdAccount?.careerName || 'Your business'}, ${statusConfig.badge}`}>
            <View style={[styles.avatarTemp, {backgroundColor: `${primaryColor}20`}]}>
              <Briefcase color={primaryColor} size={24} />
            </View>
            <View style={{flex: 1, marginLeft: 16}}>
              <Text fontSize={16} fontWeight="700" color="text-primary">
-               {createdAccount?.accountName || t('trading.success.yourBusinessName')}
+               {createdAccount?.accountName || createdAccount?.careerName || t('trading.success.yourBusinessName')}
              </Text>
              <Text fontSize={14} color="text-subtle" mt={2}>
-               {isFlex ? t('trading.success.flexAccount') : t('trading.success.proAccount')}
+               {statusConfig.badge}
              </Text>
            </View>
         </View>
 
         <View style={styles.buttons}>
-          {isFlex ? (
-             <Button
-               label={t('trading.success.browseJobs')}
-               severity="brand"
-               w="full"
-               onClick={handleGoToJobs}
-             />
-          ) : (
-             <Button
-               label={t('trading.success.goToProfileVerify')}
-               severity="brand"
-               w="full"
-               onClick={handleGoToProfile}
-             />
-          )}
-          
           <Button
-            label={isFlex ? t('trading.success.goToProfile') : t('trading.success.doItLater')}
+            label={statusConfig.primaryButton.label}
+            severity="brand"
+            w="full"
+            onClick={statusConfig.primaryButton.action}
+          />
+          <Button
+            label={statusConfig.secondaryButton.label}
             severity="secondary"
             outlined
             w="full"
-            onClick={isFlex ? handleGoToProfile : handleGoToJobs}
+            onClick={statusConfig.secondaryButton.action}
           />
         </View>
       </Flex>
@@ -152,19 +140,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  iconCircleFlex: {
+  iconCircle: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#D1FAE5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconCirclePro: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#FEF3C7',
     justifyContent: 'center',
     alignItems: 'center',
   },

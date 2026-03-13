@@ -12,21 +12,26 @@ import {
   type IUseFormReturn,
   type IFormElement,
 } from '@lmb-it/kitsconcerto';
-import {Camera, CheckSquare, Square} from 'lucide-react-native';
-import {launchImageLibrary, type ImageLibraryOptions} from 'react-native-image-picker';
+import * as Yup from 'yup';
+import {Camera} from 'lucide-react-native';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 import {selectUser} from '@src/modules/Auth';
 import Config from 'react-native-config';
 import {tradingAccountActions} from '../store/tradingAccount.slice';
 
 export interface IBasicInfoForm {
+  profileImage?: Record<string, unknown>;
   firstName: string;
   lastName: string;
-  businessPhone: string;
+  businessName?: string;
+  shortBio?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   fullAddress: string;
-  country_id?: number;
-  profileImageBase64?: string;
 }
+
+const PRIVACY_NOTE =
+  'This information will not be visible to anyone unless you choose to grant access.';
 
 export default function BasicInformationScreen() {
   const {t} = useLanguage();
@@ -38,181 +43,209 @@ export default function BasicInformationScreen() {
 
   const user = useSelector(selectUser);
 
-  // States
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
-  const [sameAsPersonal, setSameAsPersonal] = useState(false);
+  // Track whether user uploaded a profile image
+  const avatarBase64Ref = useRef<string | null>(null);
+  const [hasImage, setHasImage] = useState(false);
 
-  // Handle Image Picker
-  const handlePickImage = useCallback(() => {
-    const options: ImageLibraryOptions = {
-      mediaType: 'photo',
-      includeBase64: true,
-      quality: 0.8,
-      maxWidth: 800,
-      maxHeight: 800,
-    };
+  const formElements: IFormElement[] = useMemo(
+    () => [
+      // ── Profile image (scoped to trading account; does NOT update global profile) ──
+      {
+        id: 'profileImage',
+        type: 'Image',
+        colSpan: 12,
+        multiple: false,
+        limit: 1,
+        onChangeValue: (value: Record<string, unknown>) => {
+          const b64 = value?.base64
+            ? `data:${value.type || 'image/jpeg'};base64,${value.base64}`
+            : null;
+          avatarBase64Ref.current = b64;
+          setHasImage(!!b64);
+        },
+        schema: Yup.object(),
+        template: ({values, browse}: any) => (
+          <Flex justifyContent="center" w="full" style={styles.avatarSection}>
+            <TouchableOpacity
+              style={styles.avatarContainer}
+              activeOpacity={0.7}
+              onPress={() => browse()}>
+              {values?.length > 0 ? (
+                <Image
+                  source={{uri: values[0].uri || values[0]}}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                  <Camera color="#9CA3AF" size={32} />
+                </View>
+              )}
+              <View style={[styles.cameraIcon, {backgroundColor: primaryColor}]}>
+                <Text fontSize={18} color="white" style={{lineHeight: 22}}>
+                  +
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Flex>
+        ),
+      },
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) return;
-      if (response.errorCode) {
-        Alert.alert(t('error'), response.errorMessage || t('trading.basic.imageError'));
-        return;
-      }
-
-      const asset = response.assets?.[0];
-      if (asset) {
-        setAvatarUri(asset.uri || null);
-        if (asset.base64) {
-          // Prepend data uri scheme if necessary or just send raw base64
-          setAvatarBase64(`data:${asset.type || 'image/jpeg'};base64,${asset.base64}`);
-        }
-      }
-    });
-  }, []);
-
-  const formElements = useMemo(() => {
-    const elements: any[] = [
+      // ── Global fields (shared across the entire app) ──
       {
         id: 'firstName',
-        name: 'firstName',
-        label: t('trading.basic.firstName'),
         type: 'Text',
+        label: t('trading.basic.firstName'),
         placeholder: t('trading.basic.firstNamePlaceholder'),
         defaultValue: user?.displayName || '',
-        required: !user?.displayName,
         disabled: !!user?.displayName,
-        colSpan: 12, // User requested everything to be 12
+        colSpan: 12,
+        schema: Yup.string().required(t('trading.basic.firstNameRequired')),
       },
       {
         id: 'lastName',
-        name: 'lastName',
-        label: t('trading.basic.lastName'),
         type: 'Text',
+        label: t('trading.basic.lastName'),
         placeholder: t('trading.basic.lastNamePlaceholder'),
         defaultValue: user?.familyName || '',
-        required: !user?.familyName,
         disabled: !!user?.familyName,
         colSpan: 12,
+        schema: Yup.string().required(t('trading.basic.lastNameRequired')),
       },
-      // Note: User explicitly requested NOT to ask about personal number here.
-      // So no Input field for `personalPhone`. It only appears as a conditional checkbox if user?.contactPhone exists
-    ];
 
-    if (!sameAsPersonal) {
-      elements.push({
-        id: 'businessPhone',
-        name: 'businessPhone',
-        label: t('trading.basic.businessPhone'),
+      // ── Business name (used as accountName on finalize) ──
+      {
+        id: 'businessName',
         type: 'Text',
-        placeholder: t('trading.basic.phonePlaceholder'),
-        required: true,
+        label: t('trading.basic.businessName'),
+        placeholder: t('trading.basic.businessNamePlaceholder'),
         colSpan: 12,
-      });
-    }
+        schema: Yup.string().max(50),
+      },
 
-    elements.push({
-      id: 'fullAddress',
-      name: 'fullAddress',
-      label: t('trading.basic.fullAddress'),
-      type: 'Location',
-      placeholder: t('trading.basic.addressPlaceholder'),
-      required: true,
-      colSpan: 12,
-      apiKey: Config.GOOGLE_MAPS_API_KEY || '',
-      provider: 'google',
-      countryISO: 'aus',
-      forceSelection: true,
-    });
+      // ── Trading account bio ──
+      {
+        id: 'shortBio',
+        type: 'Textarea',
+        label: t('ta.bio'),
+        placeholder: t('ta.bioPlaceholder'),
+        colSpan: 12,
+      },
 
-    return elements;
-  }, [t, sameAsPersonal, user]);
+      // ── Contact: email OR phone required (not both mandatory) ──
+      // Yup.when() works here because schemaBuilder merges ALL field schemas
+      // into a single Yup.object().shape({...}), giving each field access to
+      // its siblings. When contactEmail is empty (user has no email on account),
+      // contactPhone becomes required — mirroring Laravel's nullable rule.
+      {
+        id: 'contactPhone',
+        type: 'Text',
+        label: t('ta.phone'),
+        placeholder: t('ta.phonePlaceholder'),
+        colSpan: 12,
+        helperText: PRIVACY_NOTE,
+        schema: Yup.string().when('contactEmail', {
+          is: (val: string | undefined) => !val || val.trim() === '',
+          then: schema => schema.required(t('trading.basic.phoneRequired')),
+          otherwise: schema => schema.nullable(),
+        }),
+      },
+      {
+        id: 'contactEmail',
+        type: 'Text',
+        label: t('ta.email'),
+        placeholder: t('trading.details.emailPlaceholder'),
+        defaultValue: user?.contactEmail || '',
+        disabled: true,
+        colSpan: 12,
+        schema: Yup.string().email().nullable(),
+      },
 
-  const processFormSubmit = useCallback((data: IBasicInfoForm) => {
-    const finalPayload = {
-      ...data,
-      country_id: 14, // Hardcoded to Australia
-    };
+      // ── Address ──
+      {
+        id: 'fullAddress',
+        type: 'Location',
+        label: t('trading.basic.fullAddress'),
+        placeholder: t('trading.basic.addressPlaceholder'),
+        helperText: PRIVACY_NOTE,
+        colSpan: 12,
+        schema: Yup.string().required(t('trading.basic.addressRequired')),
+        apiKey: Config.GOOGLE_MAPS_API_KEY || '',
+        provider: 'google',
+        countryISO: 'aus',
+        forceSelection: true,
+      } as any,
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, user, primaryColor],
+  );
 
-    if (sameAsPersonal && user?.contactPhone) {
-      finalPayload.businessPhone = user.contactPhone;
-    }
-
-    if (avatarBase64) {
-      finalPayload.profileImageBase64 = avatarBase64;
-    }
-
-    dispatch(tradingAccountActions.setBasicInfo(finalPayload));
-    navigation.navigate('TAInput');
-  }, [navigation, dispatch, sameAsPersonal, user, avatarBase64]);
+  const proceedWithSubmit = useCallback(
+    (data: IBasicInfoForm) => {
+      dispatch(
+        tradingAccountActions.setBasicInfo({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          businessName: data.businessName,
+          shortBio: data.shortBio,
+          contactPhone: data.contactPhone,
+          contactEmail: data.contactEmail,
+          fullAddress: data.fullAddress,
+          country_id: 14,
+          ...(avatarBase64Ref.current
+            ? {profileImageBase64: avatarBase64Ref.current}
+            : {}),
+        }),
+      );
+      navigation.navigate('TAInput');
+    },
+    [navigation, dispatch],
+  );
 
   const handleSubmit = useCallback(
     (data: IBasicInfoForm, setIsSubmitting: (v: boolean) => void) => {
       setIsSubmitting(false);
 
-      if (!avatarUri) {
+      // Advisory alert when no profile photo uploaded — non-blocking
+      if (!hasImage && !avatarBase64Ref.current) {
         Alert.alert(
-          t('trading.basic.photoTitle'),
-          t('trading.basic.photoMessage'),
+          t('trading.basic.photoAlertTitle'),
+          t('trading.basic.photoAlertMessage'),
           [
             {
-              text: t('trading.basic.addPhoto'),
-              style: "cancel",
-              onPress: handlePickImage
+              text: t('trading.basic.photoAlertSkip'),
+              style: 'cancel',
+              onPress: () => proceedWithSubmit(data),
             },
             {
-              text: t('trading.basic.continueWithout'),
-              style: "default",
-              onPress: () => processFormSubmit(data),
-            }
-          ]
+              text: t('trading.basic.photoAlertAdd'),
+              style: 'default',
+              // User stays on screen to add a photo; no action needed
+            },
+          ],
         );
-      } else {
-        processFormSubmit(data);
+        return;
       }
+
+      proceedWithSubmit(data);
     },
-    [avatarUri, processFormSubmit, handlePickImage],
+    [hasImage, proceedWithSubmit, t],
   );
 
   return (
     <AlphaLayout>
       <Flex flex={1} px={22} mt={20} pb={32} flexDirection="column">
+        {/* Heading moved from the former AccountDetailsScreen */}
         <Heading as="h2" bold color="text-primary" style={styles.heading}>
-          {t('trading.basic.title')}
+          {t('trading.details.setupYour')}{' '}
+          <Heading as="h2" bold color="primary">
+            {t('trading.details.profile')}
+          </Heading>
         </Heading>
-
-        <View style={styles.avatarSection}>
-          <TouchableOpacity style={styles.avatarContainer} activeOpacity={0.7} onPress={handlePickImage}>
-            {avatarUri ? (
-              <Image source={{uri: avatarUri}} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                 <Camera color="#9CA3AF" size={32} />
-              </View>
-            )}
-            <View style={[styles.cameraIcon, {backgroundColor: primaryColor}]}>
-              <Text fontSize={18} color="white" style={{lineHeight: 22}}>+</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <Text fontSize={14} color="text-subtle" lineHeight={20} mt={8} mb={4}>
+          {t('trading.details.subtitle')}
+        </Text>
 
         <View style={styles.formContainer}>
-          {user?.contactPhone && (
-            <TouchableOpacity
-              style={styles.checkboxRow}
-              activeOpacity={0.7}
-              onPress={() => setSameAsPersonal(!sameAsPersonal)}>
-              {sameAsPersonal ? (
-                <CheckSquare color={primaryColor} size={20} />
-              ) : (
-                <Square color="#9CA3AF" size={20} />
-              )}
-              <Text fontSize={14} color="text-primary" ml={8}>
-                {t('trading.basic.sameAsPrimary')} ({user.contactPhone})
-              </Text>
-            </TouchableOpacity>
-          )}
-
           <Form<IBasicInfoForm>
             ref={formRef}
             elements={formElements as any}
@@ -237,8 +270,8 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 16,
+    marginTop: 8,
+    marginBottom: 8,
   },
   avatarContainer: {
     position: 'relative',
@@ -270,11 +303,5 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginTop: 8,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
   },
 });

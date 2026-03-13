@@ -31,6 +31,95 @@ export default {
   'profile.projectName': 'Project Name',
   'profile.projectNamePlaceholder': 'Enter project name',
   'profile.noPortfolio': 'Showcase your best work to attract clients.',
+  'profile.saveChanges': 'Save Changes',
+  'profile.editProfileTitle': 'Edit Profile',
+  'profile.displayName': 'Display Name',
+  'profile.familyName': 'Family Name',
+  'profile.phone': 'Phone',
+  'profile.bio': 'Bio',
+  'profile.uploadFailed': 'Failed to upload image',
+
+  // Profile Screen — Section Labels
+  'profile.switchMode': 'Switch Mode',
+  'profile.personalMode': 'Client Mode',
+  'profile.sectionPersonal': 'My Account',
+  'profile.sectionTrading': 'Trading Account',
+  'profile.sectionGlobal': 'More',
+  'profile.tradingAccountActive': 'Trading account active',
+  'profile.clientModeActive': 'Client mode active',
+
+  // Profile Screen — Menu Items
+  'profile.tradingAccounts': 'Trading Accounts',
+  'profile.walletTransactions': 'Wallet & Transactions',
+  'profile.publicProfile': 'Public Profile',
+  'profile.publicProfileDesc': 'What clients see',
+  'profile.verificationStatus': 'Verification Status',
+  'profile.earningsWallet': 'Earnings & Wallet',
+  'profile.teams': 'Teams',
+  'profile.support': 'Support',
+  'profile.inviteFriends': 'Invite Friends',
+  'profile.appLanguage': 'App Language',
+
+  // Settings Screen
+  'settings.title': 'Settings',
+  'settings.sectionAccount': 'Account',
+  'settings.sectionNotifications': 'Notifications',
+  'settings.sectionAppearance': 'Appearance',
+  'settings.sectionDanger': 'Danger Zone',
+  'settings.underConstruction': 'This settings screen is under construction.',
+  'settings.privacy': 'Privacy',
+  'settings.privacyDesc': 'Who can see your details',
+  'settings.paymentMethods': 'Payment Methods',
+  'settings.address': 'Address',
+  'settings.languagesSpoken': 'Languages Spoken',
+  'settings.email': 'Email',
+  'settings.emailDesc': 'Change your email address',
+  'settings.password': 'Password',
+  'settings.passwordDesc': 'Change your password',
+  'settings.trustVerification': 'Trust & Verification',
+  'settings.twoFactorAuth': 'Two-Factor Authentication',
+  'settings.emailNotifications': 'Email Notifications',
+  'settings.pushNotifications': 'Push Notifications',
+  'settings.marketingEmails': 'Marketing Emails',
+  'settings.appTheme': 'App Theme',
+  'settings.appThemeDesc': 'Dark / Light / Auto',
+  'settings.deactivateAccount': 'Deactivate Account',
+  'settings.deleteAccount': 'Delete Account',
+  'settings.deactivateTitle': 'Deactivate Account',
+  'settings.deactivateMessage':
+    'Your account will be temporarily deactivated. You can reactivate it at any time by logging back in.',
+  'settings.deactivateConfirm': 'Deactivate',
+  'settings.deleteTitle': 'Delete Account',
+  'settings.deleteMessage':
+    'This action is permanent. All your data will be deleted and cannot be recovered.',
+  'settings.deleteConfirm': 'Delete My Account',
+
+  // Support Screen
+  'support.title': 'Support',
+  'support.liveChat': 'Live Chat',
+  'support.liveChatDesc': 'Chat with support now',
+  'support.emailSupport': 'Email Support',
+  'support.emailAddress': 'support@alphamatch.com',
+  'support.callSupport': 'Call Support',
+  'support.callHours': 'Mon–Fri, 9am–5pm AEST',
+  'support.helpCentre': 'Help Centre',
+  'support.helpCentreDesc': 'Browse articles and FAQs',
+
+  // Invite Friends Screen
+  'invite.title': 'Give $20, Get $20',
+  'invite.description':
+    'Invite friends to AlphaMatch. When they complete their first project, you both earn $20 credit.',
+  'invite.codeLabel': 'Your Invite Code',
+  'invite.shareLabel': 'Share Invite Link',
+
+  // Terms Screen
+  'terms.title': 'Terms & Conditions',
+  'terms.loadingUrl': 'Loading terms and conditions...',
+
+  // Documents Screen
+  'documents.title': 'Documents',
+  'documents.loadError': 'Failed to load documents',
+  'documents.noRequired': 'No documents required',
 
   // Trading Account Creation — Intro
   'ta.introTitle': 'Create Your',

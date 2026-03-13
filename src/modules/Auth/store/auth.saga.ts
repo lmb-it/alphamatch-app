@@ -9,6 +9,7 @@ import {signInWithGoogle} from '../services/googleAuth';
 import {signInWithApple} from '../services/appleAuth';
 import {parseApiError} from '@src/services/apiError';
 import {sendFirebaseOtp, confirmFirebaseOtp} from '../services/firebasePhoneAuth';
+import {tradingAccountActions} from '@src/modules/TradingAccount';
 
 function* loginSaga(action: ReturnType<typeof authActions.login>): Generator {
   try {
@@ -123,6 +124,11 @@ function* fetchMeSaga(): Generator {
   }
 }
 
+// Bootstrap: load trading accounts after any successful login
+function* postLoginBootstrapSaga(): Generator {
+  yield put(tradingAccountActions.fetchMyAccounts());
+}
+
 export default function* authSaga(): Generator {
   yield takeLatest(authActions.login.type, loginSaga);
   yield takeLatest(authActions.register.type, registerSaga);
@@ -131,4 +137,9 @@ export default function* authSaga(): Generator {
   yield takeLatest(authActions.verifyOtp.type, verifyOtpSaga);
   yield takeLatest(authActions.logout.type, logoutSaga);
   yield takeLatest(authActions.fetchMe.type, fetchMeSaga);
+  // Bootstrap data after any login success path (including fetchMe on cold start with persisted token)
+  yield takeLatest(
+    [authActions.loginSuccess.type, authActions.socialLoginSuccess.type, authActions.verifyOtpSuccess.type, authActions.fetchMeSuccess.type],
+    postLoginBootstrapSaga,
+  );
 }

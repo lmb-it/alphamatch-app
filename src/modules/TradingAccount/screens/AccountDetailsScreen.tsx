@@ -73,18 +73,24 @@ const AccountDetailsScreen: React.FC = () => {
     });
   }, [t]);
 
-  // Navigate to portfolio after finalize success
+  // Navigate after finalize success — track account identity to avoid firing on mount
+  const prevAccountRef = useRef(createdAccount);
   useEffect(() => {
-    if (createdAccount && didSubmit.current && !loading) {
+    if (
+      didSubmit.current &&
+      createdAccount &&
+      !loading &&
+      createdAccount !== prevAccountRef.current
+    ) {
       didSubmit.current = false;
-      // Skip portfolio (now lives in MyAccount) — go to model-specific screen
-      const model = createdAccount?.careerModel;
-      if (model === 'pro') {
+      // Pro → Verification first, Flex → straight to Subscription
+      if (createdAccount.careerModel === 'pro') {
         navigation.navigate('TAVerification');
       } else {
         navigation.navigate('TASubscription');
       }
     }
+    prevAccountRef.current = createdAccount;
   }, [createdAccount, loading, navigation]);
 
   const formElements: IFormElement<IAccountDetailsForm>[] = useMemo(

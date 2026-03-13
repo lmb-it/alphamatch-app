@@ -26,7 +26,7 @@ export interface IUnansweredQuestion {
   order: number;
   options?: {label: string; value: string}[];
   isMulti?: boolean;
-  validation?: Record<string, any>;
+  validation?: Record<string, unknown>;
 }
 
 export interface IAIAnalysisResult {
@@ -56,17 +56,52 @@ export interface ISubscriptionPlan {
   stripePriceId: string | null;
 }
 
-export interface IDocumentRequirement {
+export interface IDocumentFormField {
+  fieldRef: string;
+  fieldLabel: string;
+  fieldName: string;
+  fieldType: string;
+  placeholder: string | null;
+  options: unknown | null;
+  validation: Record<string, unknown> | null;
+  order: number;
+}
+
+export interface IDocumentForm {
   identifier: string;
-  documentName: string;
-  isMandatory: boolean;
-  uploadStatus: string;
+  title: string;
+  description: string | null;
+  fields: IDocumentFormField[];
+}
+
+export interface IDocumentExpiryRules {
+  hasExpiry: boolean;
+  expirySource: string | null;
+  validityPeriodDays: number | null;
+  reminderSchedule: unknown | null;
+  actionOnExpiry: string | null;
+  gracePeriodDays: number | null;
+}
+
+export interface IDocumentRequirement {
+  id: number;
+  uuid: string;
+  identifier: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  reviewRequired: boolean;
+  expiryRules: IDocumentExpiryRules | null;
+  form: IDocumentForm | null;
+  // Computed on the client from existing form submissions
+  uploadStatus?: string;
 }
 
 export interface ITradingAccountDetail {
   identifier: string;
   accountName: string | null;
   shortBio: string | null;
+  careerRef: string | null;
   careerName: string | null;
   careerModel: string | null;
   avatar: string | null;
@@ -86,16 +121,31 @@ export interface ITradingAccountDetail {
 export interface IBasicInfo {
   firstName: string;
   lastName: string;
-  businessPhone: string;
+  businessName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  shortBio?: string;
   fullAddress: string;
+  zipCode?: string;
   country_id?: number;
   profileImageBase64?: string;
+}
+
+// Persisted step data for back-button preservation
+export interface IStepData {
+  /** AI input screen — user's freeform description */
+  aiDescription?: string;
+  /** Missing questions — partial answers the user typed before going back */
+  missingAnswers?: Record<string, unknown>;
 }
 
 // Creation flow wizard state
 export interface ITradingAccountState {
   // Basic info (from step 1 form)
   basicInfo: IBasicInfo | null;
+
+  // Persisted data from intermediate steps (for back button)
+  stepData: IStepData;
 
   // AI analysis
   aiResult: IAIAnalysisResult | null;
@@ -114,8 +164,14 @@ export interface ITradingAccountState {
   // User's existing accounts (for resume flow)
   myAccounts: ITradingAccountDetail[];
 
+  // Timestamp (ms) of last successful fetchMyAccounts — used for staleness checks
+  lastFetched: number | null;
+
   // Subscription plans
   plans: ISubscriptionPlan[];
+
+  // Form fields (for manual flow when no AI result)
+  formFields: IUnansweredQuestion[];
 
   // Required documents
   requiredDocuments: IDocumentRequirement[];
@@ -124,6 +180,16 @@ export interface ITradingAccountState {
   stripeClientSecret: string | null;
   stripeEphemeralKey: string | null;
   stripeCustomerId: string | null;
+  stripePublishableKey: string | null;
+
+  // Tracks whether fetchDocuments has completed (chained after finalizeAccount)
+  documentsChecked: boolean;
+
+  // Document form (verification flow)
+  documentFormFields: IUnansweredQuestion[];
+  documentFormLoading: boolean;
+  documentFormSubmitting: boolean;
+  documentFormSuccess: boolean;
 
   // General
   loading: boolean;
@@ -134,18 +200,19 @@ export interface ITradingAccountState {
 export interface IAIAnalyzePayload {
   description: string;
   formTypeRef: string;
+  countryId?: number;
 }
 
 export interface ICreateTradingAccountPayload {
   careerRef: string;
   signupMethod: 'ai' | 'manual';
-  answeredQuestions?: {fieldRef: string; value: any}[];
+  answeredQuestions?: {fieldRef: string; value: unknown}[];
   unmatchedContent?: string[];
 }
 
 export interface ISubmitFormAnswersPayload {
   tradingAccountRef: string;
-  answers: {fieldRef: string; value: any}[];
+  answers: {fieldRef: string; value: unknown}[];
 }
 
 export interface IFinalizeTradingAccountPayload {
@@ -159,10 +226,29 @@ export interface IFinalizeTradingAccountPayload {
   cityRef?: string;
   fullAddress?: string;
   zipCode?: string;
+  profileImageBase64?: string;
 }
 
 export interface ISubscribePayload {
   tradingAccountRef: string;
   planRef: string;
   paymentMethodId: string;
+}
+
+export interface IFetchComplianceDocumentsPayload {
+  type: 'provider' | 'client';
+  careerRef: string;
+  countryId: number;
+}
+
+export interface IFetchDocumentFormFieldsPayload {
+  tradingAccountRef: string;
+  documentRef: string;
+}
+
+export interface ISubmitDocumentFormPayload {
+  tradingAccountRef: string;
+  documentRef: string;
+  answers: {fieldRef: string; value: unknown}[];
+  fileFields: Record<string, {uri: string; type: string; name: string}>;
 }

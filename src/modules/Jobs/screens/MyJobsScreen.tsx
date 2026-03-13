@@ -107,6 +107,7 @@ const MyJobsScreen: React.FC = () => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.filtersScroll}
         contentContainerStyle={styles.filtersContainer}>
         {filters.map(f => (
           <TouchableOpacity
@@ -177,10 +178,14 @@ const styles = StyleSheet.create({
   safeTop: {backgroundColor: '#F9FAFC'},
   header: {paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4},
   title: {fontSize: 22, fontWeight: '700', color: '#111827'},
+  filtersScroll: {
+    flexGrow: 0,
+  },
   filtersContainer: {
     paddingHorizontal: 20,
     paddingVertical: 12,
     gap: 8,
+    alignItems: 'center',
   },
   filterTab: {
     paddingHorizontal: 16,

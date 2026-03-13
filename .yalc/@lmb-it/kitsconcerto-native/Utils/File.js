@@ -18,7 +18,6 @@ const ext = (fileName) => {
   return fileName.slice(lastDotIndex + 1).toLowerCase();
 };
 const shortName = (fileName, startLength = 15, endLength = 5) => {
-  console.log(fileName);
   const lastDotIndex = fileName.lastIndexOf(".");
   if (lastDotIndex === -1) return fileName;
   const name = fileName.slice(0, lastDotIndex);

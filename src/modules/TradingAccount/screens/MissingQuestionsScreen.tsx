@@ -1,5 +1,5 @@
 import React, {useRef, useCallback, useMemo, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,12 +17,32 @@ import {
   tradingAccountActions,
   selectAIResult,
   selectCreatedAccount,
+  selectFormFields,
   selectTALoading,
 } from '@src/modules/TradingAccount';
+import type {IUnansweredQuestion} from '@src/modules/TradingAccount';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
+
+/** Map backend field types to KitsConcerto component types */
+const mapFieldType = (q: IUnansweredQuestion): string => {
+  // fieldType from FormFieldResource is already KitsConcerto-mapped (Text, Select, etc.)
+  // But for safety, handle raw dbType fallbacks
+  const ft = q.fieldType;
+  if (['Text', 'Textarea', 'Select', 'Number', 'DatePicker', 'Radio', 'Checkbox', 'FileUpload'].includes(ft)) {
+    return ft;
+  }
+  // Fallback from dbType
+  switch (q.dbType) {
+    case 'textarea': return 'Textarea';
+    case 'select': case 'multiselect': return 'Select';
+    case 'checkbox': return 'Checkbox';
+    case 'number': case 'decimal': case 'currency': return 'Number';
+    default: return 'Text';
+  }
+};
 
 const MissingQuestionsScreen: React.FC = () => {
   const {t} = useLanguage();
@@ -30,45 +50,59 @@ const MissingQuestionsScreen: React.FC = () => {
   const dispatch = useDispatch();
   const aiResult = useSelector(selectAIResult);
   const createdAccount = useSelector(selectCreatedAccount);
+  const formFieldsFromApi = useSelector(selectFormFields);
   const loading = useSelector(selectTALoading);
   const formRef = useRef<IUseFormReturn<Record<string, any>>>(null);
   const didSubmit = useRef(false);
+  const didFetch = useRef(false);
+
+  // For manual flow: fetch form fields from backend when no AI result
+  useEffect(() => {
+    if (!aiResult && createdAccount?.identifier && !didFetch.current) {
+      didFetch.current = true;
+      dispatch(tradingAccountActions.fetchFormFields(createdAccount.identifier));
+    }
+  }, [aiResult, createdAccount?.identifier, dispatch]);
 
   // Navigate to account details after form submission success
+  const prevAccountRef = useRef(createdAccount);
   useEffect(() => {
-    if (createdAccount && didSubmit.current && !loading) {
+    if (
+      didSubmit.current &&
+      createdAccount &&
+      !loading &&
+      createdAccount !== prevAccountRef.current
+    ) {
       didSubmit.current = false;
-      navigation.navigate('TAAccountDetails');
+      navigation.navigate('TAConfirmation');
     }
+    prevAccountRef.current = createdAccount;
   }, [createdAccount, loading, navigation]);
 
-  // Build form elements from unanswered questions based on JSON spec
-  const formElements: IFormElement[] = useMemo(() => {
-    const questions = aiResult?.unansweredQuestions || [];
-    return questions.map((q: any) => {
-      // API provides dbType and fieldType. We map to KitsConcerto types.
-      // KitsConcerto expects Title case for types like 'Text', 'Textarea', 'Select'
-      const mappedType = q.fieldType === 'textfield' ? 'Text'
-                       : q.fieldType === 'select' ? 'Select'
-                       : q.fieldType === 'checkbox' ? 'Checkbox'
-                       : q.fieldType === 'Text' ? 'Text' // Assuming it might already be mapped
-                       : 'Text';
+  // Use AI unanswered questions or fetched form fields
+  const questions: IUnansweredQuestion[] = useMemo(() => {
+    if (aiResult?.unansweredQuestions?.length) {
+      return aiResult.unansweredQuestions;
+    }
+    return formFieldsFromApi || [];
+  }, [aiResult, formFieldsFromApi]);
 
-      return {
-        id: q.fieldRef,
-        name: q.fieldName || q.fieldRef, // fieldName matches the kitconcerto format better
-        label: q.fieldLabel,
-        type: mappedType as any,
-        placeholder: q.placeholder || '',
-        required: q.isRequired || q.validation?.required || false,
-        options: q.options?.map((opt: any) => ({
-          label: typeof opt === 'string' ? opt : opt.label,
-          value: typeof opt === 'string' ? opt : opt.value,
-        })),
-        helpText: q.helpText,
-      };
-    });
-  }, [aiResult]);
+  // Build form elements from questions
+  const formElements: IFormElement[] = useMemo(() => {
+    return questions.map(q => ({
+      id: q.fieldRef,
+      name: q.fieldName || q.fieldRef,
+      label: q.fieldLabel,
+      type: mapFieldType(q) as any,
+      placeholder: q.placeholder || '',
+      required: q.isRequired || q.validation?.required || false,
+      list: q.options?.map(opt => ({
+        label: typeof opt === 'string' ? opt : opt.label,
+        value: typeof opt === 'string' ? opt : opt.value,
+      })),
+      helpText: q.helpText,
+    }));
+  }, [questions]);
 
   const handleSubmit = useCallback(
     (data: Record<string, any>, setIsSubmitting: (v: boolean) => void) => {
@@ -89,15 +123,20 @@ const MissingQuestionsScreen: React.FC = () => {
     [createdAccount, dispatch],
   );
 
-  // If no unanswered questions, skip to account details
+  // If no questions and not loading, skip to confirmation
   useEffect(() => {
-    if (formElements.length === 0) {
-      navigation.navigate('TAAccountDetails');
+    if (formElements.length === 0 && !loading && (aiResult || didFetch.current)) {
+      navigation.navigate('TAConfirmation');
     }
-  }, [formElements.length, navigation]);
+  }, [formElements.length, loading, aiResult, navigation]);
 
+  // Show a loader while questions are being fetched or while navigation is queuing
   if (formElements.length === 0) {
-    return null;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
@@ -136,6 +175,11 @@ const MissingQuestionsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   heading: {
     fontSize: 26,
     lineHeight: 34,

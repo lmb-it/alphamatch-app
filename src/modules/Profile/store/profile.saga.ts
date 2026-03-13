@@ -1,6 +1,8 @@
-import {call, put, takeLatest} from 'redux-saga/effects';
+import {all, call, put, takeLatest} from 'redux-saga/effects';
 import {profileActions} from './profile.slice';
 import {fetchProfileApi, switchWorkspaceApi} from '../api/profile.service';
+import {tradingAccountActions} from '@src/modules/TradingAccount';
+import {listTradingAccountsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import {parseApiError} from '@src/services/apiError';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import type {IProfileData, ISwitchWorkspacePayload} from '../models/profile.types';
@@ -16,10 +18,18 @@ function* fetchProfileSaga(): Generator {
 
 function* switchWorkspaceSaga(action: PayloadAction<ISwitchWorkspacePayload>): Generator {
   try {
+    // Switch workspace on backend
     const activeWorkspace = yield call(switchWorkspaceApi, action.payload);
     yield put(profileActions.switchWorkspaceSuccess(activeWorkspace as string | null));
-    // Re-fetch profile to get updated context
-    yield put(profileActions.fetchProfile());
+
+    // Fetch fresh profile + trading accounts in parallel
+    const [profileData, accounts]: any = yield all([
+      call(fetchProfileApi),
+      call(listTradingAccountsApi),
+    ]);
+
+    yield put(profileActions.fetchProfileSuccess(profileData as IProfileData));
+    yield put(tradingAccountActions.fetchMyAccountsSuccess(accounts));
   } catch (e) {
     yield put(profileActions.switchWorkspaceFailure(parseApiError(e).message));
   }

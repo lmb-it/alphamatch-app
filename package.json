@@ -40,6 +40,7 @@
     "@react-navigation/native-stack": "^7.14.4",
     "@reduxjs/toolkit": "^2.11.2",
     "@sentry/react-native": "^8.3.0",
+    "@stripe/stripe-react-native": "^0.59.2",
     "axios": "^1.13.6",
     "buffer": "^6.0.3",
     "i18next": "^25.7.1",
@@ -55,6 +56,7 @@
     "react-native-gesture-handler": "^2.28.0",
     "react-native-google-places-autocomplete": "^2.6.4",
     "react-native-image-picker": "^8.2.1",
+    "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "~4.2.0",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "^4.18.0",
@@ -66,10 +68,12 @@
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.4.2",
     "tailwind-variants": "^0.1.20",
-    "yup": "^1.7.1"
+    "yup": "^1.7.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-export-namespace-from": "^7.27.1",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
     "@react-native-community/cli": "20.0.0",

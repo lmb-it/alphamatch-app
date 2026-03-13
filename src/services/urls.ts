@@ -41,7 +41,9 @@ export const URLs = {
   },
   profile: {
     me: '/profile/me',
-    update: '/profile',
+    update: '/profile/me',
+    avatar: '/profile/avatar',
+    cover: '/profile/cover',
     view: '/profile/:ref',
     portfolio: '/profile/portfolio',
     switchWorkspace: '/profile/switch-workspace',
@@ -53,8 +55,10 @@ export const URLs = {
     create: '/trading-accounts/create',
     submitFormAnswers: '/trading-accounts/:ref/form-answers',
     finalize: '/trading-accounts/:ref/finalize',
-    requiredDocuments: '/trading-accounts/:ref/required-documents',
+    formFields: '/trading-accounts/:ref/form-fields',
     show: '/trading-accounts/:ref',
+    documentFormFields: '/trading-accounts/:ref/documents/:docRef/form-fields',
+    documentFormSubmit: '/trading-accounts/:ref/documents/:docRef/submit',
   },
   payments: {
     methods: '/payments/methods',
@@ -62,6 +66,9 @@ export const URLs = {
     deposit: '/payments/deposit',
     earnings: '/payments/earnings',
     history: '/payments/transactions',
+  },
+  complianceDocuments: {
+    index: '/compliance-documents/:type/:careerRef/:countryId',
   },
   subscriptions: {
     plans: '/subscriptions/plans',

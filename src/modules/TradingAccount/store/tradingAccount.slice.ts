@@ -6,16 +6,22 @@ import type {
   ICareerOption,
   ICreateTradingAccountPayload,
   IDocumentRequirement,
+  IFetchComplianceDocumentsPayload,
+  IFetchDocumentFormFieldsPayload,
   IFinalizeTradingAccountPayload,
+  IStepData,
+  ISubmitDocumentFormPayload,
   ISubmitFormAnswersPayload,
   ISubscribePayload,
   ISubscriptionPlan,
   ITradingAccountDetail,
   ITradingAccountState,
+  IUnansweredQuestion,
 } from '../models/tradingAccount.types';
 
 const initialState: ITradingAccountState = {
   basicInfo: null,
+  stepData: {},
   aiResult: null,
   analyzing: false,
   careers: [],
@@ -23,11 +29,19 @@ const initialState: ITradingAccountState = {
   selectedCareerRef: null,
   createdAccount: null,
   myAccounts: [],
+  lastFetched: null,
   plans: [],
+  formFields: [],
   requiredDocuments: [],
+  documentsChecked: false,
   stripeClientSecret: null,
   stripeEphemeralKey: null,
   stripeCustomerId: null,
+  stripePublishableKey: null,
+  documentFormFields: [],
+  documentFormLoading: false,
+  documentFormSubmitting: false,
+  documentFormSuccess: false,
   loading: false,
   error: null,
 };
@@ -41,6 +55,11 @@ const tradingAccountSlice = createSlice({
       state.basicInfo = action.payload;
     },
 
+    // Persist intermediate step data for back-button preservation
+    saveStepData(state, action: PayloadAction<Partial<IStepData>>) {
+      state.stepData = {...state.stepData, ...action.payload};
+    },
+
     // Fetch my accounts (for resume flow)
     fetchMyAccounts(state) {
       state.loading = true;
@@ -49,6 +68,7 @@ const tradingAccountSlice = createSlice({
     fetchMyAccountsSuccess(state, action: PayloadAction<ITradingAccountDetail[]>) {
       state.loading = false;
       state.myAccounts = action.payload;
+      state.lastFetched = Date.now();
     },
     fetchMyAccountsFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -144,28 +164,46 @@ const tradingAccountSlice = createSlice({
       state.error = action.payload;
     },
 
+    // Form fields (manual flow)
+    fetchFormFields(state, _action: PayloadAction<string>) {
+      state.loading = true;
+    },
+    fetchFormFieldsSuccess(state, action: PayloadAction<IUnansweredQuestion[]>) {
+      state.loading = false;
+      state.formFields = action.payload;
+    },
+    fetchFormFieldsFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
     // Required documents
-    fetchDocuments(state, _action: PayloadAction<string>) {
+    fetchDocuments(state, _action: PayloadAction<IFetchComplianceDocumentsPayload>) {
       state.loading = true;
     },
     fetchDocumentsSuccess(state, action: PayloadAction<IDocumentRequirement[]>) {
       state.loading = false;
       state.requiredDocuments = action.payload;
+      state.documentsChecked = true;
     },
     fetchDocumentsFailure(state, action: PayloadAction<string>) {
       state.loading = false;
       state.error = action.payload;
+      // Mark as checked even on failure so TAConfirmationScreen can render
+      // (assume no verification documents required if the check fails)
+      state.documentsChecked = true;
     },
 
     // Stripe setup intent
     fetchSetupIntent(state) {
       state.loading = true;
     },
-    fetchSetupIntentSuccess(state, action: PayloadAction<{clientSecret: string; ephemeralKey: string; customerId: string}>) {
+    fetchSetupIntentSuccess(state, action: PayloadAction<{clientSecret: string; ephemeralKey: string; customerId: string; publishableKey: string}>) {
       state.loading = false;
       state.stripeClientSecret = action.payload.clientSecret;
       state.stripeEphemeralKey = action.payload.ephemeralKey;
       state.stripeCustomerId = action.payload.customerId;
+      state.stripePublishableKey = action.payload.publishableKey;
     },
     fetchSetupIntentFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -186,9 +224,50 @@ const tradingAccountSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Reset
+    // Document form (verification flow)
+    fetchDocumentFormFields(state, _action: PayloadAction<IFetchDocumentFormFieldsPayload>) {
+      state.documentFormLoading = true;
+      state.documentFormFields = [];
+      state.documentFormSuccess = false;
+      state.error = null;
+    },
+    fetchDocumentFormFieldsSuccess(state, action: PayloadAction<IUnansweredQuestion[]>) {
+      state.documentFormLoading = false;
+      state.documentFormFields = action.payload;
+    },
+    fetchDocumentFormFieldsFailure(state, action: PayloadAction<string>) {
+      state.documentFormLoading = false;
+      state.error = action.payload;
+    },
+    submitDocumentForm(state, _action: PayloadAction<ISubmitDocumentFormPayload>) {
+      state.documentFormSubmitting = true;
+      state.documentFormSuccess = false;
+      state.error = null;
+    },
+    submitDocumentFormSuccess(state, action: PayloadAction<ITradingAccountDetail>) {
+      state.documentFormSubmitting = false;
+      state.documentFormSuccess = true;
+      state.createdAccount = action.payload;
+    },
+    submitDocumentFormFailure(state, action: PayloadAction<string>) {
+      state.documentFormSubmitting = false;
+      state.error = action.payload;
+    },
+    resetDocumentForm(state) {
+      state.documentFormFields = [];
+      state.documentFormLoading = false;
+      state.documentFormSubmitting = false;
+      state.documentFormSuccess = false;
+    },
+
+    // Reset (preserve myAccounts — they're not creation-specific)
     resetCreationFlow(state) {
-      return initialState;
+      return {
+        ...initialState,
+        myAccounts: state.myAccounts,
+        lastFetched: state.lastFetched,
+        documentsChecked: false,
+      };
     },
     clearError(state) {
       state.error = null;

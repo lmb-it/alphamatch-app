@@ -6,11 +6,22 @@ import AIInputScreen from '@src/modules/TradingAccount/screens/AIInputScreen';
 import CareerSelectionScreen from '@src/modules/TradingAccount/screens/CareerSelectionScreen';
 import CareerConfirmationScreen from '@src/modules/TradingAccount/screens/CareerConfirmationScreen';
 import MissingQuestionsScreen from '@src/modules/TradingAccount/screens/MissingQuestionsScreen';
-import AccountDetailsScreen from '@src/modules/TradingAccount/screens/AccountDetailsScreen';
+import TAConfirmationScreen from '@src/modules/TradingAccount/screens/TAConfirmationScreen';
+import TAProConfirmationScreen from '@src/modules/TradingAccount/screens/TAProConfirmationScreen';
+import FlexSubscriptionScreen from '@src/modules/TradingAccount/screens/FlexSubscriptionScreen';
 import VerificationScreen from '@src/modules/TradingAccount/screens/VerificationScreen';
-import SubscriptionScreen from '@src/modules/TradingAccount/screens/SubscriptionScreen';
+import DocumentFormScreen from '@src/modules/TradingAccount/screens/DocumentFormScreen';
 import CompletionScreen from '@src/modules/TradingAccount/screens/CompletionScreen';
 
+/**
+ * Route map — business model rules enforced here:
+ *
+ * Alpha Pro:  TAConfirmation → TAProConfirmation → TAVerification → TACompletion
+ * Alpha Flex: TAConfirmation → TAFlexActivation  → TACompletion
+ *
+ * TASubscription (multi-plan picker) is intentionally absent.
+ * Alpha Pro has no subscription. Alpha Flex has a single fixed plan rendered by TAFlexActivation.
+ */
 export type TradingAccountCreationParamList = {
   TAIntro: undefined;
   TABasicInfo: undefined;
@@ -18,9 +29,14 @@ export type TradingAccountCreationParamList = {
   TACareerSelection: undefined;
   TACareerConfirmation: undefined;
   TAMissingQuestions: undefined;
-  TAAccountDetails: undefined;
+  // Loading transition — dispatches finalizeAccount, then routes by careerModel
+  TAConfirmation: undefined;
+  // Alpha Pro only — verification pending, no subscription
+  TAProConfirmation: undefined;
   TAVerification: undefined;
-  TASubscription: undefined;
+  TADocumentForm: {documentRef: string; documentName: string};
+  // Alpha Flex only — subscription activation, no verification
+  TAFlexActivation: undefined;
   TACompletion: undefined;
 };
 
@@ -37,9 +53,11 @@ export function TradingAccountCreationNavigator() {
       <Stack.Screen name="TACareerSelection" component={CareerSelectionScreen} />
       <Stack.Screen name="TACareerConfirmation" component={CareerConfirmationScreen} />
       <Stack.Screen name="TAMissingQuestions" component={MissingQuestionsScreen} />
-      <Stack.Screen name="TAAccountDetails" component={AccountDetailsScreen} />
+      <Stack.Screen name="TAConfirmation" component={TAConfirmationScreen} />
+      <Stack.Screen name="TAProConfirmation" component={TAProConfirmationScreen} />
       <Stack.Screen name="TAVerification" component={VerificationScreen} />
-      <Stack.Screen name="TASubscription" component={SubscriptionScreen} />
+      <Stack.Screen name="TADocumentForm" component={DocumentFormScreen} />
+      <Stack.Screen name="TAFlexActivation" component={FlexSubscriptionScreen} />
       <Stack.Screen name="TACompletion" component={CompletionScreen} />
     </Stack.Navigator>
   );

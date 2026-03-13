@@ -56,14 +56,49 @@ const formFileValidation = ({
     }
     const errorSizeFiles = [];
     for (const file of files) {
-      if (file instanceof File) {
+      if (typeof file === "string") {
+        if (!isValidURL(file)) {
+          return createError({ path, message: "Items must be valid Files, URLs, or uploaded file objects." });
+        }
+        continue;
+      }
+      if (typeof file !== "object" || file === null) {
+        return createError({ path, message: "Items must be valid Files, URLs, or uploaded file objects." });
+      }
+      if ("base64" in file) {
+        if (typeof file.base64 !== "string" || !file.base64) {
+          return createError({ path, message: "Items must be valid Files, URLs, or uploaded file objects." });
+        }
+        if (minKB || maxKB) {
+          const approxSizeKB = file.base64.length * 3 / 4 / 1024;
+          const name = file.filename || file.name || "file";
+          if (maxKB && approxSizeKB > maxKB || minKB && approxSizeKB < minKB) {
+            errorSizeFiles.push(name);
+          }
+        }
+        continue;
+      }
+      if ("uri" in file) {
+        if (typeof file.uri !== "string" || !file.uri) {
+          return createError({ path, message: "Items must be valid Files, URLs, or uploaded file objects." });
+        }
+        if ((minKB || maxKB) && file.size != null) {
+          const fileSizeKB = file.size / 1024;
+          const name = file.name || "file";
+          if (maxKB && fileSizeKB > maxKB || minKB && fileSizeKB < minKB) {
+            errorSizeFiles.push(name);
+          }
+        }
+        continue;
+      }
+      if (typeof File !== "undefined" && file instanceof File) {
         const fileSizeKB = file.size / 1024;
         if (maxKB && fileSizeKB > maxKB || minKB && fileSizeKB < minKB) {
           errorSizeFiles.push(file.name);
         }
-      } else if (!isValidURL(file) && !("value" in file)) {
-        return createError({ path, message: "Items must be valid Files, URLs, or base64 objects." });
+        continue;
       }
+      return createError({ path, message: "Items must be valid Files, URLs, or uploaded file objects." });
     }
     if (errorSizeFiles.length > 0) {
       return createError({
