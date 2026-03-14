@@ -61,6 +61,7 @@ require('../../../../../packages/types/src/Components/Molecules/Form/FilePicker/
 require('yup');
 require('../../../../../packages/types/src/Css/map/index.cjs');
 require('../../../../../apps/mobile/src/Factory/DimensionsContext.cjs');
+var useSeparator = require('../../../../../apps/mobile/src/Factory/useSeparator.cjs');
 require('i18next');
 require('react-i18next');
 var index = require('../../../../../apps/mobile/src/Core/AutoComplete/index.cjs');
@@ -81,10 +82,13 @@ require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
 var useAutoCompleteLogic = require('../hooks/useAutoCompleteLogic.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
+var useResolvedStyle = require('../../../../../Hooks/useResolvedStyle.cjs');
 require('../../../../../Hooks/useKeyboardNavigation.cjs');
+var KitsThemeProvider_native = require('../../../../../Contexts/Theme/KitsThemeProvider.cjs');
 
 const KitsAutoComplete = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults.default("AutoComplete", rawProps, "Input");
+  const resolvedThemeStyle = useResolvedStyle.default(themeStyle);
   const {
     id,
     rightAddon,
@@ -107,8 +111,14 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
     delay,
     minLength,
     selectionLimit,
-    showEmptyMessage
+    showEmptyMessage,
+    attached,
+    containerStyle
   } = props;
+  useSeparator.default(props);
+  const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
+  resolveToken("primary");
+  const borderColor = resolveToken("border");
   const {
     inputValue,
     setInputValue,
@@ -119,7 +129,41 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
     childrenKey,
     labelKey
   } = useAutoCompleteLogic.useAutoCompleteLogic({ isMultiple, forceSelection, completeMethod, ref });
-  const hasThemeStyle = Object.keys(themeStyle).length > 0;
+  Object.keys(themeStyle).length > 0;
+  const Element = /* @__PURE__ */ jsxRuntime.jsx(
+    index.default,
+    {
+      disabled,
+      placeholder,
+      value: inputValue,
+      forceSelection,
+      suggestions: Array.isArray(filteredList) ? filteredList : list,
+      completeMethod: search,
+      dropdown: withArrow,
+      multiple: isMultiple,
+      field: labelKey,
+      invalid: !!invalid,
+      emptyMessage: "No results found",
+      ...delay != null ? { delay } : {},
+      ...minLength != null ? { minLength } : {},
+      ...selectionLimit != null ? { selectionLimit } : {},
+      showEmptyMessage: showEmptyMessage ?? true,
+      optionGroupChildren: childrenKey ?? void 0,
+      optionGroupLabel: childrenKey ? labelKey : void 0,
+      inputStyle: {
+        borderColor
+      },
+      style: { flexDirection: "row", borderRadius: 0, ...resolvedThemeStyle },
+      onChange: (event) => {
+        setInputValue(event.value);
+        handleOnChange(event);
+      },
+      ...localProps ?? {}
+    }
+  );
+  if (attached) {
+    return Element;
+  }
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -134,34 +178,7 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
       errors,
       invalid,
       label,
-      children: /* @__PURE__ */ jsxRuntime.jsx(
-        index.default,
-        {
-          disabled,
-          placeholder,
-          value: inputValue,
-          forceSelection,
-          suggestions: Array.isArray(filteredList) ? filteredList : list,
-          completeMethod: search,
-          dropdown: withArrow,
-          multiple: isMultiple,
-          field: labelKey,
-          invalid: !!invalid,
-          emptyMessage: "No results found",
-          ...delay != null ? { delay } : {},
-          ...minLength != null ? { minLength } : {},
-          ...selectionLimit != null ? { selectionLimit } : {},
-          showEmptyMessage: showEmptyMessage ?? true,
-          optionGroupChildren: childrenKey ?? void 0,
-          optionGroupLabel: childrenKey ? labelKey : void 0,
-          inputStyle: hasThemeStyle ? themeStyle : void 0,
-          onChange: (event) => {
-            setInputValue(event.value);
-            handleOnChange(event);
-          },
-          ...localProps ?? {}
-        }
-      )
+      containerStyle
     }
   );
 };

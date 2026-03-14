@@ -57,6 +57,7 @@ import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/t
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
 import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
+import useSeparator from '../../../../../apps/mobile/src/Factory/useSeparator.js';
 import 'i18next';
 import 'react-i18next';
 import AutoComplete from '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -77,10 +78,13 @@ import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
 import { useAutoCompleteLogic } from '../hooks/useAutoCompleteLogic.js';
 import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
+import useResolvedStyle from '../../../../../Hooks/useResolvedStyle.js';
 import '../../../../../Hooks/useKeyboardNavigation.js';
+import { useKitsTheme } from '../../../../../Contexts/Theme/KitsThemeProvider.js';
 
 const KitsAutoComplete = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults("AutoComplete", rawProps, "Input");
+  const resolvedThemeStyle = useResolvedStyle(themeStyle);
   const {
     id,
     rightAddon,
@@ -103,8 +107,14 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
     delay,
     minLength,
     selectionLimit,
-    showEmptyMessage
+    showEmptyMessage,
+    attached,
+    containerStyle
   } = props;
+  useSeparator(props);
+  const { resolveToken } = useKitsTheme();
+  resolveToken("primary");
+  const borderColor = resolveToken("border");
   const {
     inputValue,
     setInputValue,
@@ -115,7 +125,41 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
     childrenKey,
     labelKey
   } = useAutoCompleteLogic({ isMultiple, forceSelection, completeMethod, ref });
-  const hasThemeStyle = Object.keys(themeStyle).length > 0;
+  Object.keys(themeStyle).length > 0;
+  const Element = /* @__PURE__ */ jsx(
+    AutoComplete,
+    {
+      disabled,
+      placeholder,
+      value: inputValue,
+      forceSelection,
+      suggestions: Array.isArray(filteredList) ? filteredList : list,
+      completeMethod: search,
+      dropdown: withArrow,
+      multiple: isMultiple,
+      field: labelKey,
+      invalid: !!invalid,
+      emptyMessage: "No results found",
+      ...delay != null ? { delay } : {},
+      ...minLength != null ? { minLength } : {},
+      ...selectionLimit != null ? { selectionLimit } : {},
+      showEmptyMessage: showEmptyMessage ?? true,
+      optionGroupChildren: childrenKey ?? void 0,
+      optionGroupLabel: childrenKey ? labelKey : void 0,
+      inputStyle: {
+        borderColor
+      },
+      style: { flexDirection: "row", borderRadius: 0, ...resolvedThemeStyle },
+      onChange: (event) => {
+        setInputValue(event.value);
+        handleOnChange(event);
+      },
+      ...localProps ?? {}
+    }
+  );
+  if (attached) {
+    return Element;
+  }
   return /* @__PURE__ */ jsx(
     KitsContainer,
     {
@@ -130,34 +174,7 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
       errors,
       invalid,
       label,
-      children: /* @__PURE__ */ jsx(
-        AutoComplete,
-        {
-          disabled,
-          placeholder,
-          value: inputValue,
-          forceSelection,
-          suggestions: Array.isArray(filteredList) ? filteredList : list,
-          completeMethod: search,
-          dropdown: withArrow,
-          multiple: isMultiple,
-          field: labelKey,
-          invalid: !!invalid,
-          emptyMessage: "No results found",
-          ...delay != null ? { delay } : {},
-          ...minLength != null ? { minLength } : {},
-          ...selectionLimit != null ? { selectionLimit } : {},
-          showEmptyMessage: showEmptyMessage ?? true,
-          optionGroupChildren: childrenKey ?? void 0,
-          optionGroupLabel: childrenKey ? labelKey : void 0,
-          inputStyle: hasThemeStyle ? themeStyle : void 0,
-          onChange: (event) => {
-            setInputValue(event.value);
-            handleOnChange(event);
-          },
-          ...localProps ?? {}
-        }
-      )
+      containerStyle
     }
   );
 };

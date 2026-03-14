@@ -143,3 +143,69 @@ export const SetupIntentSchema = z.object({
   customerId: z.string(),
   publishableKey: z.string(),
 });
+
+// ─── Tier schemas ───────────────────────────────────────────────────────────
+
+export const VerificationTierSchema = z.object({
+  ref: z.string(),
+  name: z.string(),
+  level: z.number(),
+  badgeLabel: z.string(),
+  badgeColor: z.string(),
+});
+
+export const TierConditionInfoSchema = z.object({
+  condition_type: z.enum(['document', 'electronic_verification', 'points_threshold']),
+  description: z.string(),
+});
+
+export const RequiredDocumentWithStatusSchema = z.object({
+  ref: z.string(),
+  name: z.string(),
+  isMandatory: z.boolean(),
+  status: z.enum([
+    'not_submitted',
+    'pending',
+    'approved',
+    'rejected',
+    'expiring_soon',
+    'expired',
+  ]),
+});
+
+export const RequiredDocumentsResponseSchema = z.object({
+  currentTier: VerificationTierSchema.nullable(),
+  requiredTier: z
+    .object({
+      ref: z.string(),
+      name: z.string(),
+      level: z.number(),
+      enforcement: z.string(),
+    })
+    .nullable(),
+  tierConditions: z.array(TierConditionInfoSchema),
+  documents: z.array(RequiredDocumentWithStatusSchema),
+  pointsSystem: z.object({
+    enabled: z.boolean(),
+    currentPoints: z.number(),
+    requiredPoints: z.number().nullable(),
+  }),
+});
+
+export const TierStatusSchema = z.object({
+  currentTier: VerificationTierSchema.nullable(),
+  achievedAt: z.string().nullable(),
+  calculationMethod: z.string().nullable(),
+  points: z.object({
+    enabled: z.boolean(),
+    current: z.number(),
+    required: z.number().nullable(),
+  }),
+  nextTier: z
+    .object({
+      ref: z.string(),
+      name: z.string(),
+      level: z.number(),
+    })
+    .nullable(),
+});

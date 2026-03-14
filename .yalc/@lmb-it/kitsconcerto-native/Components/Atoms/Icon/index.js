@@ -50,7 +50,7 @@ import '../../../apps/mobile/src/ui/toast/index.js';
 import '../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../apps/mobile/src/ui/vstack/index.js';
 import ResponsiveElement from '../../../apps/mobile/src/Factory/ResponsiveElement.js';
-import { resolveCssVar } from '../../../apps/mobile/src/Factory/helpers/style.js';
+import { resolveThemeTokenForNative } from '../../../apps/mobile/src/Factory/helpers/style.js';
 import useSeparator from '../../../apps/mobile/src/Factory/useSeparator.js';
 import '../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
@@ -85,7 +85,7 @@ function Icon({ name, size = "md", color, strokeWidth, ...rest }) {
   const { cssProps, nativeProps } = useSeparator(rest);
   if (!IconComponent) return null;
   const numericSize = typeof size === "number" ? size : SIZE_MAP[size] ?? 18;
-  const resolvedColor = color ? resolveCssVar(color) : void 0;
+  const resolvedColor = color ? resolveThemeTokenForNative(color) : void 0;
   return /* @__PURE__ */ jsx(ResponsiveElement, { as: "Box", cssProps, nativeProps, children: /* @__PURE__ */ jsx(IconComponent, { size: numericSize, color: resolvedColor, strokeWidth }) });
 }
 

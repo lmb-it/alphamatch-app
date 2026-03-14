@@ -7,8 +7,10 @@ import {
   CareerOptionSchema,
   DocumentRequirementSchema,
   FinalizeResultSchema,
+  RequiredDocumentsResponseSchema,
   SetupIntentSchema,
   SubscriptionPlanSchema,
+  TierStatusSchema,
   TradingAccountDetailSchema,
   UnansweredQuestionSchema,
 } from '../schemas';
@@ -24,6 +26,7 @@ import type {
   ITradingAccountDetail,
   IUnansweredQuestion,
 } from '../models/tradingAccount.types';
+import type {IRequiredDocumentsResponse, ITierStatus} from '../models/tier.types';
 
 /**
  * Safe parse helper — logs a warning if validation fails but still returns the raw data
@@ -147,4 +150,20 @@ export async function submitDocumentFormApi(
     {headers: {'Content-Type': 'multipart/form-data'}},
   );
   return safeParse(TradingAccountDetailSchema, response.data.data.tradingAccount, 'submitDocumentForm');
+}
+
+export async function fetchRequiredDocumentsWithTierApi(
+  ref: string,
+): Promise<IRequiredDocumentsResponse> {
+  const response = await api.get(
+    resolveUrl(URLs.tradingAccounts.requiredDocuments, {ref}),
+  );
+  return safeParse(RequiredDocumentsResponseSchema, response.data.data, 'fetchRequiredDocumentsWithTier');
+}
+
+export async function fetchTierStatusApi(ref: string): Promise<ITierStatus> {
+  const response = await api.get(
+    resolveUrl(URLs.tradingAccounts.tierStatus, {ref}),
+  );
+  return safeParse(TierStatusSchema, response.data.data, 'fetchTierStatus');
 }

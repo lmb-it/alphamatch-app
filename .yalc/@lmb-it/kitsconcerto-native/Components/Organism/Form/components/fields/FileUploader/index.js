@@ -38,7 +38,7 @@ const FileUploader = ({
     maxFileSize,
     minFileSize,
     classicUploader,
-    template
+    children
   } = fileElement;
   const handleOnChange = (files, base64Data) => {
     if (outputFormat === "FormData") {
@@ -77,7 +77,7 @@ const FileUploader = ({
       minFileSize,
       classicUploader,
       isJsonOutput: outputFormat === "Json",
-      template,
+      children,
       style: elementStyle?.input,
       containerStyle: elementStyle?.container
     }

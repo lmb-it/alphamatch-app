@@ -18,6 +18,7 @@ import type {
   ITradingAccountState,
   IUnansweredQuestion,
 } from '../models/tradingAccount.types';
+import type {ITierStatus, IRequiredDocumentsResponse} from '../models/tier.types';
 
 const initialState: ITradingAccountState = {
   basicInfo: null,
@@ -42,6 +43,10 @@ const initialState: ITradingAccountState = {
   documentFormLoading: false,
   documentFormSubmitting: false,
   documentFormSuccess: false,
+  tierStatus: null,
+  tierStatusLoading: false,
+  requiredDocsWithTier: null,
+  requiredDocsWithTierLoading: false,
   loading: false,
   error: null,
 };
@@ -258,6 +263,34 @@ const tradingAccountSlice = createSlice({
       state.documentFormLoading = false;
       state.documentFormSubmitting = false;
       state.documentFormSuccess = false;
+    },
+
+    // Tier status
+    fetchTierStatus(state, _action: PayloadAction<string>) {
+      state.tierStatusLoading = true;
+      state.error = null;
+    },
+    fetchTierStatusSuccess(state, action: PayloadAction<ITierStatus>) {
+      state.tierStatusLoading = false;
+      state.tierStatus = action.payload;
+    },
+    fetchTierStatusFailure(state, action: PayloadAction<string>) {
+      state.tierStatusLoading = false;
+      state.error = action.payload;
+    },
+
+    // Required documents with tier info
+    fetchRequiredDocsWithTier(state, _action: PayloadAction<string>) {
+      state.requiredDocsWithTierLoading = true;
+      state.error = null;
+    },
+    fetchRequiredDocsWithTierSuccess(state, action: PayloadAction<IRequiredDocumentsResponse>) {
+      state.requiredDocsWithTierLoading = false;
+      state.requiredDocsWithTier = action.payload;
+    },
+    fetchRequiredDocsWithTierFailure(state, action: PayloadAction<string>) {
+      state.requiredDocsWithTierLoading = false;
+      state.error = action.payload;
     },
 
     // Reset (preserve myAccounts — they're not creation-specific)

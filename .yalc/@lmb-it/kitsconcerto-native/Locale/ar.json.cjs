@@ -151,6 +151,11 @@ var addCategory = "إضافة فئة";
 var addItem = "إضافة عنصر";
 var any = "أي";
 var chooseFile = "اختر ملف";
+var chooseImage = "اختر صورة";
+var changeImage = "تغيير الصورة";
+var tapToUpload = "انقر للتحميل";
+var clickOrDragToUpload = "انقر أو اسحب للتحميل";
+var addImages = "إضافة صور";
 var greaterThan = "أكبر من";
 var greaterThanOrEqualTo = "أكبر من أو يساوي";
 var lessThan = "أقل من";
@@ -302,6 +307,11 @@ var ar = {
 	"delete": "حذف",
 	any: any,
 	chooseFile: chooseFile,
+	chooseImage: chooseImage,
+	changeImage: changeImage,
+	tapToUpload: tapToUpload,
+	clickOrDragToUpload: clickOrDragToUpload,
+	addImages: addImages,
 	greaterThan: greaterThan,
 	greaterThanOrEqualTo: greaterThanOrEqualTo,
 	lessThan: lessThan,
@@ -317,6 +327,7 @@ var ar = {
 
 exports.accept = accept;
 exports.addCategory = addCategory;
+exports.addImages = addImages;
 exports.addItem = addItem;
 exports.addRule = addRule;
 exports.after = after;
@@ -327,12 +338,15 @@ exports.aria = aria;
 exports.before = before;
 exports.between = between;
 exports.cancel = cancel;
+exports.changeImage = changeImage;
 exports.choose = choose;
 exports.chooseDate = chooseDate;
 exports.chooseFile = chooseFile;
+exports.chooseImage = chooseImage;
 exports.chooseMonth = chooseMonth;
 exports.chooseYear = chooseYear;
 exports.clear = clear;
+exports.clickOrDragToUpload = clickOrDragToUpload;
 exports.completed = completed;
 exports.contains = contains;
 exports.custom = custom;
@@ -410,6 +424,7 @@ exports.showMonthAfterYear = showMonthAfterYear;
 exports.signOut = signOut;
 exports.startsWith = startsWith;
 exports.strong = strong;
+exports.tapToUpload = tapToUpload;
 exports.today = today;
 exports.toggleColorMode = toggleColorMode;
 exports.typeNotSupported = typeNotSupported;

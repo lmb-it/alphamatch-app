@@ -1,7 +1,9 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useUploader } from '../MainUploader/index.js';
+import { Icon } from '../../../../Atoms/Icon/index.js';
 import 'react';
 import 'axios';
+import { useLanguage } from '../../../../../Hooks/locale.js';
 import '../../../../../Contexts/DialogContext.js';
 import '../../../../../Hooks/useKeyboardNavigation.js';
 import '../../KitsSelect/SelectContext.js';
@@ -13,35 +15,64 @@ import 'primereact/skeleton';
 
 const MultipleFileUploader = () => {
   const { onPick, files, removeFile, disabled, limit, placeholder, isClassicUploader } = useUploader();
+  const { t } = useLanguage();
   if (!isClassicUploader) {
-    return /* @__PURE__ */ jsxs(Flex, { w: "full", gap: 2, children: [
-      /* @__PURE__ */ jsx(Button, { label: "Upload", onClick: onPick, disabled }),
-      /* @__PURE__ */ jsx(
-        Button,
+    return /* @__PURE__ */ jsxs(Flex, { w: "full", flexDirection: "column", gap: 8, opacity: disabled ? 0.5 : 1, children: [
+      /* @__PURE__ */ jsxs(
+        Flex,
         {
-          label: `${files.length}/${limit} Files Selected`,
-          outlined: true,
-          disabled: true
+          w: "full",
+          borderW: 2,
+          borderStyle: "dashed",
+          borderColor: "primary",
+          borderRadiusLeft: "lg",
+          borderRadiusRight: "lg",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          py: 32,
+          px: 16,
+          gap: 8,
+          onClick: onPick,
+          children: [
+            /* @__PURE__ */ jsx(Icon, { name: "cloud-upload", size: "lg", color: "primary" }),
+            /* @__PURE__ */ jsx(Text, { fontSize: 14, color: "text-secondary", textAlign: "center", children: t("tapToUpload") })
+          ]
         }
-      )
+      ),
+      files.length > 0 && /* @__PURE__ */ jsxs(Text, { fontSize: 13, color: "text-secondary", textAlign: "center", children: [
+        t("filesSelected", files.length),
+        " / ",
+        limit
+      ] })
     ] });
   }
-  return /* @__PURE__ */ jsxs(Flex, { w: "full", gap: 2, children: [
+  return /* @__PURE__ */ jsxs(Flex, { w: "full", flexDirection: "column", gap: 8, children: [
     files.map((f, idx) => /* @__PURE__ */ jsxs(
       Flex,
       {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: 2,
+        gap: 8,
         children: [
-          /* @__PURE__ */ jsx(Text, { as: "span", textOverflow: "ellipsis", whiteSpace: "nowrap", children: f.shortName }),
+          /* @__PURE__ */ jsx(
+            Text,
+            {
+              as: "span",
+              fontSize: 13,
+              color: "text-secondary",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+              children: f.shortName
+            }
+          ),
           /* @__PURE__ */ jsx(
             Button,
             {
               icon: "pi pi-times",
-              size: "md",
-              w: 20,
+              size: "sm",
               severity: "danger",
               onClick: removeFile(idx),
               disabled
@@ -54,7 +85,10 @@ const MultipleFileUploader = () => {
     /* @__PURE__ */ jsx(
       Button,
       {
-        label: placeholder ?? "Tap to add files",
+        label: placeholder ?? t("chooseFile"),
+        severity: "secondary",
+        outlined: true,
+        w: "full",
         onClick: onPick,
         disabled: disabled || files.length >= limit
       }

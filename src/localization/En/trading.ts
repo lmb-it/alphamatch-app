@@ -176,4 +176,30 @@ export default {
   'trading.success.goToProfileVerify': 'Go to Profile to Verify',
   'trading.success.doItLater': 'Do it later',
   'trading.success.completeVerification': 'Complete Verification',
+
+  // Tier Display
+  'trading.tier.unverified': 'Unverified',
+  'trading.tier.currentTier': 'Current Tier',
+  'trading.tier.requiredTier': 'Required Tier',
+  'trading.tier.nextTier': 'Next Tier',
+  'trading.tier.tierStatus': 'Tier Status',
+  'trading.tier.achievedOn': 'Achieved on',
+  'trading.tier.method': 'Verification Method',
+  'trading.tier.pointsProgress': '{current}/{required} points',
+  'trading.tier.docsProgress': '{approved} of {total} documents verified',
+  'trading.tier.noNextTier': 'You have reached the highest tier!',
+
+  // Document Status
+  'trading.doc.notSubmitted': 'Not Submitted',
+  'trading.doc.pending': 'Pending Review',
+  'trading.doc.approved': 'Approved',
+  'trading.doc.rejected': 'Rejected',
+  'trading.doc.expiringSoon': 'Expiring Soon',
+  'trading.doc.expired': 'Expired',
+
+  // Expiry Banner
+  'trading.expiry.title': 'License Expiring Soon',
+  'trading.expiry.message':
+    'Your {documentName} expires in {days} days.',
+  'trading.expiry.renewNow': 'Renew Now',
 };

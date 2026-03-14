@@ -21,6 +21,7 @@ import SupportScreen from '@src/modules/Profile/screens/SupportScreen';
 import InviteFriendsScreen from '@src/modules/Profile/screens/InviteFriendsScreen';
 import TermsAndConditionsScreen from '@src/modules/Profile/screens/TermsAndConditionsScreen';
 import LanguageSettingsScreen from '@src/modules/Profile/screens/LanguageSettingsScreen';
+import TierStatusScreen from '@src/modules/TradingAccount/screens/TierStatusScreen';
 import {TradingAccountCreationNavigator} from './TradingAccountCreationNavigator';
 
 export type ProfileStackParamList = {
@@ -37,6 +38,7 @@ export type ProfileStackParamList = {
   TransactionHistory: undefined;
   Earnings: undefined;
   Documents: undefined;
+  TierStatus: {accountRef: string};
   Support: undefined;
   InviteFriends: undefined;
   TermsAndConditions: undefined;
@@ -91,6 +93,11 @@ export function ProfileStackNavigator() {
       <Stack.Screen
         name="Documents"
         component={DocumentsScreen}
+        options={{animation: 'slide_from_right'}}
+      />
+      <Stack.Screen
+        name="TierStatus"
+        component={TierStatusScreen}
         options={{animation: 'slide_from_right'}}
       />
       <Stack.Screen

@@ -34,7 +34,7 @@ export type TradingAccountCreationParamList = {
   // Alpha Pro only — verification pending, no subscription
   TAProConfirmation: undefined;
   TAVerification: undefined;
-  TADocumentForm: {documentRef: string; documentName: string};
+  TADocumentForm: {documentRef: string; documentName: string; accountRef?: string};
   // Alpha Flex only — subscription activation, no verification
   TAFlexActivation: undefined;
   TACompletion: undefined;

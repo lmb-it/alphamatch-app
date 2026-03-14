@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useEffect, useMemo} from 'react';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -10,10 +10,15 @@ import {
   selectRequiredDocuments,
   selectSelectedCareerRef,
   selectTALoading,
+  selectCreatedAccount,
+  selectRequiredDocsWithTier,
+  selectRequiredDocsWithTierLoading,
 } from '@src/modules/TradingAccount';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount';
 import {DocumentVerificationList} from '@src/components/shared/DocumentVerificationList';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
+import {TierBadge} from '../components/TierBadge';
+import {TierProgressBar} from '../components/TierProgressBar';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 
@@ -25,17 +30,62 @@ export default function VerificationScreen() {
   const requiredDocuments = useSelector(selectRequiredDocuments);
   const selectedCareerRef = useSelector(selectSelectedCareerRef);
   const loading = useSelector(selectTALoading);
+  const createdAccount = useSelector(selectCreatedAccount);
+  const tierData = useSelector(selectRequiredDocsWithTier);
+  const tierLoading = useSelector(selectRequiredDocsWithTierLoading);
 
-  // Fetch required documents on mount using new compliance-documents endpoint
+  // If the account is created, use the tier-aware endpoint; otherwise fall back
   useEffect(() => {
-    if (selectedCareerRef) {
-      dispatch(tradingAccountActions.fetchDocuments({
-        type: 'provider',
-        careerRef: selectedCareerRef,
-        countryId: 14,
+    if (createdAccount?.identifier) {
+      dispatch(
+        tradingAccountActions.fetchRequiredDocsWithTier(
+          createdAccount.identifier,
+        ),
+      );
+    } else if (selectedCareerRef) {
+      dispatch(
+        tradingAccountActions.fetchDocuments({
+          type: 'provider',
+          careerRef: selectedCareerRef,
+          countryId: 14,
+        }),
+      );
+    }
+  }, [createdAccount?.identifier, selectedCareerRef, dispatch]);
+
+  // Calculate progress from tier data
+  const progress = useMemo(() => {
+    if (!tierData?.documents?.length) return {percent: 0, approved: 0, total: 0};
+    const total = tierData.documents.length;
+    const approved = tierData.documents.filter(
+      d => d.status === 'approved',
+    ).length;
+    return {percent: total > 0 ? (approved / total) * 100 : 0, approved, total};
+  }, [tierData]);
+
+  // Build document list compatible with DocumentVerificationList
+  const displayDocuments: IDocumentRequirement[] = useMemo(() => {
+    if (tierData?.documents) {
+      return tierData.documents.map(doc => ({
+        id: 0,
+        uuid: '',
+        identifier: doc.ref,
+        name: doc.name,
+        description: null,
+        category: null,
+        reviewRequired: true,
+        expiryRules: null,
+        form: null,
+        uploadStatus:
+          doc.status === 'approved'
+            ? 'approved'
+            : doc.status === 'pending'
+              ? 'uploaded'
+              : undefined,
       }));
     }
-  }, [selectedCareerRef, dispatch]);
+    return requiredDocuments;
+  }, [tierData, requiredDocuments]);
 
   const handleUploadDocument = (doc: IDocumentRequirement) => {
     navigation.navigate('TADocumentForm', {
@@ -52,6 +102,9 @@ export default function VerificationScreen() {
     navigation.navigate('TACompletion');
   };
 
+  const isLoading = loading || tierLoading;
+  const hasTierData = !!tierData;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg">
@@ -63,9 +116,58 @@ export default function VerificationScreen() {
             {t('trading.verify.desc')}
           </Text>
 
+          {/* Tier info header — shown when tier data is available */}
+          {hasTierData && (
+            <View style={styles.tierSection}>
+              <TierBadge
+                tier={tierData.currentTier}
+                size="large"
+                showLabel
+              />
+
+              <TierProgressBar
+                currentTierName={
+                  tierData.currentTier?.badgeLabel ??
+                  t('trading.tier.unverified')
+                }
+                badgeColor={tierData.currentTier?.badgeColor ?? '#9CA3AF'}
+                progress={progress.percent}
+                progressLabel={t('trading.tier.docsProgress')
+                  .replace('{approved}', String(progress.approved))
+                  .replace('{total}', String(progress.total))}
+              />
+
+              {tierData.requiredTier && (
+                <Text fontSize={13} color="text-subtle" mt={4}>
+                  {t('trading.tier.requiredTier')}:{' '}
+                  <Text fontSize={13} fontWeight="700" color="text-primary">
+                    {tierData.requiredTier.name}
+                  </Text>
+                </Text>
+              )}
+
+              {/* Points progress (if enabled) */}
+              {tierData.pointsSystem.enabled && (
+                <View style={styles.pointsRow}>
+                  <Text fontSize={13} color="text-subtle">
+                    {t('trading.tier.pointsProgress')
+                      .replace(
+                        '{current}',
+                        String(tierData.pointsSystem.currentPoints),
+                      )
+                      .replace(
+                        '{required}',
+                        String(tierData.pointsSystem.requiredPoints ?? '—'),
+                      )}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+
           <DocumentVerificationList
-            documents={requiredDocuments}
-            loading={loading}
+            documents={displayDocuments}
+            loading={isLoading}
             onUpload={handleUploadDocument}
           />
 
@@ -73,7 +175,7 @@ export default function VerificationScreen() {
             label={t('trading.verify.done')}
             severity="brand"
             w="full"
-            loading={loading}
+            loading={isLoading}
             onClick={handleContinue}
             style={styles.doneBtn}
           />
@@ -111,6 +213,20 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     lineHeight: 36,
+  },
+  tierSection: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  pointsRow: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E7EB',
   },
   doneBtn: {
     marginTop: 40,

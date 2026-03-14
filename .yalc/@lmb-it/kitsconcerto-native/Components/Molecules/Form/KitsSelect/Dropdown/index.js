@@ -49,14 +49,13 @@ import '../../../../../apps/mobile/src/ui/toast/index.js';
 import '../../../../../apps/mobile/src/ui/tooltip/index.js';
 import '../../../../../apps/mobile/src/ui/vstack/index.js';
 import 'react-native-reanimated';
-import { style } from '../../../../../apps/mobile/src/Factory/helpers/style.js';
-import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'react-icons/fa';
 import 'react-icons/ai';
 import 'react-icons/io';
 import '../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
 import '../../../../../packages/types/src/Css/map/index.js';
+import '../../../../../apps/mobile/src/Factory/DimensionsContext.js';
 import 'i18next';
 import 'react-i18next';
 import '../../../../../apps/mobile/src/Core/AutoComplete/index.js';
@@ -78,6 +77,7 @@ import KitsContainer from '../../Helpers/FormContainer/index.js';
 import 'axios';
 import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
+import useResolvedStyle from '../../../../../Hooks/useResolvedStyle.js';
 import '../../../../../Hooks/useKeyboardNavigation.js';
 import '../SelectContext.js';
 import '../../../UI/Flex/index.js';
@@ -88,6 +88,7 @@ import { useSelectBase } from '../hooks/useSelectBase.js';
 
 const KitsDropdown = ({ className, ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle } = useComponentDefaults("DropdownSelect", rawProps, "Select");
+  const resolvedThemeStyle = useResolvedStyle(themeStyle);
   const {
     id,
     rightAddon,
@@ -109,7 +110,8 @@ const KitsDropdown = ({ className, ref, ...rawProps }) => {
     emptyFilterMessage,
     filterBy,
     loading,
-    showClear
+    showClear,
+    containerStyle
   } = props;
   const { list, keys, onChange, selectedValue } = useSelectBase();
   const ClState = ClHelper({
@@ -129,7 +131,7 @@ const KitsDropdown = ({ className, ref, ...rawProps }) => {
       disabled,
       loading,
       showClear: showClear ?? (!required && selectedValue != null),
-      style: { width: "100%", height: attached ? "100%" : void 0, ...Object.keys(themeStyle).length ? style(themeStyle) : {} },
+      style: { width: "100%", height: attached ? "100%" : void 0, borderRadius: 0, ...resolvedThemeStyle },
       onChange,
       ...keys,
       invalid: hideError && !!invalid,
@@ -157,6 +159,7 @@ const KitsDropdown = ({ className, ref, ...rawProps }) => {
       helperText,
       invalid,
       label,
+      containerStyle,
       children: Element
     }
   );

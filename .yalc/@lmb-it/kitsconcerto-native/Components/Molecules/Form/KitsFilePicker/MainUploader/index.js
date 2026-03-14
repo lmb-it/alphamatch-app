@@ -65,7 +65,7 @@ const MainUploader = (props) => {
     disabled,
     maxFileSize,
     minFileSize,
-    template
+    children
   } = props;
   const initialValueSynced = useRef(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -294,7 +294,7 @@ const MainUploader = (props) => {
     id: name ?? "",
     isImage
   };
-  return /* @__PURE__ */ jsx(FileUploaderContext.Provider, { value: contextValue, children: /* @__PURE__ */ jsx(Flex, { onFocus, w: "full", children: template ? template({
+  return /* @__PURE__ */ jsx(FileUploaderContext.Provider, { value: contextValue, children: /* @__PURE__ */ jsx(Flex, { onFocus, w: "full", children: children ? children({
     values: selectedFiles,
     browse: onPick,
     update: updateFiles,

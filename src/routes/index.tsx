@@ -42,11 +42,11 @@ export default function Routes() {
       <NavigationContainer>
         {isAuthenticated && token ? <MainTabNavigator /> : <AuthNavigator />}
       </NavigationContainer>
-      {__DEV__ && (
-        <TouchableOpacity style={styles.fab} onPress={handleReset} activeOpacity={0.8}>
-          <Text fontSize={18} color="white">R</Text>
-        </TouchableOpacity>
-      )}
+      {/*{__DEV__ && (*/}
+      {/*  <TouchableOpacity style={styles.fab} onPress={handleReset} activeOpacity={0.8}>*/}
+      {/*    <Text fontSize={18} color="white">R</Text>*/}
+      {/*  </TouchableOpacity>*/}
+      {/*)}*/}
     </>
   );
 }

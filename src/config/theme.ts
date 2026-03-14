@@ -81,6 +81,22 @@ export const alphaMatchTheme = extendTheme({
         // minHeight: 52,
       },
     },
+    Select: {
+      props: {
+        inputSize: 'lg',
+      },
+      style: {
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: '#EEEEEE',
+        paddingHorizontal: 16,
+        height: 52,
+        minHeight: 52,
+        backgroundColor: '#F9FAFC',
+        fontSize: 14,
+        color: '#263238',
+      },
+    },
     Input: {
       props: {
         inputSize: 'lg',

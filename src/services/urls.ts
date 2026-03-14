@@ -59,6 +59,8 @@ export const URLs = {
     show: '/trading-accounts/:ref',
     documentFormFields: '/trading-accounts/:ref/documents/:docRef/form-fields',
     documentFormSubmit: '/trading-accounts/:ref/documents/:docRef/submit',
+    requiredDocuments: '/trading-accounts/:ref/required-documents',
+    tierStatus: '/trading-accounts/:ref/tier-status',
   },
   payments: {
     methods: '/payments/methods',

@@ -69,7 +69,7 @@ const MainUploader = (props) => {
     disabled,
     maxFileSize,
     minFileSize,
-    template
+    children
   } = props;
   const initialValueSynced = React.useRef(false);
   const [selectedFiles, setSelectedFiles] = React.useState([]);
@@ -298,7 +298,7 @@ const MainUploader = (props) => {
     id: name ?? "",
     isImage
   };
-  return /* @__PURE__ */ jsxRuntime.jsx(FileUploaderContext.Provider, { value: contextValue, children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { onFocus, w: "full", children: template ? template({
+  return /* @__PURE__ */ jsxRuntime.jsx(FileUploaderContext.Provider, { value: contextValue, children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { onFocus, w: "full", children: children ? children({
     values: selectedFiles,
     browse: onPick,
     update: updateFiles,

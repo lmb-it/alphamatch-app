@@ -8,10 +8,7 @@ import {
   Text,
   Heading,
   Button,
-  Form,
   useLanguage,
-  type IUseFormReturn,
-  type IFormElement,
 } from '@lmb-it/kitsconcerto';
 import {
   tradingAccountActions,
@@ -23,26 +20,9 @@ import {
 import type {IUnansweredQuestion} from '@src/modules/TradingAccount';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
+import DynamicForm, {type DynamicFormRef} from '@src/components/shared/DynamicForm';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
-
-/** Map backend field types to KitsConcerto component types */
-const mapFieldType = (q: IUnansweredQuestion): string => {
-  // fieldType from FormFieldResource is already KitsConcerto-mapped (Text, Select, etc.)
-  // But for safety, handle raw dbType fallbacks
-  const ft = q.fieldType;
-  if (['Text', 'Textarea', 'Select', 'Number', 'DatePicker', 'Radio', 'Checkbox', 'FileUpload'].includes(ft)) {
-    return ft;
-  }
-  // Fallback from dbType
-  switch (q.dbType) {
-    case 'textarea': return 'Textarea';
-    case 'select': case 'multiselect': return 'Select';
-    case 'checkbox': return 'Checkbox';
-    case 'number': case 'decimal': case 'currency': return 'Number';
-    default: return 'Text';
-  }
-};
 
 const MissingQuestionsScreen: React.FC = () => {
   const {t} = useLanguage();
@@ -52,7 +32,7 @@ const MissingQuestionsScreen: React.FC = () => {
   const createdAccount = useSelector(selectCreatedAccount);
   const formFieldsFromApi = useSelector(selectFormFields);
   const loading = useSelector(selectTALoading);
-  const formRef = useRef<IUseFormReturn<Record<string, any>>>(null);
+  const dynamicFormRef = useRef<DynamicFormRef>(null);
   const didSubmit = useRef(false);
   const didFetch = useRef(false);
 
@@ -87,23 +67,6 @@ const MissingQuestionsScreen: React.FC = () => {
     return formFieldsFromApi || [];
   }, [aiResult, formFieldsFromApi]);
 
-  // Build form elements from questions
-  const formElements: IFormElement[] = useMemo(() => {
-    return questions.map(q => ({
-      id: q.fieldRef,
-      name: q.fieldName || q.fieldRef,
-      label: q.fieldLabel,
-      type: mapFieldType(q) as any,
-      placeholder: q.placeholder || '',
-      required: q.isRequired || q.validation?.required || false,
-      list: q.options?.map(opt => ({
-        label: typeof opt === 'string' ? opt : opt.label,
-        value: typeof opt === 'string' ? opt : opt.value,
-      })),
-      helpText: q.helpText,
-    }));
-  }, [questions]);
-
   const handleSubmit = useCallback(
     (data: Record<string, any>, setIsSubmitting: (v: boolean) => void) => {
       if (!createdAccount) return;
@@ -125,13 +88,13 @@ const MissingQuestionsScreen: React.FC = () => {
 
   // If no questions and not loading, skip to confirmation
   useEffect(() => {
-    if (formElements.length === 0 && !loading && (aiResult || didFetch.current)) {
+    if (questions.length === 0 && !loading && (aiResult || didFetch.current)) {
       navigation.navigate('TAConfirmation');
     }
-  }, [formElements.length, loading, aiResult, navigation]);
+  }, [questions.length, loading, aiResult, navigation]);
 
   // Show a loader while questions are being fetched or while navigation is queuing
-  if (formElements.length === 0) {
+  if (questions.length === 0) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
@@ -152,12 +115,10 @@ const MissingQuestionsScreen: React.FC = () => {
           </Text>
 
           <View style={styles.formContainer}>
-            <Form
-              ref={formRef}
-              elements={formElements}
+            <DynamicForm
+              ref={dynamicFormRef}
+              fields={questions}
               onSubmit={handleSubmit}
-              outputFormat="Json"
-              submitButtonProps="none"
             />
           </View>
         </View>
@@ -167,7 +128,7 @@ const MissingQuestionsScreen: React.FC = () => {
           severity="brand"
           w="full"
           loading={loading}
-          onClick={() => formRef.current?.onFormSubmit()}
+          onClick={() => dynamicFormRef.current?.submit()}
         />
       </Flex>
     </AlphaLayout>

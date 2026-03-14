@@ -1,3 +1,5 @@
+import type {ITierStatus, IRequiredDocumentsResponse} from './tier.types';
+
 export interface IDetectedCareer {
   identifier: string;
   name: string;
@@ -191,6 +193,14 @@ export interface ITradingAccountState {
   documentFormSubmitting: boolean;
   documentFormSuccess: boolean;
 
+  // Tier status (for TierStatusScreen and tier display)
+  tierStatus: ITierStatus | null;
+  tierStatusLoading: boolean;
+
+  // Required documents with tier info (for enhanced VerificationScreen / DocumentsScreen)
+  requiredDocsWithTier: IRequiredDocumentsResponse | null;
+  requiredDocsWithTierLoading: boolean;
+
   // General
   loading: boolean;
   error: string | null;
@@ -252,3 +262,17 @@ export interface ISubmitDocumentFormPayload {
   answers: {fieldRef: string; value: unknown}[];
   fileFields: Record<string, {uri: string; type: string; name: string}>;
 }
+
+// Re-export tier types for convenience
+export type {
+  IVerificationTier,
+  ITierStatus,
+  IRequiredDocumentsResponse,
+  IRequiredDocumentWithStatus,
+  ITierConditionInfo,
+  IPointsSystem,
+  IRequiredTierInfo,
+  ITierStatusPoints,
+  INextTierInfo,
+  ITierHistory,
+} from './tier.types';

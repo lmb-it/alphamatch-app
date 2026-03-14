@@ -2,7 +2,7 @@
  * DocumentsScreen
  * Standalone verification screen accessible from the Profile.
  * Resolves careerRef from the active workspace's trading account,
- * then fetches required compliance documents from the new endpoint.
+ * then fetches required documents with tier information.
  */
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {View, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
@@ -10,58 +10,100 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {Text} from '@lmb-it/kitsconcerto';
-import {ArrowLeft, RefreshCw} from 'lucide-react-native';
-import {selectActiveWorkspace, selectTradingAccounts} from '@src/modules/Profile';
-import {fetchRequiredDocumentsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
+import {ArrowLeft, RefreshCw, Shield} from 'lucide-react-native';
+import {selectActiveWorkspaceId, selectIsTradeMode} from '@src/modules/Workspace';
+import {fetchRequiredDocumentsWithTierApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount/models/tradingAccount.types';
+import type {IRequiredDocumentsResponse} from '@src/modules/TradingAccount/models/tier.types';
 import {DocumentVerificationList} from '@src/components/shared/DocumentVerificationList';
+import {TierBadge} from '@src/modules/TradingAccount/components/TierBadge';
+import {ExpiryWarningBanner} from '@src/modules/TradingAccount/components/ExpiryWarningBanner';
 import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
 
 const DocumentsScreen: React.FC = () => {
   const navigation = useNavigation<ProfileStackNavigationProp>();
-  const activeWorkspace = useSelector(selectActiveWorkspace);
-  const tradingAccounts = useSelector(selectTradingAccounts);
+  const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
+  const isTradeMode = useSelector(selectIsTradeMode);
 
-  const [docs, setDocs] = useState<IDocumentRequirement[]>([]);
+  const [tierResponse, setTierResponse] =
+    useState<IRequiredDocumentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Resolve careerRef from the active trading account
-  const careerRef = useMemo(() => {
-    if (!activeWorkspace) return null;
-    const account = tradingAccounts.find(a => a.identifier === activeWorkspace);
-    return account?.careerRef ?? null;
-  }, [activeWorkspace, tradingAccounts]);
+  // Use workspace module's active ID directly — it's the trading account identifier
+  const accountIdentifier = useMemo(() => {
+    if (!isTradeMode || !activeWorkspaceId || activeWorkspaceId === 'personal') {
+      return null;
+    }
+    return activeWorkspaceId;
+  }, [activeWorkspaceId, isTradeMode]);
 
   const fetchDocs = useCallback(async () => {
-    if (!careerRef) {
-      setDocs([]);
+    if (!accountIdentifier) {
+      setTierResponse(null);
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(false);
     try {
-      const result = await fetchRequiredDocumentsApi('provider', careerRef, 14);
-      setDocs(result);
+      const result = await fetchRequiredDocumentsWithTierApi(accountIdentifier);
+      setTierResponse(result);
     } catch {
       setError(true);
-      setDocs([]);
+      setTierResponse(null);
     } finally {
       setLoading(false);
     }
-  }, [careerRef]);
+  }, [accountIdentifier]);
 
   useEffect(() => {
     fetchDocs();
   }, [fetchDocs]);
 
+  // Convert tier documents to IDocumentRequirement for DocumentVerificationList
+  const docs: IDocumentRequirement[] = useMemo(() => {
+    if (!tierResponse?.documents) return [];
+    return tierResponse.documents.map(doc => ({
+      id: 0,
+      uuid: '',
+      identifier: doc.ref,
+      name: doc.name,
+      description: null,
+      category: null,
+      reviewRequired: true,
+      expiryRules: null,
+      form: null,
+      uploadStatus:
+        doc.status === 'approved'
+          ? 'approved'
+          : doc.status === 'pending'
+            ? 'uploaded'
+            : undefined,
+    }));
+  }, [tierResponse]);
+
+  // Find documents that are expiring soon
+  const expiringDocs = useMemo(() => {
+    if (!tierResponse?.documents) return [];
+    return tierResponse.documents.filter(d => d.status === 'expiring_soon');
+  }, [tierResponse]);
+
   const handleUpload = (doc: IDocumentRequirement) => {
-    // Navigate to trading account creation flow's document form screen
     navigation.navigate('TradingAccountCreation', {
       screen: 'TADocumentForm',
-      params: {documentRef: doc.identifier, documentName: doc.name},
+      params: {
+        documentRef: doc.identifier,
+        documentName: doc.name,
+        accountRef: accountIdentifier ?? undefined,
+      },
     } as any);
+  };
+
+  const handleTierStatus = () => {
+    if (accountIdentifier) {
+      navigation.navigate('TierStatus', {accountRef: accountIdentifier});
+    }
   };
 
   return (
@@ -74,12 +116,19 @@ const DocumentsScreen: React.FC = () => {
         <Text fontSize={16} fontWeight="700" color="text-primary">
           Documents
         </Text>
-        <TouchableOpacity onPress={fetchDocs}>
-          <RefreshCw size={20} color="#00A8B1" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={handleTierStatus} style={styles.headerBtn}>
+            <Shield size={18} color="#00A8B1" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={fetchDocs} style={styles.headerBtn}>
+            <RefreshCw size={18} color="#00A8B1" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}>
         {error ? (
           <View style={styles.center}>
             <Text fontSize={14} color="#EF4444" mb={12}>
@@ -92,11 +141,46 @@ const DocumentsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         ) : (
-          <DocumentVerificationList
-            documents={docs}
-            loading={loading}
-            onUpload={handleUpload}
-          />
+          <>
+            {/* Tier badge at top */}
+            {tierResponse?.currentTier && (
+              <View style={styles.tierHeader}>
+                <TierBadge
+                  tier={tierResponse.currentTier}
+                  size="large"
+                  showLabel
+                />
+              </View>
+            )}
+
+            {/* Expiry warning banners */}
+            {expiringDocs.map(doc => (
+              <ExpiryWarningBanner
+                key={doc.ref}
+                documentName={doc.name}
+                daysUntilExpiry={30}
+                onRenew={() =>
+                  handleUpload({
+                    id: 0,
+                    uuid: '',
+                    identifier: doc.ref,
+                    name: doc.name,
+                    description: null,
+                    category: null,
+                    reviewRequired: true,
+                    expiryRules: null,
+                    form: null,
+                  })
+                }
+              />
+            ))}
+
+            <DocumentVerificationList
+              documents={docs}
+              loading={loading}
+              onUpload={handleUpload}
+            />
+          </>
         )}
       </ScrollView>
     </View>
@@ -117,9 +201,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#F3F4F6',
   },
+  headerRight: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  headerBtn: {
+    padding: 4,
+  },
   content: {
     paddingHorizontal: 20,
     paddingBottom: 40,
+  },
+  tierHeader: {
+    marginTop: 16,
+    marginBottom: 12,
   },
   center: {
     flex: 1,

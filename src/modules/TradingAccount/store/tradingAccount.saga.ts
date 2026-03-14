@@ -8,7 +8,9 @@ import {
   fetchFormFieldsApi,
   fetchPlansApi,
   fetchRequiredDocumentsApi,
+  fetchRequiredDocumentsWithTierApi,
   fetchSetupIntentApi,
+  fetchTierStatusApi,
   finalizeTradingAccountApi,
   listTradingAccountsApi,
   submitDocumentFormApi,
@@ -181,6 +183,26 @@ function* submitDocumentFormSaga(action: PayloadAction<ISubmitDocumentFormPayloa
   }
 }
 
+function* fetchTierStatusSaga(action: PayloadAction<string>): Generator {
+  try {
+    const status = yield call(fetchTierStatusApi, action.payload);
+    yield put(tradingAccountActions.fetchTierStatusSuccess(status as any));
+  } catch (e) {
+    logger.error('fetchTierStatus failed', e, {feature: 'trading_account', step: 'fetch_tier_status'});
+    yield put(tradingAccountActions.fetchTierStatusFailure(parseApiError(e).message));
+  }
+}
+
+function* fetchRequiredDocsWithTierSaga(action: PayloadAction<string>): Generator {
+  try {
+    const result = yield call(fetchRequiredDocumentsWithTierApi, action.payload);
+    yield put(tradingAccountActions.fetchRequiredDocsWithTierSuccess(result as any));
+  } catch (e) {
+    logger.error('fetchRequiredDocsWithTier failed', e, {feature: 'trading_account', step: 'fetch_required_docs_with_tier'});
+    yield put(tradingAccountActions.fetchRequiredDocsWithTierFailure(parseApiError(e).message));
+  }
+}
+
 export default function* tradingAccountSaga(): Generator {
   yield takeLatest(tradingAccountActions.fetchMyAccounts.type, fetchMyAccountsSaga);
   yield takeLatest(tradingAccountActions.aiAnalyze.type, aiAnalyzeSaga);
@@ -195,4 +217,6 @@ export default function* tradingAccountSaga(): Generator {
   yield takeLatest(tradingAccountActions.subscribe.type, subscribeSaga);
   yield takeLatest(tradingAccountActions.fetchDocumentFormFields.type, fetchDocumentFormFieldsSaga);
   yield takeLatest(tradingAccountActions.submitDocumentForm.type, submitDocumentFormSaga);
+  yield takeLatest(tradingAccountActions.fetchTierStatus.type, fetchTierStatusSaga);
+  yield takeLatest(tradingAccountActions.fetchRequiredDocsWithTier.type, fetchRequiredDocsWithTierSaga);
 }

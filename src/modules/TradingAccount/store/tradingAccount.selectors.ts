@@ -25,3 +25,7 @@ export const selectDocumentFormFields = (state: RootState) => state.tradingAccou
 export const selectDocumentFormLoading = (state: RootState) => state.tradingAccount.documentFormLoading;
 export const selectDocumentFormSubmitting = (state: RootState) => state.tradingAccount.documentFormSubmitting;
 export const selectDocumentFormSuccess = (state: RootState) => state.tradingAccount.documentFormSuccess;
+export const selectTierStatus = (state: RootState) => state.tradingAccount.tierStatus;
+export const selectTierStatusLoading = (state: RootState) => state.tradingAccount.tierStatusLoading;
+export const selectRequiredDocsWithTier = (state: RootState) => state.tradingAccount.requiredDocsWithTier;
+export const selectRequiredDocsWithTierLoading = (state: RootState) => state.tradingAccount.requiredDocsWithTierLoading;

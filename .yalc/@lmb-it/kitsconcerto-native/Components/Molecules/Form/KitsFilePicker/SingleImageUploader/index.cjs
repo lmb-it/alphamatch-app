@@ -5,7 +5,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var jsxRuntime = require('react/jsx-runtime');
 var React = require('react');
 var index_native = require('../MainUploader/index.cjs');
+var index_native$3 = require('../../../../Atoms/Icon/index.cjs');
 require('axios');
+var locale = require('../../../../../Hooks/locale.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
 require('../../../../../Hooks/useKeyboardNavigation.cjs');
 require('../../KitsSelect/SelectContext.cjs');
@@ -19,14 +21,17 @@ require('primereact/skeleton');
 
 const SingleImageUploader = () => {
   const { onPick, files, removeFile, disabled, isClassicUploader } = index_native.useUploader();
+  const { t } = locale.useLanguage();
   const current = React.useMemo(() => files.length ? files[0] : null, [files]);
   const uri = current && typeof current.file === "object" && "uri" in current.file ? current.file.uri : null;
   if (isClassicUploader) {
-    return /* @__PURE__ */ jsxRuntime.jsxs(index.default, { w: "full", gap: 2, flexDirection: "row", alignItems: "center", children: [
+    return /* @__PURE__ */ jsxRuntime.jsxs(index.default, { w: "full", gap: 8, flexDirection: "row", alignItems: "center", children: [
       /* @__PURE__ */ jsxRuntime.jsx(
         Button_native.Button,
         {
-          label: "Choose image",
+          label: uri ? t("changeImage") : t("chooseImage"),
+          severity: "secondary",
+          outlined: true,
           w: "85%",
           onClick: onPick,
           disabled
@@ -36,43 +41,84 @@ const SingleImageUploader = () => {
         Button_native.Button,
         {
           icon: "pi pi-times",
-          size: "md",
-          w: 20,
+          size: "sm",
           severity: "danger",
+          outlined: true,
           onClick: removeFile(0),
           disabled: !current || disabled
         }
       ),
-      !!current?.name && /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { as: "span", children: current.name })
+      !!current?.name && /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { as: "span", fontSize: 13, color: "text-secondary", children: current.name })
     ] });
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(index$1.default, { w: "full", gap: 2, children: [
-    /* @__PURE__ */ jsxRuntime.jsxs(index.default, { w: "full", gap: 5, flexDirection: "row", children: [
+  if (uri) {
+    return /* @__PURE__ */ jsxRuntime.jsxs(index$1.default, { w: "full", children: [
+      /* @__PURE__ */ jsxRuntime.jsxs(index.default, { position: "relative", w: "full", children: [
+        /* @__PURE__ */ jsxRuntime.jsx(
+          index_native$2.default,
+          {
+            w: "full",
+            aspectRatio: 1.5,
+            objectFit: "contain",
+            src: uri,
+            alt: "Preview",
+            borderRadiusLeft: "lg",
+            borderRadiusRight: "lg"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntime.jsx(
+          Button_native.Button,
+          {
+            icon: "pi pi-times",
+            size: "sm",
+            severity: "danger",
+            style: {
+              position: "absolute",
+              right: 8,
+              top: 8
+            },
+            onClick: removeFile(0),
+            disabled
+          }
+        )
+      ] }),
       /* @__PURE__ */ jsxRuntime.jsx(
         Button_native.Button,
         {
-          label: uri ? "Change image" : "Choose image",
-          w: "85%",
+          label: t("changeImage"),
+          severity: "secondary",
+          outlined: true,
+          w: "full",
+          mt: 8,
           onClick: onPick,
-          disabled,
-          flex: 75
-        }
-      ),
-      /* @__PURE__ */ jsxRuntime.jsx(
-        Button_native.Button,
-        {
-          icon: "pi pi-times",
-          size: "md",
-          w: 20,
-          severity: "danger",
-          onClick: removeFile(0),
-          disabled,
-          flex: 1
+          disabled
         }
       )
-    ] }),
-    uri ? /* @__PURE__ */ jsxRuntime.jsx(index.default, { position: "relative", w: "full", children: /* @__PURE__ */ jsxRuntime.jsx(index_native$2.default, { w: "full", aspectRatio: 1, objectFit: "contain", src: uri, alt: "Preview" }) }) : /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { as: "span", children: "Tap to pick an image" })
-  ] });
+    ] });
+  }
+  return /* @__PURE__ */ jsxRuntime.jsxs(
+    index.default,
+    {
+      w: "full",
+      borderWidth: 2,
+      borderStyle: "dashed",
+      borderColor: "brand.500",
+      borderRadiusLeft: "lg",
+      borderRadiusRight: "lg",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+      py: 32,
+      px: 16,
+      gap: 8,
+      onClick: onPick,
+      opacity: disabled ? 0.5 : 1,
+      children: [
+        /* @__PURE__ */ jsxRuntime.jsx(index_native$3.Icon, { name: "cloud-upload", size: "lg", color: "brand.500" }),
+        /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { fontSize: 14, color: "text-secondary", textAlign: "center", children: t("tapToUpload") })
+      ]
+    }
+  );
 };
 
 exports.default = SingleImageUploader;

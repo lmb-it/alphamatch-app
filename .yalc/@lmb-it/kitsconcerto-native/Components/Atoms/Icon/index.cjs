@@ -87,7 +87,7 @@ function Icon({ name, size = "md", color, strokeWidth, ...rest }) {
   const { cssProps, nativeProps } = useSeparator.default(rest);
   if (!IconComponent) return null;
   const numericSize = typeof size === "number" ? size : SIZE_MAP[size] ?? 18;
-  const resolvedColor = color ? style.resolveCssVar(color) : void 0;
+  const resolvedColor = color ? style.resolveThemeTokenForNative(color) : void 0;
   return /* @__PURE__ */ jsxRuntime.jsx(ResponsiveElement.default, { as: "Box", cssProps, nativeProps, children: /* @__PURE__ */ jsxRuntime.jsx(IconComponent, { size: numericSize, color: resolvedColor, strokeWidth }) });
 }
 

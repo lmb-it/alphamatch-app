@@ -147,6 +147,11 @@ var addCategory = "Add Category";
 var addItem = "Add Item";
 var any = "Any";
 var chooseFile = "Choose file";
+var chooseImage = "Choose image";
+var changeImage = "Change image";
+var tapToUpload = "Tap to upload";
+var clickOrDragToUpload = "Click or drag to upload";
+var addImages = "Add images";
 var greaterThan = "Greater than";
 var greaterThanOrEqualTo = "Greater than or equal to";
 var lessThan = "Less than";
@@ -298,6 +303,11 @@ var en = {
 	"delete": "Delete",
 	any: any,
 	chooseFile: chooseFile,
+	chooseImage: chooseImage,
+	changeImage: changeImage,
+	tapToUpload: tapToUpload,
+	clickOrDragToUpload: clickOrDragToUpload,
+	addImages: addImages,
 	greaterThan: greaterThan,
 	greaterThanOrEqualTo: greaterThanOrEqualTo,
 	lessThan: lessThan,
@@ -311,5 +321,5 @@ var en = {
 	aria: aria
 };
 
-export { accept, addCategory, addItem, addRule, after, am, any, apply, aria, before, between, cancel, choose, chooseDate, chooseFile, chooseMonth, chooseYear, clear, completed, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, en as default, dragFilesHere, edit, emptyFileUploadMessage, emptyFilterMessage, emptyMessage, emptySearchMessage, emptySelectionMessage, endsWith, equal, equals, fileSizeTypes, filesBeingDropped, filesSelected, filter, firstDayOfWeek, generatePhoto, greaterThan, greaterThanOrEqualTo, gt, gte, include, lessThan, lessThanOrEqualTo, lt, lte, matchAll, matchAny, maximumAllowedFiles, medium, monthNames, monthNamesShort, nextDecade, nextHour, nextMinute, nextMonth, nextSecond, nextYear, noFilter, not, notContains, notEquals, now, openMenu, password, passwordPrompt, pending, pm, prevDecade, prevHour, prevMinute, prevMonth, prevSecond, prevYear, profile, reject, remove, removeRule, save, searchMessage, selectionMessage, settings, showMonthAfterYear, signOut, startsWith, strong, today, toggleColorMode, typeNotSupported, upload, weak, weekHeader };
+export { accept, addCategory, addImages, addItem, addRule, after, am, any, apply, aria, before, between, cancel, changeImage, choose, chooseDate, chooseFile, chooseImage, chooseMonth, chooseYear, clear, clickOrDragToUpload, completed, contains, custom, dateAfter, dateBefore, dateFormat, dateIs, dateIsNot, dayNames, dayNamesMin, dayNamesShort, en as default, dragFilesHere, edit, emptyFileUploadMessage, emptyFilterMessage, emptyMessage, emptySearchMessage, emptySelectionMessage, endsWith, equal, equals, fileSizeTypes, filesBeingDropped, filesSelected, filter, firstDayOfWeek, generatePhoto, greaterThan, greaterThanOrEqualTo, gt, gte, include, lessThan, lessThanOrEqualTo, lt, lte, matchAll, matchAny, maximumAllowedFiles, medium, monthNames, monthNamesShort, nextDecade, nextHour, nextMinute, nextMonth, nextSecond, nextYear, noFilter, not, notContains, notEquals, now, openMenu, password, passwordPrompt, pending, pm, prevDecade, prevHour, prevMinute, prevMonth, prevSecond, prevYear, profile, reject, remove, removeRule, save, searchMessage, selectionMessage, settings, showMonthAfterYear, signOut, startsWith, strong, tapToUpload, today, toggleColorMode, typeNotSupported, upload, weak, weekHeader };
 //# sourceMappingURL=en.json.js.map

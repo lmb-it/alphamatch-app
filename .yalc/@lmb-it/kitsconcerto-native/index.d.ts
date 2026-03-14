@@ -373,8 +373,8 @@ export interface IFile<T extends FieldValues = any> extends IElementBase<T> {
     minFileSize?: number; // in KB
     acceptedTypes?: (IImagesExtTypeKeys | IFilesExtTypeKeys)[];
     classicUploader?: boolean;
-    /** Custom render template for the uploader UI */
-    template?: FileUploaderTemplate;
+    /** Custom render function for the uploader UI */
+    children?: FileUploaderTemplate<any>;
 }
 
 export interface ILocation<T extends FieldValues = any> extends ITextFieldProps<T> {
@@ -479,8 +479,8 @@ export interface IFileUploaderElement<T extends FieldValues = any> extends IElem
     initialUri?: string | string[];
     placeholder?: string;
     acceptedTypes?: (IImagesExtTypeKeys | IFilesExtTypeKeys)[];
-    /** Custom render template for the uploader UI */
-    template?: FileUploaderTemplate;
+    /** Custom render function for the uploader UI */
+    children?: FileUploaderTemplate<any>;
 }
 
 
@@ -2725,7 +2725,7 @@ export interface IFormSingleElement<Value = any> {
     id?: string;
     name?: string;
     ref?: any;
-
+    onFocus?:()=>void
     value?: Value;
     defaultValue?: Value;
     attached?:boolean;
@@ -5211,8 +5211,8 @@ export interface IFileUploader<T = File$1>
         ClickDragLabel?: string;
         selectedFile?: string;
     };
-    /** Custom render template for the uploader UI */
-    template?: FileUploaderTemplate<T>;
+    /** Custom render function for the uploader UI */
+    children?: FileUploaderTemplate<T>;
 }
 
 export interface IKitsCheckboxProps<T> extends IFormSingleElement<Array<T>>{
@@ -8013,6 +8013,11 @@ declare const localeFiles: {
         delete: string;
         any: string;
         chooseFile: string;
+        chooseImage: string;
+        changeImage: string;
+        tapToUpload: string;
+        clickOrDragToUpload: string;
+        addImages: string;
         greaterThan: string;
         greaterThanOrEqualTo: string;
         lessThan: string;
@@ -8781,6 +8786,11 @@ declare const localeFiles: {
         delete: string;
         any: string;
         chooseFile: string;
+        chooseImage: string;
+        changeImage: string;
+        tapToUpload: string;
+        clickOrDragToUpload: string;
+        addImages: string;
         greaterThan: string;
         greaterThanOrEqualTo: string;
         lessThan: string;

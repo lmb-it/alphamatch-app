@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "@lmb-it/kitsconcerto-native": {
-      "signature": "5b2033242328bd2e34e3051bd3b0798f",
+      "signature": "bc29c35f0a0f1ab817d9dbfa3389e08c",
       "file": true
     }
   }

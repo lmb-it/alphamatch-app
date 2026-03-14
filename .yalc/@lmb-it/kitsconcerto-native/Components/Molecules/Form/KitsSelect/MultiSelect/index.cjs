@@ -83,10 +83,12 @@ var helper = require('../helper.cjs');
 var useSelectBase = require('../hooks/useSelectBase.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
+var useResolvedStyle = require('../../../../../Hooks/useResolvedStyle.cjs');
 require('../../../../../Hooks/useKeyboardNavigation.cjs');
 
 const KitsMultiSelect = ({ className, ref, ...rawProps }) => {
-  const { mergedProps: props, themeStyle } = useComponentDefaults.default("MultiSelect", rawProps, "Select");
+  const { mergedProps: props, themeStyle } = useComponentDefaults.default("MultiSelect", rawProps, "Input");
+  const resolvedThemeStyle = useResolvedStyle.default(themeStyle);
   const {
     id,
     disabled,
@@ -126,6 +128,27 @@ const KitsMultiSelect = ({ className, ref, ...rawProps }) => {
     }
     onChange && onChange(e, items);
   }, [selectionLimit, onChange]);
+  const Element = /* @__PURE__ */ jsxRuntime.jsx(
+    index.default,
+    {
+      emptyFilterMessage,
+      value: selectedValue,
+      onChange: handleChange,
+      disabled,
+      loading,
+      showClear,
+      options: typeof list !== "function" ? list : [],
+      placeholder,
+      ...keys,
+      filter: withFilter !== false,
+      selectionLimit,
+      display: valueMode === "comma" ? "comma" : localProps?.maxSelectedLabels ? void 0 : "chip",
+      maxSelectedLabels: selectionLimit ?? localProps?.maxSelectedLabels ?? 10,
+      className: `w-full ${ClState}`,
+      style: { borderRadius: 0, ...resolvedThemeStyle },
+      ...localProps ? localProps : {}
+    }
+  );
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -140,27 +163,7 @@ const KitsMultiSelect = ({ className, ref, ...rawProps }) => {
       helperText,
       invalid,
       label,
-      children: /* @__PURE__ */ jsxRuntime.jsx(
-        index.default,
-        {
-          emptyFilterMessage,
-          value: selectedValue,
-          onChange: handleChange,
-          disabled,
-          loading,
-          showClear,
-          options: typeof list !== "function" ? list : [],
-          placeholder,
-          ...keys,
-          filter: withFilter !== false,
-          selectionLimit,
-          display: valueMode === "comma" ? "comma" : localProps?.maxSelectedLabels ? void 0 : "chip",
-          maxSelectedLabels: selectionLimit ?? localProps?.maxSelectedLabels ?? 10,
-          className: `w-full ${ClState}`,
-          style: Object.keys(themeStyle).length ? themeStyle : void 0,
-          ...localProps ? localProps : {}
-        }
-      )
+      children: Element
     }
   );
 };
