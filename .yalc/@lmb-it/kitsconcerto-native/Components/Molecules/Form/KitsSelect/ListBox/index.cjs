@@ -110,12 +110,12 @@ const KitsListBox = (rawProps) => {
   const { list, labelKey, valueKey, childrenKey, onChange, selectedValue } = useSelectBase.useSelectBase();
   const [filterText, setFilterText] = React.useState("");
   const t = style.resolveThemeTokenForNative;
-  const primaryBg = t("primary.100") || "#E8EAF6";
+  const primaryBg = t("highlight-bg") || t("primary.100") || "#E8EAF6";
   const primaryText = t("primary.700") || "#303F9F";
-  const borderClr = invalid ? t("red.500") || "#EF4444" : t("gray.300") || "#D1D5DB";
-  const textColor = t("gray.800") || "#1F2937";
-  const placeholderColor = t("gray.400") || "#9CA3AF";
-  const groupBg = t("gray.50") || "#F9FAFB";
+  const borderClr = invalid ? t("danger") || "#EF4444" : t("border") || "#D1D5DB";
+  const textColor = t("text") || "#1F2937";
+  const placeholderColor = t("text-secondary") || "#9CA3AF";
+  const groupBg = t("surface-ground") || "#F9FAFB";
   const isSelected = React.useCallback((val) => {
     if (isMultiple && Array.isArray(selectedValue)) {
       return selectedValue.includes(val);

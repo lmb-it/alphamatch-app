@@ -1,6 +1,6 @@
 import { jsx } from 'react/jsx-runtime';
 import { useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { TouchableOpacity, ScrollView, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import '../ui/accordion/index.js';
 import '../ui/actionsheet/index.js';
@@ -134,7 +134,26 @@ const ResponsiveElement = ({
     if (animationDelay != null) anim = anim.delay(animationDelay);
     return anim;
   }, [exiting, animationDuration, animationDelay]);
-  const content = /* @__PURE__ */ jsx(Component, { ref, ...nativeProps, style: combinedStyles, className: additionalClasses, children: isText ? /* @__PURE__ */ jsx(Text, { children }) : children });
+  const pressHandler = "onClick" in nativeProps ? nativeProps?.onClick : "onPress" in nativeProps ? nativeProps?.onPress : null;
+  const hasPressHandler = typeof pressHandler === "function";
+  const isButton = as === "Button" || as === "ButtonGroup";
+  const isImage = as === "Image";
+  const cleanedNativeProps = useMemo(() => {
+    if (!hasPressHandler || isButton) return nativeProps;
+    if (!nativeProps) return nativeProps;
+    const { onClick, onPress, ...rest } = nativeProps;
+    return rest;
+  }, [nativeProps, hasPressHandler, isButton]);
+  let content;
+  if (hasPressHandler && pressHandler && !isButton) {
+    if (isImage) {
+      content = /* @__PURE__ */ jsx(TouchableOpacity, { activeOpacity: 0.7, onPress: pressHandler, children: /* @__PURE__ */ jsx(Component, { ref, ...cleanedNativeProps, style: combinedStyles, className: additionalClasses }) });
+    } else {
+      content = /* @__PURE__ */ jsx(TouchableOpacity, { activeOpacity: 0.7, onPress: pressHandler, style: combinedStyles, children: /* @__PURE__ */ jsx(Component, { ref, ...cleanedNativeProps, style: { ...combinedStyles, borderWidth: 0 }, className: additionalClasses, children: isText ? /* @__PURE__ */ jsx(Text, { children }) : children }) });
+    }
+  } else {
+    content = /* @__PURE__ */ jsx(Component, { ref, ...nativeProps, style: combinedStyles, className: additionalClasses, children: isText ? /* @__PURE__ */ jsx(Text, { children }) : children });
+  }
   if (scrollable) {
     return /* @__PURE__ */ jsx(ScrollView, { horizontal: as === "HStack", children: content });
   }

@@ -83,7 +83,7 @@ const KitsInputCalendar = ({ ref, ...rawProps }) => {
             ...localProps
           }
         ),
-        /* @__PURE__ */ jsx(Flex, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsx(Text, { children: val.toLocaleDateString() }) })
+        /* @__PURE__ */ jsx(Flex, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: containerStyle.backgroundColor ?? resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsx(Text, { children: val.toLocaleDateString() }) })
       ] }) }) })
     }
   );

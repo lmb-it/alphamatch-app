@@ -85,6 +85,31 @@ const getValue = (item, optionValue) => {
   return item[optionValue];
 };
 const t = resolveThemeTokenForNative;
+const TEXT_STYLE_KEYS = /* @__PURE__ */ new Set([
+  "fontSize",
+  "fontFamily",
+  "fontWeight",
+  "fontStyle",
+  "color",
+  "letterSpacing",
+  "lineHeight",
+  "textAlign",
+  "textDecorationLine",
+  "textTransform"
+]);
+function splitStyle(combined) {
+  if (!combined) return {};
+  const view = {};
+  const text = {};
+  for (const [k, v] of Object.entries(combined)) {
+    if (TEXT_STYLE_KEYS.has(k)) text[k] = v;
+    else view[k] = v;
+  }
+  return {
+    viewStyle: Object.keys(view).length ? view : void 0,
+    textStyle: Object.keys(text).length ? text : void 0
+  };
+}
 function Dropdown({
   value,
   options = [],
@@ -107,23 +132,27 @@ function Dropdown({
   optionGroupTemplate,
   virtualScrollerOptions,
   invalid,
-  testID
+  testID,
+  style: externalStyle
 }) {
   const inputRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [inputText, setInputText] = useState("");
   const [filterQuery, setFilterQuery] = useState("");
+  const { viewStyle: externalViewStyle, textStyle: externalTextStyle } = splitStyle(externalStyle);
   const colors = {
-    border: t("gray.300"),
-    borderInvalid: t("red.500"),
-    bg: "#fff",
-    placeholder: t("gray.400"),
-    optionSelected: t("gray.100"),
-    groupBg: t("gray.50"),
-    filterBorder: t("gray.200"),
-    filterBg: t("gray.50"),
-    filterText: t("gray.800"),
-    emptyText: t("gray.400")
+    border: t("border") || t("gray.300"),
+    borderInvalid: t("danger") || t("red.500"),
+    bg: t("surface-card") || "#fff",
+    text: t("text") || t("gray.800"),
+    placeholder: t("text-secondary") || t("gray.400"),
+    optionSelected: t("highlight-bg") || t("gray.100"),
+    groupBg: t("surface-ground") || t("gray.50"),
+    filterBorder: t("border") || t("gray.200"),
+    filterBg: t("surface-ground") || t("gray.50"),
+    filterText: t("text") || t("gray.800"),
+    emptyText: t("text-secondary") || t("gray.400"),
+    primary: t("primary")
   };
   const selectedItem = useMemo(() => {
     if (value == null) return null;
@@ -174,7 +203,7 @@ function Dropdown({
         const rendered = itemTemplate(item);
         content = React.isValidElement(rendered) ? rendered : /* @__PURE__ */ jsx(Text, { children: String(rendered ?? "") });
       } else {
-        content = /* @__PURE__ */ jsx(Text, { children: getLabel(item, optionLabel) });
+        content = /* @__PURE__ */ jsx(Text, { style: [{ color: colors.text }, externalTextStyle && { fontSize: externalTextStyle.fontSize }], children: getLabel(item, optionLabel) });
       }
       return /* @__PURE__ */ jsxs(
         Pressable,
@@ -231,7 +260,8 @@ function Dropdown({
           styles.control,
           { borderColor: colors.border, backgroundColor: colors.bg },
           invalid && { borderColor: colors.borderInvalid },
-          disabled && styles.disabled
+          disabled && styles.disabled,
+          externalViewStyle
         ],
         onPress: toggle,
         children: [
@@ -244,8 +274,12 @@ function Dropdown({
               placeholder,
               editable: !disabled
             }
-          ) }) : /* @__PURE__ */ jsx(Text, { style: displayValue ? void 0 : { color: colors.placeholder }, children: displayValue || placeholder }),
-          /* @__PURE__ */ jsx(Text, { children: "\u25BE" })
+          ) }) : /* @__PURE__ */ jsx(Text, { style: [
+            displayValue ? { color: colors.text } : { color: colors.placeholder },
+            externalTextStyle,
+            !displayValue && { color: colors.placeholder }
+          ], children: displayValue || placeholder }),
+          /* @__PURE__ */ jsx(Text, { style: [{ color: colors.text }, externalTextStyle], children: "\u25BE" })
         ]
       }
     ),
@@ -258,7 +292,7 @@ function Dropdown({
           placeholder: "Search...",
           placeholderTextColor: colors.placeholder,
           style: [styles.filterInput, {
-            borderColor: colors.border,
+            borderColor: colors.filterBorder,
             backgroundColor: colors.filterBg,
             color: colors.filterText
           }],

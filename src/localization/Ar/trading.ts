@@ -19,6 +19,17 @@ export default {
   'trading.doc.expiringSoon': 'ينتهي قريباً',
   'trading.doc.expired': 'منتهي الصلاحية',
 
+  // Verification List
+  'trading.verify.requiredDocuments': 'المستندات المطلوبة',
+  'trading.verify.documentsApproved': 'مستندات معتمدة',
+  'trading.verify.pendingReview': 'قيد المراجعة',
+  'trading.verify.approved': 'تمت الموافقة',
+  'trading.verify.pending': 'قيد المراجعة',
+  'trading.verify.rejected': 'مرفوض — يرجى إعادة التقديم',
+  'trading.verify.expiringSoon': 'ينتهي قريباً',
+  'trading.verify.expired': 'منتهي الصلاحية',
+  'trading.verify.noDocumentsRequired': 'لا توجد مستندات مطلوبة لحسابك في الوقت الحالي.',
+
   // Expiry Banner
   'trading.expiry.title': 'الترخيص ينتهي قريباً',
   'trading.expiry.message': 'ينتهي {documentName} الخاص بك خلال {days} يوماً.',

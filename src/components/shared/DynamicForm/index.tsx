@@ -151,6 +151,22 @@ const resolveType = (field: IFormFieldData): IFormElement['type'] => {
 const isFileField = (field: IFormFieldData): boolean =>
   field.formioType === 'file' || field.dbType === 'file' || field.dbType === 'image';
 
+/** Parse a size string like "1GB", "20MB", "500KB" into KB. Falls back to 0. */
+const parseSizeToKB = (raw: string | number): number => {
+  if (typeof raw === 'number') return raw * 1024; // assume MB if plain number
+  const match = raw.trim().match(/^([\d.]+)\s*(GB|MB|KB|B)?$/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1]);
+  const unit = (match[2] || 'MB').toUpperCase();
+  switch (unit) {
+    case 'GB': return num * 1024 * 1024;
+    case 'MB': return num * 1024;
+    case 'KB': return num;
+    case 'B':  return num / 1024;
+    default:   return num * 1024;
+  }
+};
+
 // ---------------------------------------------------------------------------
 // Yup schema builder
 // ---------------------------------------------------------------------------
@@ -425,12 +441,14 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
             label: field.fieldLabel || field.fieldName,
             placeholder: field.placeholder || undefined,
             colSpan: 12,
-            schema: buildSchema(field),
             isDisabled: field.isDisabled || false,
             initialValue: field.defaultValue ?? undefined,
             helperText: field.description || undefined,
           };
 
+          if(element.type != 'File' && element.type != 'Image'){
+            element.schema =buildSchema(field);
+          }
           // Left / right addons from prefix / suffix
           if (field.prefix) element.leftAddon = field.prefix;
           if (field.suffix) element.rightAddon = field.suffix;
@@ -460,9 +478,9 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
 
           // File / Image props
           if (element.type === 'File' || element.type === 'Image') {
-            // Formio stores sizes in MB, KitsConcerto expects KB
-            if (field.fileMaxSize) element.maxFileSize = field.fileMaxSize * 1024;
-            if (field.fileMinSize) element.minFileSize = field.fileMinSize * 1024;
+            // Formio stores sizes as strings like "1GB", "20MB" — parse to KB for KitsConcerto
+            if (field.fileMaxSize) element.maxFileSize = parseSizeToKB(field.fileMaxSize);
+            if (field.fileMinSize) element.minFileSize = parseSizeToKB(field.fileMinSize);
             if (field.isMultiple) element.multiple = true;
 
             if(element.type === 'Image'){

@@ -4,6 +4,31 @@ import { View, Text, TouchableOpacity, TextInput, Modal, Pressable, StyleSheet, 
 import { resolveThemeTokenForNative } from '../../Factory/helpers/style.js';
 
 const t = resolveThemeTokenForNative;
+const TEXT_STYLE_KEYS = /* @__PURE__ */ new Set([
+  "fontSize",
+  "fontFamily",
+  "fontWeight",
+  "fontStyle",
+  "color",
+  "letterSpacing",
+  "lineHeight",
+  "textAlign",
+  "textDecorationLine",
+  "textTransform"
+]);
+function splitStyle(combined) {
+  if (!combined) return {};
+  const view = {};
+  const text = {};
+  for (const [k, v] of Object.entries(combined)) {
+    if (TEXT_STYLE_KEYS.has(k)) text[k] = v;
+    else view[k] = v;
+  }
+  return {
+    viewStyle: Object.keys(view).length ? view : void 0,
+    textStyle: Object.keys(text).length ? text : void 0
+  };
+}
 function MultiSelect(props) {
   const {
     value,
@@ -22,32 +47,34 @@ function MultiSelect(props) {
     display = "chip",
     maxSelectedLabels = 10,
     itemTemplate,
-    selectedItemTemplate
+    selectedItemTemplate,
+    style: externalStyle
   } = props;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const { viewStyle: externalViewStyle, textStyle: externalTextStyle } = splitStyle(externalStyle);
   const colors = {
-    border: t("gray.300"),
+    border: t("border") || t("gray.300"),
     borderFocus: t("primary"),
-    bg: "#fff",
-    disabledBg: t("gray.100"),
-    placeholder: t("gray.400"),
-    text: t("gray.800"),
-    textSecondary: t("gray.500"),
-    chipBg: t("indigo.100"),
-    chipText: t("indigo.700"),
-    chipRemove: t("indigo.500"),
-    chipMoreBg: t("gray.100"),
-    headerBorder: t("gray.200"),
-    groupBg: t("gray.50"),
-    groupBorder: t("gray.200"),
-    itemBorder: t("gray.100"),
-    itemSelectedBg: t("indigo.50"),
-    itemSelectedText: t("indigo.700"),
-    checkboxBorder: t("gray.300"),
+    bg: t("surface-card") || "#fff",
+    disabledBg: t("surface-ground") || t("gray.100"),
+    placeholder: t("text-secondary") || t("gray.400"),
+    text: t("text") || t("gray.800"),
+    textSecondary: t("text-secondary") || t("gray.500"),
+    chipBg: t("primary.100") || t("indigo.100"),
+    chipText: t("primary.700") || t("indigo.700"),
+    chipRemove: t("primary.500") || t("indigo.500"),
+    chipMoreBg: t("surface-ground") || t("gray.100"),
+    headerBorder: t("border") || t("gray.200"),
+    groupBg: t("surface-ground") || t("gray.50"),
+    groupBorder: t("border") || t("gray.200"),
+    itemBorder: t("surface-ground") || t("gray.100"),
+    itemSelectedBg: t("highlight-bg") || t("indigo.50"),
+    itemSelectedText: t("primary.700") || t("indigo.700"),
+    checkboxBorder: t("border") || t("gray.300"),
     checkboxChecked: t("primary"),
-    invalidBorder: t("red.500"),
-    searchBg: t("gray.50")
+    invalidBorder: t("danger") || t("red.500"),
+    searchBg: t("surface-ground") || t("gray.50")
   };
   const getValue = (item, key) => key ? item[key] : item;
   const getLabel = (item, key) => String(key ? item[key] : item);
@@ -152,7 +179,7 @@ function MultiSelect(props) {
   };
   const renderSelected = () => {
     if (!selectedValues.length) {
-      return /* @__PURE__ */ jsx(Text, { style: [styles.placeholder, { color: colors.placeholder }], children: placeholder });
+      return /* @__PURE__ */ jsx(Text, { style: [styles.placeholder, { color: colors.placeholder }, externalTextStyle], children: placeholder });
     }
     if (display === "chip") {
       const visibleItems = selectedValues.slice(0, maxSelectedLabels);
@@ -177,7 +204,7 @@ function MultiSelect(props) {
         ] }) })
       ] });
     }
-    return /* @__PURE__ */ jsx(Text, { numberOfLines: 1, style: [styles.commaText, { color: colors.text }], children: selectedValues.slice(0, maxSelectedLabels).map((v) => getLabel(v, optionLabel)).join(", ") });
+    return /* @__PURE__ */ jsx(Text, { numberOfLines: 1, style: [styles.commaText, { color: colors.text }, externalTextStyle], children: selectedValues.slice(0, maxSelectedLabels).map((v) => getLabel(v, optionLabel)).join(", ") });
   };
   const panelContent = /* @__PURE__ */ jsxs(View, { style: { flex: 1 }, children: [
     /* @__PURE__ */ jsxs(View, { style: [styles.panelHeader, { borderBottomColor: colors.headerBorder }], children: [
@@ -215,7 +242,8 @@ function MultiSelect(props) {
           styles.input,
           { borderColor: colors.border, backgroundColor: colors.bg },
           disabled && { backgroundColor: colors.disabledBg, opacity: 0.6 },
-          open && { borderColor: colors.borderFocus }
+          open && { borderColor: colors.borderFocus },
+          externalViewStyle
         ],
         children: [
           /* @__PURE__ */ jsx(View, { style: styles.inputContent, children: renderSelected() }),

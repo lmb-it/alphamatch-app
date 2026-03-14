@@ -126,6 +126,13 @@ export default {
   'trading.verify.uploadComingSoon':
     'Document upload is coming soon. You can do this from your profile.',
   'trading.verify.documentsUploaded': 'documents uploaded',
+  'trading.verify.documentsApproved': 'documents approved',
+  'trading.verify.pendingReview': 'pending review',
+  'trading.verify.approved': 'Approved',
+  'trading.verify.pending': 'Under Review',
+  'trading.verify.rejected': 'Rejected — Please Resubmit',
+  'trading.verify.expiringSoon': 'Expiring Soon',
+  'trading.verify.expired': 'Expired',
   'trading.verify.noDocumentsRequired':
     'No compliance documents are required for your account at this time.',
   'trading.verify.done': 'Done',

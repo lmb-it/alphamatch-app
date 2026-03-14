@@ -138,7 +138,26 @@ const ResponsiveElement = ({
     if (animationDelay != null) anim = anim.delay(animationDelay);
     return anim;
   }, [exiting, animationDuration, animationDelay]);
-  const content = /* @__PURE__ */ jsxRuntime.jsx(Component, { ref, ...nativeProps, style: combinedStyles, className: additionalClasses, children: isText ? /* @__PURE__ */ jsxRuntime.jsx(index$5.Text, { children }) : children });
+  const pressHandler = "onClick" in nativeProps ? nativeProps?.onClick : "onPress" in nativeProps ? nativeProps?.onPress : null;
+  const hasPressHandler = typeof pressHandler === "function";
+  const isButton = as === "Button" || as === "ButtonGroup";
+  const isImage = as === "Image";
+  const cleanedNativeProps = React.useMemo(() => {
+    if (!hasPressHandler || isButton) return nativeProps;
+    if (!nativeProps) return nativeProps;
+    const { onClick, onPress, ...rest } = nativeProps;
+    return rest;
+  }, [nativeProps, hasPressHandler, isButton]);
+  let content;
+  if (hasPressHandler && pressHandler && !isButton) {
+    if (isImage) {
+      content = /* @__PURE__ */ jsxRuntime.jsx(reactNative.TouchableOpacity, { activeOpacity: 0.7, onPress: pressHandler, children: /* @__PURE__ */ jsxRuntime.jsx(Component, { ref, ...cleanedNativeProps, style: combinedStyles, className: additionalClasses }) });
+    } else {
+      content = /* @__PURE__ */ jsxRuntime.jsx(reactNative.TouchableOpacity, { activeOpacity: 0.7, onPress: pressHandler, style: combinedStyles, children: /* @__PURE__ */ jsxRuntime.jsx(Component, { ref, ...cleanedNativeProps, style: { ...combinedStyles, borderWidth: 0 }, className: additionalClasses, children: isText ? /* @__PURE__ */ jsxRuntime.jsx(index$5.Text, { children }) : children }) });
+    }
+  } else {
+    content = /* @__PURE__ */ jsxRuntime.jsx(Component, { ref, ...nativeProps, style: combinedStyles, className: additionalClasses, children: isText ? /* @__PURE__ */ jsxRuntime.jsx(index$5.Text, { children }) : children });
+  }
   if (scrollable) {
     return /* @__PURE__ */ jsxRuntime.jsx(reactNative.ScrollView, { horizontal: as === "HStack", children: content });
   }

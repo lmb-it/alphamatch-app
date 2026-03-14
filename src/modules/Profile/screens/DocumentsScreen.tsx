@@ -74,12 +74,7 @@ const DocumentsScreen: React.FC = () => {
       reviewRequired: true,
       expiryRules: null,
       form: null,
-      uploadStatus:
-        doc.status === 'approved'
-          ? 'approved'
-          : doc.status === 'pending'
-            ? 'uploaded'
-            : undefined,
+      uploadStatus: doc.status !== 'not_submitted' ? doc.status : undefined,
     }));
   }, [tierResponse]);
 

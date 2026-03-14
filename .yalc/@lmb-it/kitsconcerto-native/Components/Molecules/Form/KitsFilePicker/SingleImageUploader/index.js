@@ -14,6 +14,7 @@ import Box from '../../../UI/Box/index.js';
 import { Button } from '../../../Button/Button.js';
 import 'primereact/tooltip';
 import 'primereact/skeleton';
+import { TouchableOpacity } from 'react-native';
 
 const SingleImageUploader = () => {
   const { onPick, files, removeFile, disabled, isClassicUploader } = useUploader();
@@ -67,12 +68,12 @@ const SingleImageUploader = () => {
           {
             icon: "pi pi-times",
             size: "sm",
+            width: 40,
+            height: 40,
             severity: "danger",
-            style: {
-              position: "absolute",
-              right: 8,
-              top: 8
-            },
+            position: "absolute",
+            right: 0,
+            top: 0,
             onClick: removeFile(0),
             disabled
           }
@@ -92,7 +93,7 @@ const SingleImageUploader = () => {
       )
     ] });
   }
-  return /* @__PURE__ */ jsxs(
+  return /* @__PURE__ */ jsx(TouchableOpacity, { activeOpacity: 0.7, onPress: onPick, style: { width: "100%" }, children: /* @__PURE__ */ jsxs(
     Flex,
     {
       w: "full",
@@ -102,19 +103,19 @@ const SingleImageUploader = () => {
       borderRadiusLeft: "lg",
       borderRadiusRight: "lg",
       alignItems: "center",
+      display: "flex",
       justifyContent: "center",
       flexDirection: "column",
+      height: 200,
       py: 32,
       px: 16,
       gap: 8,
-      onClick: onPick,
-      opacity: disabled ? 0.5 : 1,
       children: [
         /* @__PURE__ */ jsx(Icon, { name: "cloud-upload", size: "lg", color: "brand.500" }),
         /* @__PURE__ */ jsx(Text, { fontSize: 14, color: "text-secondary", textAlign: "center", children: t("tapToUpload") })
       ]
     }
-  );
+  ) });
 };
 
 export { SingleImageUploader as default };

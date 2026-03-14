@@ -103,20 +103,20 @@ function AutoComplete({
   const isFilled = variant === "filled";
   const isMultiple = !!multiple;
   const colors = React.useMemo(() => ({
-    border: t("gray.300"),
+    border: t("border") || t("gray.300"),
     borderFocus: t("primary"),
-    borderInvalid: t("red.500"),
-    bg: isFilled ? t("gray.100") : t("surface-card") || "#fff",
-    text: t("gray.800"),
-    placeholder: t("gray.400"),
-    itemBorder: t("gray.200"),
-    itemHighlight: t("gray.100"),
-    chipBg: t("indigo.100"),
-    chipText: t("indigo.700"),
-    chipRemove: t("indigo.500"),
+    borderInvalid: t("danger") || t("red.500"),
+    bg: isFilled ? t("surface-ground") || t("gray.100") : t("surface-card") || "#fff",
+    text: t("text") || t("gray.800"),
+    placeholder: t("text-secondary") || t("gray.400"),
+    itemBorder: t("border") || t("gray.200"),
+    itemHighlight: t("highlight-bg") || t("gray.100"),
+    chipBg: t("primary.100") || t("indigo.100"),
+    chipText: t("primary.700") || t("indigo.700"),
+    chipRemove: t("primary.500") || t("indigo.500"),
     primary: t("primary"),
-    emptyText: t("gray.400"),
-    groupBg: t("gray.50")
+    emptyText: t("text-secondary") || t("gray.400"),
+    groupBg: t("surface-ground") || t("gray.50")
   }), [isFilled]);
   const selectedValues = React.useMemo(() => {
     if (!isMultiple) return [];

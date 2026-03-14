@@ -94,14 +94,14 @@ export default function DocumentFormScreen() {
       }));
       console.log({answers})
 
-    /*  dispatch(
+     dispatch(
         tradingAccountActions.submitDocumentForm({
           tradingAccountRef: resolvedAccountRef,
           documentRef,
           answers,
           fileFields: filePicks,
         }),
-      );*/
+      );
       setIsSubmitting(false);
     },
     [resolvedAccountRef, documentRef, dispatch],
