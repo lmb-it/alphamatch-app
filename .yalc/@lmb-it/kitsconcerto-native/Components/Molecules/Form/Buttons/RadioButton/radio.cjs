@@ -29,7 +29,8 @@ const KitsRadio = ({
   onChange,
   appearanceMode = "vertical",
   disabled,
-  invalid
+  invalid,
+  containerStyle
 }) => {
   const items = React.useMemo(
     () => Array.isArray(item) ? item : [item],
@@ -65,6 +66,7 @@ const KitsRadio = ({
       hideError,
       required,
       disabled,
+      containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle, borderWidth: 0 },
       children: /* @__PURE__ */ jsxRuntime.jsx(index.default, { flexDirection: direction, gap: 10, children: items.map((it, index) => {
         const selected = controller.isSelected(it);
         return /* @__PURE__ */ jsxRuntime.jsx(

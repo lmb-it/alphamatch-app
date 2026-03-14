@@ -96,6 +96,7 @@ const KitsInputSwitch = ({ ref, ...rawProps }) => {
     value,
     checked,
     onChange,
+    containerStyle,
     localProps,
     ...rest
   } = props;
@@ -124,6 +125,7 @@ const KitsInputSwitch = ({ ref, ...rawProps }) => {
       invalid,
       label,
       disabled,
+      containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle, borderWidth: 0 },
       children: /* @__PURE__ */ jsxRuntime.jsx(
         index.Switch,
         {

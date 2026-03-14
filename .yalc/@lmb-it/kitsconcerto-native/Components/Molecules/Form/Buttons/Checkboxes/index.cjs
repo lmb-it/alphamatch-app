@@ -94,7 +94,7 @@ const KitsCheckbox = ({
       hideError,
       required,
       disabled,
-      containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle },
+      containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle, borderWidth: 0 },
       children: Element
     }
   );
