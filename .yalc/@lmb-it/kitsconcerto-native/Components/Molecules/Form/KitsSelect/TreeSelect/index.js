@@ -74,7 +74,6 @@ import '../../../../../apps/mobile/src/Core/Badge/index.js';
 import '../../../../../apps/mobile/src/Core/ProgressBar/index.js';
 import '../../../../../apps/mobile/src/Core/Checkbox/index.js';
 import '../../../../../apps/mobile/src/Core/RadioButton/index.js';
-import { ClHelper } from '../../Helpers/Functions.js';
 import { useTreeBuild } from '../hooks/useTreeBuild.js';
 import '../../../../../Contexts/DialogContext.js';
 import useComponentDefaults from '../../../../../Hooks/useComponentDefaults.js';
@@ -111,12 +110,6 @@ const KitsTreeSelect = ({ ref, ...rawProps }) => {
   const { nodes, value, handleChange } = useTreeBuild({
     isStructured: props.isStructured,
     ref
-  });
-  ClHelper({
-    inputSize: inputSize ?? "",
-    isChecked: false,
-    isInvalid: !!invalid,
-    isDisabled: !!disabled
   });
   const Element = /* @__PURE__ */ jsx(
     CoreTreeSelect,

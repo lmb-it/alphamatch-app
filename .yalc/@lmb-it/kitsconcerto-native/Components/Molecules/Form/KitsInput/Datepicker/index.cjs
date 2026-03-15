@@ -62,7 +62,7 @@ const KitsInputCalendar = ({ ref, ...rawProps }) => {
     width: "100%",
     ...themeStyle
   };
-  const val = internalVal instanceof Date ? internalVal : /* @__PURE__ */ new Date();
+  const val = internalVal instanceof Date ? internalVal : null;
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -79,7 +79,7 @@ const KitsInputCalendar = ({ ref, ...rawProps }) => {
         /* @__PURE__ */ jsxRuntime.jsx(
           DateTimePicker,
           {
-            value: val,
+            value: val ?? /* @__PURE__ */ new Date(),
             onChange: onSelectDate,
             mode: "date",
             display: "default",
@@ -87,7 +87,7 @@ const KitsInputCalendar = ({ ref, ...rawProps }) => {
             ...localProps
           }
         ),
-        /* @__PURE__ */ jsxRuntime.jsx(index.default, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: containerStyle.backgroundColor ?? resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { children: val.toLocaleDateString() }) })
+        /* @__PURE__ */ jsxRuntime.jsx(index.default, { alignItems: "center", w: "full", h: "full", paddingHorizontal: 10, backgroundColor: containerStyle.backgroundColor ?? resolveToken("surface-card"), pointerEvents: "none", position: "absolute", top: 0, children: /* @__PURE__ */ jsxRuntime.jsx(index_native$1.default, { children: val ? val.toLocaleDateString() : "" }) })
       ] }) }) })
     }
   );

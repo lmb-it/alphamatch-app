@@ -71,9 +71,12 @@ const MissingQuestionsScreen: React.FC = () => {
     (data: Record<string, any>, setIsSubmitting: (v: boolean) => void) => {
       if (!createdAccount) return;
       didSubmit.current = true;
+      const addressPicks = dynamicFormRef.current?.getAddressPicks() ?? {};
       const answers = Object.entries(data).map(([fieldRef, value]) => ({
         fieldRef,
-        value,
+        value: addressPicks[fieldRef]
+          ? JSON.stringify(addressPicks[fieldRef])
+          : value,
       }));
       dispatch(
         tradingAccountActions.submitFormAnswers({

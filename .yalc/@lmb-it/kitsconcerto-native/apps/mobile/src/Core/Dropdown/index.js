@@ -1,6 +1,6 @@
 import { jsx, jsxs } from 'react/jsx-runtime';
 import React, { useRef, useState, useMemo, useCallback } from 'react';
-import { Text, Pressable, View, TextInput, FlatList, Keyboard, StyleSheet } from 'react-native';
+import { Text, Pressable, View, TextInput, ScrollView, Keyboard, StyleSheet } from 'react-native';
 import '../../ui/accordion/index.js';
 import '../../ui/actionsheet/index.js';
 import '../../ui/alert/index.js';
@@ -190,12 +190,12 @@ function Dropdown({
     setOpen(false);
   };
   const renderItem = useCallback(
-    ({ item }) => {
+    (item, index) => {
       if (!item) {
         return null;
       }
       if (item.__group) {
-        return /* @__PURE__ */ jsx(Text, { style: [styles.groupLabel, { backgroundColor: colors.groupBg }], children: optionGroupLabel ? item.group?.[optionGroupLabel] : "" });
+        return /* @__PURE__ */ jsx(Text, { style: [styles.groupLabel, { backgroundColor: colors.groupBg }], children: optionGroupLabel ? item.group?.[optionGroupLabel] : "" }, `group-${index}`);
       }
       const selected = value != null && getValue(item, optionValue) === value;
       let content;
@@ -217,7 +217,8 @@ function Dropdown({
             content,
             checkmark && selected && /* @__PURE__ */ jsx(Text, { children: "\u2713" })
           ]
-        }
+        },
+        `item-${index}`
       );
     },
     [
@@ -300,18 +301,11 @@ function Dropdown({
         }
       ) }),
       /* @__PURE__ */ jsx(
-        FlatList,
+        ScrollView,
         {
-          data: filteredData,
-          keyExtractor: (_, i) => String(i),
-          renderItem,
           keyboardShouldPersistTaps: "handled",
-          ListEmptyComponent: filterQuery ? /* @__PURE__ */ jsx(View, { style: styles.emptyContainer, children: /* @__PURE__ */ jsx(Text, { style: [styles.emptyText, { color: colors.emptyText }], children: emptyFilterMessage }) }) : null,
-          getItemLayout: virtualScrollerOptions ? (_, index) => ({
-            length: virtualScrollerOptions.itemSize,
-            offset: virtualScrollerOptions.itemSize * index,
-            index
-          }) : void 0
+          nestedScrollEnabled: true,
+          children: filteredData.length > 0 ? filteredData.map((item, i) => renderItem(item, i)) : filterQuery ? /* @__PURE__ */ jsx(View, { style: styles.emptyContainer, children: /* @__PURE__ */ jsx(Text, { style: [styles.emptyText, { color: colors.emptyText }], children: emptyFilterMessage }) }) : null
         }
       ),
       panelFooterTemplate?.()

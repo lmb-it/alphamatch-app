@@ -78,7 +78,6 @@ require('../../../../../apps/mobile/src/Core/Badge/index.cjs');
 require('../../../../../apps/mobile/src/Core/ProgressBar/index.cjs');
 require('../../../../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../../../../apps/mobile/src/Core/RadioButton/index.cjs');
-var Functions = require('../../Helpers/Functions.cjs');
 var useTreeBuild = require('../hooks/useTreeBuild.cjs');
 require('../../../../../Contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../../../Hooks/useComponentDefaults.cjs');
@@ -115,12 +114,6 @@ const KitsTreeSelect = ({ ref, ...rawProps }) => {
   const { nodes, value, handleChange } = useTreeBuild.useTreeBuild({
     isStructured: props.isStructured,
     ref
-  });
-  Functions.ClHelper({
-    inputSize: inputSize ?? "",
-    isChecked: false,
-    isInvalid: !!invalid,
-    isDisabled: !!disabled
   });
   const Element = /* @__PURE__ */ jsxRuntime.jsx(
     CoreTreeSelect.default,

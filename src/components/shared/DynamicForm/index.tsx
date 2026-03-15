@@ -12,7 +12,7 @@
  * Used by: MissingQuestionsScreen, DocumentFormScreen, and any future screen
  * that renders dynamic backend-driven forms.
  */
-import React, {useRef, useCallback, useMemo, useState, useEffect, forwardRef, useImperativeHandle} from 'react';
+import React, {useRef, useCallback, useMemo, forwardRef, useImperativeHandle} from 'react';
 import {Alert} from 'react-native';
 import {
   Form,
@@ -23,9 +23,7 @@ import {
 import DocumentPicker from 'react-native-document-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
 import * as Yup from 'yup';
-import api from '@src/services/api';
-import {URLs, resolveUrl} from '@src/services/urls';
-
+import AddressField, {type IAddressValue} from './AddressField';
 // ---------------------------------------------------------------------------
 // Types — API response from FormFieldMap
 // ---------------------------------------------------------------------------
@@ -82,7 +80,7 @@ export interface IFormFieldData {
   webcam?: boolean;
   validate?: IFormFieldValidate | null;
   conditional?: IFormFieldConditional | null;
-  data?: {values?: {label: string; value: string}[]; url?: string; [key: string]: unknown} | null;
+  data?:{label: string; value: string}[] | null;
   widget?: Record<string, unknown> | null;
   datePicker?: Record<string, unknown> | null;
   timePicker?: Record<string, unknown> | null;
@@ -196,134 +194,6 @@ const buildSchema = (field: IFormFieldData): Yup.Schema | undefined => {
 };
 
 // ---------------------------------------------------------------------------
-// Remote options resolver (data.url)
-// ---------------------------------------------------------------------------
-
-type SelectOption = {label: string; value: string | number};
-
-/**
- * Parse a data.url pattern like "states:au" or "countries".
- * Returns { resource, param } or null if format is unrecognised.
- */
-const parseDataUrl = (url: string): {resource: string; param?: string} | null => {
-  const trimmed = url.trim().toLowerCase();
-  if (!trimmed) return null;
-  const [resource, param] = trimmed.split(':');
-  return {resource, param};
-};
-
-/**
- * Resolve the country ID from an ISO2 code by querying the countries endpoint.
- * Returns the numeric ID or null.
- */
-const resolveCountryId = async (iso2: string): Promise<number | null> => {
-  try {
-    const res = await api.get(URLs.lookups.countries);
-    const countries: {ref: number; iso2: string}[] = res.data?.data ?? [];
-    const match = countries.find(
-      c => c.iso2?.toLowerCase() === iso2.toLowerCase(),
-    );
-    return match?.ref ?? null;
-  } catch {
-    return null;
-  }
-};
-
-/**
- * Fetch options for a given data.url pattern.
- * Supported patterns:
- *   "states:au"  → states of Australia (resolves iso2 → country ID first)
- *   "states"     → states of the fallback country (countryRef prop)
- *   "countries"  → all countries
- */
-const fetchRemoteOptions = async (
-  url: string,
-  fallbackCountryRef?: number,
-): Promise<SelectOption[]> => {
-  const parsed = parseDataUrl(url);
-  if (!parsed) return [];
-
-  try {
-    switch (parsed.resource) {
-      case 'states': {
-        let countryId: number | null = null;
-
-        if (parsed.param) {
-          // e.g. "states:au" — resolve ISO2 to country ID
-          countryId = await resolveCountryId(parsed.param);
-        } else {
-          // e.g. "states" — use fallback country
-          countryId = fallbackCountryRef ?? null;
-        }
-
-        if (!countryId) return [];
-
-        const res = await api.get(
-          resolveUrl(URLs.lookups.states, {countryRef: countryId}),
-        );
-        const states: {ref: number; label: string}[] = res.data?.data ?? [];
-        return states.map(s => ({label: s.label, value: s.ref}));
-      }
-
-      case 'countries': {
-        const res = await api.get(URLs.lookups.countries);
-        const countries: {ref: number; label: string}[] = res.data?.data ?? [];
-        return countries.map(c => ({label: c.label, value: c.ref}));
-      }
-
-      default:
-        return [];
-    }
-  } catch {
-    return [];
-  }
-};
-
-/**
- * Hook: for every field with data.url, fetch remote options asynchronously.
- * Returns a map of fieldRef → resolved options.
- */
-const useRemoteOptions = (
-  fields: IFormFieldData[],
-  fallbackCountryRef?: number,
-): Record<string, SelectOption[]> => {
-  const [optionsMap, setOptionsMap] = useState<Record<string, SelectOption[]>>(
-    {},
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fieldsWithUrl = fields.filter(f => f.data?.url);
-    if (fieldsWithUrl.length === 0) return;
-
-    // Fetch all in parallel
-    Promise.all(
-      fieldsWithUrl.map(async f => {
-        const options = await fetchRemoteOptions(
-          f.data!.url!,
-          fallbackCountryRef,
-        );
-        return {fieldRef: f.fieldRef, options};
-      }),
-    ).then(results => {
-      if (cancelled) return;
-      const map: Record<string, SelectOption[]> = {};
-      results.forEach(r => {
-        map[r.fieldRef] = r.options;
-      });
-      setOptionsMap(map);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [fields, fallbackCountryRef]);
-
-  return optionsMap;
-};
-
-// ---------------------------------------------------------------------------
 // Exported types
 // ---------------------------------------------------------------------------
 
@@ -338,6 +208,8 @@ export interface DynamicFormRef {
   submit: () => void;
   /** Access picked files keyed by fieldRef (only populated when `enableFilePicker` is true). */
   getFilePicks: () => Record<string, IFilePick>;
+  /** Access address data keyed by fieldRef (populated for address-type fields). */
+  getAddressPicks: () => Record<string, IAddressValue>;
 }
 
 export interface DynamicFormProps {
@@ -351,11 +223,6 @@ export interface DynamicFormProps {
    * @default false
    */
   enableFilePicker?: boolean;
-  /**
-   * Fallback country ref (numeric ID) for data.url patterns like "states"
-   * (without explicit ISO code). Defaults to 14 (Australia).
-   */
-  countryRef?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -363,16 +230,17 @@ export interface DynamicFormProps {
 // ---------------------------------------------------------------------------
 
 const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
-  ({fields, onSubmit, enableFilePicker = false, countryRef = 14}, ref) => {
+  ({fields, onSubmit, enableFilePicker = false}, ref) => {
     const {t} = useLanguage();
     const formRef = useRef<IUseFormReturn<Record<string, any>>>(null);
     const filePicksRef = useRef<Record<string, IFilePick>>({});
-    const remoteOptions = useRemoteOptions(fields, countryRef);
+    const addressPicksRef = useRef<Record<string, IAddressValue>>({});
 
-    // Expose submit + filePicks to parent via ref
+    // Expose submit + filePicks + addressPicks to parent via ref
     useImperativeHandle(ref, () => ({
       submit: () => formRef.current?.onFormSubmit(),
       getFilePicks: () => filePicksRef.current,
+      getAddressPicks: () => addressPicksRef.current,
     }));
 
     // File picker handler (only active when enableFilePicker is true)
@@ -421,6 +289,35 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
         .slice()
         .sort((a, b) => a.fieldOrder - b.fieldOrder)
         .reduce<IFormElement[]>((acc, field) => {
+          // ── Address fields → Container with AddressField ──
+          if (field.formioType === 'address') {
+            const required = field.isRequired || field.validate?.required;
+            // @ts-ignore
+            const addressElement: IFormElement<any> = {
+              id: field.fieldRef,
+              type: 'Container' as IFormElement['type'],
+              label: '',
+              colSpan: 12,
+              schema: required
+                ? Yup.string().required(field.errorLabel || 'Required')
+                : Yup.string(),
+              children: (rhfField: any) => (
+                <AddressField
+                  fieldRef={field.fieldRef}
+                  label={field.fieldLabel || field.fieldName}
+                  isRequired={!!required}
+                  value={addressPicksRef.current[field.fieldRef] || null}
+                  onChange={(addressValue: IAddressValue) => {
+                    addressPicksRef.current[field.fieldRef] = addressValue;
+                    rhfField.onChange(addressValue.formatted_address);
+                  }}
+                />
+              ),
+            };
+            acc.push(addressElement as IFormElement);
+            return acc;
+          }
+
           let type:IFormElement['type'] = resolveType(field);
           if (!type) return acc; // skip hidden/content/button etc.
 
@@ -442,7 +339,6 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
             placeholder: field.placeholder || undefined,
             colSpan: 12,
             isDisabled: field.isDisabled || false,
-            initialValue: field.defaultValue ?? undefined,
             helperText: field.description || undefined,
           };
 
@@ -454,12 +350,11 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
           if (field.suffix) element.rightAddon = field.suffix;
 
           // List-based fields: Select, Multiselect, Radios, Checkbox, Tags
-          // Remote options (data.url) take priority over static data.values
-          const resolved = remoteOptions[field.fieldRef];
-          const staticValues = field.data?.values || [];
+          const values = field.data || [];
+
 
           if (element.type == 'Select' || element.type == 'Multiselect' || element.type == 'Radios' || element.type == 'Checkbox') {
-            element.list = resolved ?? staticValues;
+            element.list = values;
           }
 
           if (element.type == 'Select' || element.type == 'Multiselect') {
@@ -468,7 +363,7 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
           }
 
           if (element.type == 'Radios' || element.type == 'Checkbox') {
-            element.list = (resolved ?? staticValues).map(
+            element.list = values.map(
               (opt: {label: string; value: string | number}) => ({
                 label: opt.label,
                 value: opt.value,
@@ -504,7 +399,7 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
           acc.push(element as IFormElement);
           return acc;
         }, []);
-    }, [fields, enableFilePicker, t, handleFilePick, remoteOptions]);
+    }, [fields, enableFilePicker, t, handleFilePick]);
 
     console.log(formElements)
 
@@ -523,7 +418,6 @@ const DynamicForm = forwardRef<DynamicFormRef, DynamicFormProps>(
     );
   },
 );
-//check across all the select elements in the data which I sent you (the meta ones) when it is state is there any of them in the resources
 DynamicForm.displayName = 'DynamicForm';
 
 export default DynamicForm;

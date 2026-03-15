@@ -3174,6 +3174,7 @@ export type ITreeItem<T = any> = {
     parentId?: null | number | string;
     data: T;
     icon?: string;
+    selectable?: boolean;
 };
 
 // Interface for server-side interactions

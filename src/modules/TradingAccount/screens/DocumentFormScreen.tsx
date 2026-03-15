@@ -87,12 +87,16 @@ export default function DocumentFormScreen() {
       if (!resolvedAccountRef) return;
 
       const filePicks = dynamicFormRef.current?.getFilePicks() ?? {};
+      const addressPicks = dynamicFormRef.current?.getAddressPicks() ?? {};
 
       const answers = Object.entries(data).map(([fieldRef, value]) => ({
         fieldRef,
-        value: filePicks[fieldRef] ? filePicks[fieldRef].name : value,
+        value: filePicks[fieldRef]
+          ? filePicks[fieldRef].name
+          : addressPicks[fieldRef]
+            ? JSON.stringify(addressPicks[fieldRef])
+            : value,
       }));
-      console.log({answers})
 
      dispatch(
         tradingAccountActions.submitDocumentForm({
