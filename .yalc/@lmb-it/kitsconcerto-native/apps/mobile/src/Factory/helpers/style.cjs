@@ -6,8 +6,8 @@ require('react-icons/ai');
 require('react-icons/io');
 require('../../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
 require('yup');
-var index_native = require('../../../../../packages/types/src/Css/map/index.cjs');
-var index_native$1 = require('../../../../../packages/types/src/Css/constants/breakpoints/index.cjs');
+var index_native$1 = require('../../../../../packages/types/src/Css/map/index.cjs');
+var index_native = require('../../../../../packages/types/src/Css/constants/breakpoints/index.cjs');
 var resolvers = require('../../../../../packages/types/src/Theme/resolvers.cjs');
 var cssVarMap = require('./cssVarMap.cjs');
 
@@ -76,7 +76,7 @@ function createStyleContext() {
   };
 }
 const getCurrentBreakpoint = (width) => {
-  const entries = Object.entries(index_native$1.breakpoints).sort((a, b) => b[1] - a[1]);
+  const entries = Object.entries(index_native.breakpoints).sort((a, b) => b[1] - a[1]);
   for (const [key, value] of entries) {
     if (width >= value) return key;
   }
@@ -200,7 +200,7 @@ const style = (props, externalCtx) => {
   const finalStyles = {};
   const transforms = [];
   const apply = (key, value) => {
-    const mapped = index_native.default[key];
+    const mapped = index_native$1.default[key];
     if (!mapped) return;
     const converted = toNativeValue(value);
     finalStyles[mapped] = converted;

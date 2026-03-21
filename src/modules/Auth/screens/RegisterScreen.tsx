@@ -1,5 +1,5 @@
-import React, {useRef, useCallback, useMemo} from 'react';
-import {TouchableOpacity} from 'react-native';
+import React, {useRef, useCallback, useMemo, useEffect} from 'react';
+import {Keyboard, TouchableOpacity} from 'react-native';
 import {
   Button,
   Flex,
@@ -13,7 +13,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
-import {authActions, selectAuthLoading} from '@src/modules/Auth';
+import {authActions, selectAuthLoading, selectPendingVerification} from '@src/modules/Auth';
 import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import {
   getRegisterFormElements,
@@ -30,8 +30,23 @@ const RegisterScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch();
   const loading = useSelector(selectAuthLoading);
+  const pendingVerification = useSelector(selectPendingVerification);
   const formRef = useRef<IUseFormReturn<IRegisterForm>>(null);
   useAuthErrorToast();
+
+  // Navigate to verification screen when saga sets pendingVerification
+  useEffect(() => {
+    if (pendingVerification?.context === 'phoneVerification') {
+      navigation.navigate('VerifyOTP', {
+        phone: pendingVerification.contactEmail,
+        context: 'register',
+      });
+    } else if (pendingVerification?.context === 'emailVerification') {
+      navigation.navigate('VerifyEmail', {
+        email: pendingVerification.contactEmail,
+      });
+    }
+  }, [pendingVerification, navigation]);
 
   const formElements = useMemo(() => getRegisterFormElements(t), [t]);
 
@@ -45,10 +60,10 @@ const RegisterScreen: React.FC = () => {
 
   const handleSubmit = useCallback(
     (data: IRegisterForm, setIsSubmitting: (v: boolean) => void) => {
+      Keyboard.dismiss();
       const isPhone = /^\d/.test(data.email);
       if (isPhone) {
         dispatch(authActions.sendOtp({phone: data.email, context: 'register'}));
-        navigation.navigate('VerifyOTP', {phone: data.email, context: 'register'});
       } else {
         const payload: IRegisterPayload = {
           contactEmail: data.email,

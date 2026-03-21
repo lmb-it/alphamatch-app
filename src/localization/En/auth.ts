@@ -76,6 +76,7 @@ export default {
   'auth.verifyTitle': 'Verify Your',
   'auth.verifyTitleAccent': 'Phone!',
   'auth.verifyPhoneSubtitle': 'We have sent a 6-digit code to {{phone}}. Enter it below to continue.',
+  'auth.verifyEmailSubtitle': 'We have sent a 4-digit code to {{email}}. Enter it below to verify your account.',
   'auth.verifySubtitle': 'We have sent a verification code to your email. Please enter the code below.',
   'auth.verifyCode': 'Verification Code',
   'auth.verify': 'Verify',

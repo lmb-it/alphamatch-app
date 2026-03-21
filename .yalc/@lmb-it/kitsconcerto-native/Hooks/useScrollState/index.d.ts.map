@@ -1,1 +1,0 @@
-{"version":3,"file":"index.native.d.ts","sourceRoot":"","sources":["../../../../src/Hooks/useScrollState/index.native.ts"],"names":[],"mappings":"AACA,OAAO,EAAqB,KAAK,WAAW,EAAC,MAAM,UAAU,CAAC;AAE9D,KAAK,OAAO,GAAG;IACX,SAAS,CAAC,EAAE,MAAM,CAAC;IACnB,MAAM,CAAC,EAAE,GAAG,CAAC;CAChB,CAAC;AAEF,QAAA,MAAM,cAAc,GAAI,UAAS,OAAY;;kBAWpB,GAAG;CAW3B,CAAA;AAED,eAAe,cAAc,CAAA"}

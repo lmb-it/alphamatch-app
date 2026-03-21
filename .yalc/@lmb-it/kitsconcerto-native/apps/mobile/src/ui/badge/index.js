@@ -2,11 +2,11 @@ import { jsx } from 'react/jsx-runtime';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
-import { withStyleContext, tva, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { tva, withStyleContext, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
 
 const SCOPE = "BADGE";
-const badgeStyle = tva({
+tva({
   base: "flex-row items-center rounded-sm data-[disabled=true]:opacity-50 px-2 py-1",
   variants: {
     action: {
@@ -84,7 +84,7 @@ const badgeIconStyle = tva({
     }
   }
 });
-const ContextView = withStyleContext(View, SCOPE);
+withStyleContext(View, SCOPE);
 cssInterop(PrimitiveIcon, {
   className: {
     target: "style",
@@ -97,28 +97,6 @@ cssInterop(PrimitiveIcon, {
     }
   }
 });
-function Badge({
-  children,
-  action = "muted",
-  variant = "solid",
-  size = "md",
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    ContextView,
-    {
-      className: badgeStyle({ action, variant, class: className }),
-      ...props,
-      context: {
-        action,
-        variant,
-        size
-      },
-      children
-    }
-  );
-}
 const BadgeText = React.forwardRef(function BadgeText2({ children, className, size, ...props }, ref) {
   const { size: parentSize, action: parentAction } = useStyleContext(SCOPE);
   return /* @__PURE__ */ jsx(
@@ -176,9 +154,8 @@ const BadgeIcon = React.forwardRef(function BadgeIcon2({ className, size, ...pro
     }
   );
 });
-Badge.displayName = "Badge";
 BadgeText.displayName = "BadgeText";
 BadgeIcon.displayName = "BadgeIcon";
 
-export { Badge, BadgeIcon, BadgeText };
+export { BadgeIcon, BadgeText };
 //# sourceMappingURL=index.js.map

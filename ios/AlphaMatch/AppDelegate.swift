@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import FirebaseCore
+import FirebaseAuth
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,6 +33,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
+  }
+
+  // MARK: - URL Handling (Firebase reCAPTCHA redirect + deep links)
+  // Firebase Auth MUST check first — it intercepts the reCAPTCHA callback URL.
+  // If it doesn't handle it, fall through to React Native's Linking module.
+  func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    if Auth.auth().canHandle(url) {
+      return true
+    }
+    // Not a Firebase URL — forward to React Native Linking
+    NotificationCenter.default.post(
+      name: NSNotification.Name("RCTOpenURLNotification"),
+      object: nil,
+      userInfo: ["url": url.absoluteString]
+    )
+    return true
+  }
+
+  // MARK: - APNs Token (required for phone auth on real devices)
+  // Firebase uses silent push notifications to verify the device.
+  func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+  ) {
+    Auth.auth().setAPNSToken(deviceToken, type: .unknown)
+  }
+
+  // MARK: - Silent Push Notification (phone auth device verification)
+  func application(
+    _ application: UIApplication,
+    didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+    fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+  ) {
+    if Auth.auth().canHandleNotification(userInfo) {
+      completionHandler(.noData)
+      return
+    }
+    completionHandler(.noData)
   }
 }
 

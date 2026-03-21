@@ -5,17 +5,56 @@
  *   1. signInWithPhoneNumber(phone) → Firebase sends SMS, returns confirmation
  *   2. confirmation.confirm(code)   → verifies code, returns Firebase user
  *   3. user.getIdToken()            → returns Firebase ID token for backend
+ *
+ * Uses the NAMESPACED API (auth()) — more reliable than the modular getAuth()
+ * wrapper for phone auth on react-native-firebase v23.
  */
 import auth, {type FirebaseAuthTypes} from '@react-native-firebase/auth';
 
 let _confirmation: FirebaseAuthTypes.ConfirmationResult | null = null;
 
 /**
+ * Ensure phone number is in E.164 format (e.g. +61412345678).
+ * Firebase requires E.164 — calls will fail with [auth/internal-error] without it.
+ */
+function toE164(phone: string): string {
+  // Remove everything except digits and +
+  let cleaned = phone.replace(/[^\d+]/g, '');
+
+  // If already in E.164 format
+  if (cleaned.startsWith('+')) {
+    return cleaned;
+  }
+
+  // Remove any accidental leading +
+  cleaned = cleaned.replace(/^\+/, '');
+
+  // If starts with country code already (61...)
+  if (cleaned.startsWith('61')) {
+    return `+${cleaned}`;
+  }
+
+  // If local Australian number (starts with 0)
+  if (cleaned.startsWith('0')) {
+    return `+61${cleaned.slice(1)}`; // remove leading 0
+  }
+
+  // Fallback: assume missing country code
+  return `+61${cleaned}`;
+}
+
+/**
  * Initiate Firebase phone sign-in — sends SMS to the phone number.
  * Stores the confirmation result for later verification.
  */
 export async function sendFirebaseOtp(phone: string): Promise<void> {
-  _confirmation = await auth().signInWithPhoneNumber(phone);
+  const formattedPhone = toE164(phone);
+
+  if (__DEV__) {
+    console.log('[FirebasePhoneAuth] Calling signInWithPhoneNumber:', formattedPhone);
+  }
+
+  _confirmation = await auth().signInWithPhoneNumber(formattedPhone);
 }
 
 /**

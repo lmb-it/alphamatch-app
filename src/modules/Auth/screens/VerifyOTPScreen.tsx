@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {TextInput, StyleSheet} from 'react-native';
+import {TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
 import {
   Button,
   Flex,
@@ -36,6 +36,12 @@ const VerifyOTPScreen: React.FC = () => {
 
   const primaryColor = resolveToken('primary');
   const borderColor = resolveToken('border');
+
+  // Auto-focus first digit input on mount
+  useEffect(() => {
+    const timer = setTimeout(() => inputRefs.current[0]?.focus(), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -92,76 +98,91 @@ const VerifyOTPScreen: React.FC = () => {
 
   const isComplete = code.every(d => d !== '');
 
+  // Auto-submit when all digits are filled (paste or SMS autofill)
+  useEffect(() => {
+    if (isComplete) {
+      handleVerify();
+    }
+  }, [isComplete]);
+
   return (
     <AlphaLayout>
-      <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
-        {/* Header */}
-        <Flex flexDirection="column" gap={8}>
-          <Heading as="h2" bold color="text-primary" style={{fontSize: 24, lineHeight: 32}}>
-            {t('auth.verifyTitle')}{' '}
-            <Heading as="h2" bold color="primary" style={{fontSize: 24, lineHeight: 32}}>
-              {t('auth.verifyTitleAccent')}
-            </Heading>
-          </Heading>
-          <Text fontSize={14} color="text-subtle" lineHeight={20}>
-            {t('auth.verifyPhoneSubtitle').replace('{{phone}}', phone)}
-          </Text>
-        </Flex>
-
-        {/* Code inputs */}
-        <Flex flexDirection="row" justifyContent="space-between" gap={8}>
-          {code.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={ref => {
-                inputRefs.current[index] = ref;
-              }}
-              style={[
-                styles.codeInput,
-                {
-                  borderColor: digit ? primaryColor : borderColor,
-                  color: resolveToken('text'),
-                },
-              ]}
-              value={digit}
-              onChangeText={text => handleChange(text, index)}
-              onKeyPress={({nativeEvent}) => handleKeyPress(nativeEvent.key, index)}
-              keyboardType="number-pad"
-              maxLength={index === 0 ? CODE_LENGTH : 1}
-              textContentType="oneTimeCode"
-              autoComplete={index === 0 ? 'sms-otp' : 'off'}
-            />
-          ))}
-        </Flex>
-
-        {/* Verify button */}
-        <Button
-          label="auth.verify"
-          w="full"
-          severity="brand"
-          loading={loading}
-          disabled={!isComplete}
-          onClick={handleVerify}
-        />
-
-        {/* Resend */}
-        <Flex justifyContent="center" alignItems="center">
-          <Text fontSize={14} color="text-subtle">
-            {t('auth.didntReceiveCode')}{' '}
-          </Text>
-          {countdown > 0 ? (
-            <Text fontSize={14} color="text-subtle" fontWeight="600">
-              {t('auth.resendIn')} {countdown}{t('auth.seconds')}
-            </Text>
-          ) : (
-            <TouchableOpacity onPress={handleResend} activeOpacity={0.6}>
-              <Text fontSize={14} color="primary" fontWeight="600">
-                {t('auth.resendCode')}
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
+          <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
+            {/* Header */}
+            <Flex flexDirection="column" gap={8}>
+              <Heading as="h2" bold color="text-primary" style={{fontSize: 24, lineHeight: 32}}>
+                {t('auth.verifyTitle')}{' '}
+                <Heading as="h2" bold color="primary" style={{fontSize: 24, lineHeight: 32}}>
+                  {t('auth.verifyTitleAccent')}
+                </Heading>
+              </Heading>
+              <Text fontSize={14} color="text-subtle" lineHeight={20}>
+                {t('auth.verifyPhoneSubtitle').replace('{{phone}}', phone)}
               </Text>
-            </TouchableOpacity>
-          )}
-        </Flex>
-      </Flex>
+            </Flex>
+
+            {/* Code inputs */}
+            <Flex flexDirection="row" justifyContent="space-between" gap={8}>
+              {code.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={ref => {
+                    inputRefs.current[index] = ref;
+                  }}
+                  style={[
+                    styles.codeInput,
+                    {
+                      borderColor: digit ? primaryColor : borderColor,
+                      color: resolveToken('text'),
+                    },
+                  ]}
+                  value={digit}
+                  onChangeText={text => handleChange(text, index)}
+                  onKeyPress={({nativeEvent}) => handleKeyPress(nativeEvent.key, index)}
+                  keyboardType="number-pad"
+                  maxLength={index === 0 ? CODE_LENGTH : 1}
+                  textContentType="oneTimeCode"
+                  autoComplete={index === 0 ? 'sms-otp' : 'off'}
+                />
+              ))}
+            </Flex>
+
+            {/* Verify button */}
+            <Button
+              label="auth.verify"
+              w="full"
+              severity="brand"
+              loading={loading}
+              disabled={!isComplete}
+              onClick={handleVerify}
+            />
+
+            {/* Resend */}
+            <Flex justifyContent="center" alignItems="center">
+              <Text fontSize={14} color="text-subtle">
+                {t('auth.didntReceiveCode')}{' '}
+              </Text>
+              {countdown > 0 ? (
+                <Text fontSize={14} color="text-subtle" fontWeight="600">
+                  {t('auth.resendIn')} {countdown}{t('auth.seconds')}
+                </Text>
+              ) : (
+                <TouchableOpacity onPress={handleResend} activeOpacity={0.6}>
+                  <Text fontSize={14} color="primary" fontWeight="600">
+                    {t('auth.resendCode')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </Flex>
+          </Flex>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </AlphaLayout>
   );
 };

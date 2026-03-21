@@ -8,7 +8,7 @@ var nativewindUtils = require('@gluestack-ui/utils/nativewind-utils');
 var nativewind = require('nativewind');
 
 const SCOPE = "BADGE";
-const badgeStyle = nativewindUtils.tva({
+nativewindUtils.tva({
   base: "flex-row items-center rounded-sm data-[disabled=true]:opacity-50 px-2 py-1",
   variants: {
     action: {
@@ -86,7 +86,7 @@ const badgeIconStyle = nativewindUtils.tva({
     }
   }
 });
-const ContextView = nativewindUtils.withStyleContext(reactNative.View, SCOPE);
+nativewindUtils.withStyleContext(reactNative.View, SCOPE);
 nativewind.cssInterop(creator.PrimitiveIcon, {
   className: {
     target: "style",
@@ -99,28 +99,6 @@ nativewind.cssInterop(creator.PrimitiveIcon, {
     }
   }
 });
-function Badge({
-  children,
-  action = "muted",
-  variant = "solid",
-  size = "md",
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    ContextView,
-    {
-      className: badgeStyle({ action, variant, class: className }),
-      ...props,
-      context: {
-        action,
-        variant,
-        size
-      },
-      children
-    }
-  );
-}
 const BadgeText = React.forwardRef(function BadgeText2({ children, className, size, ...props }, ref) {
   const { size: parentSize, action: parentAction } = nativewindUtils.useStyleContext(SCOPE);
   return /* @__PURE__ */ jsxRuntime.jsx(
@@ -178,11 +156,9 @@ const BadgeIcon = React.forwardRef(function BadgeIcon2({ className, size, ...pro
     }
   );
 });
-Badge.displayName = "Badge";
 BadgeText.displayName = "BadgeText";
 BadgeIcon.displayName = "BadgeIcon";
 
-exports.Badge = Badge;
 exports.BadgeIcon = BadgeIcon;
 exports.BadgeText = BadgeText;
 //# sourceMappingURL=index.cjs.map

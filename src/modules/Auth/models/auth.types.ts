@@ -14,6 +14,7 @@ export interface IUser {
   active: boolean;
   emailConfirmed: boolean;
   confirmed: boolean;
+  welcomeSeen: boolean;
   displayName: string | null;
   familyName: string | null;
   avatar: string | null;
@@ -35,7 +36,7 @@ export interface IAuthState {
 
 export interface IPendingVerification {
   contactEmail: string;
-  context: 'emailVerification' | 'passwordReset';
+  context: 'emailVerification' | 'phoneVerification' | 'passwordReset';
 }
 
 export interface ILoginPayload {

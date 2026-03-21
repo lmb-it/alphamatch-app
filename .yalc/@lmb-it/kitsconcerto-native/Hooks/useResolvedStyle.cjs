@@ -3,7 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
-var KitsThemeProvider_native = require('../Contexts/Theme/KitsThemeProvider.cjs');
+var KitsThemeProvider_native = require('../contexts/Theme/KitsThemeProvider.cjs');
 
 const CSS_PROP_MAP = {
   bg: "backgroundColor",
@@ -39,24 +39,26 @@ const EXPAND_MAP = {
   borderX: ["borderLeft", "borderRight"],
   borderY: ["borderTop", "borderBottom"]
 };
+function resolveStyleRecord(themeStyle, resolveToken) {
+  if (!themeStyle || Object.keys(themeStyle).length === 0) return {};
+  const resolved = {};
+  for (const [key, value] of Object.entries(themeStyle)) {
+    const resolvedValue = typeof value === "string" ? resolveToken(value) : value;
+    if (key in EXPAND_MAP) {
+      for (const cssKey of EXPAND_MAP[key]) {
+        resolved[cssKey] = resolvedValue;
+      }
+      continue;
+    }
+    resolved[CSS_PROP_MAP[key] ?? key] = resolvedValue;
+  }
+  return resolved;
+}
 function useResolvedStyle(themeStyle) {
   const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
-  return React.useMemo(() => {
-    if (!themeStyle || Object.keys(themeStyle).length === 0) return {};
-    const resolved = {};
-    for (const [key, value] of Object.entries(themeStyle)) {
-      const resolvedValue = typeof value === "string" ? resolveToken(value) : value;
-      if (key in EXPAND_MAP) {
-        for (const cssKey of EXPAND_MAP[key]) {
-          resolved[cssKey] = resolvedValue;
-        }
-        continue;
-      }
-      resolved[CSS_PROP_MAP[key] ?? key] = resolvedValue;
-    }
-    return resolved;
-  }, [themeStyle, resolveToken]);
+  return React.useMemo(() => resolveStyleRecord(themeStyle, resolveToken), [themeStyle, resolveToken]);
 }
 
 exports.default = useResolvedStyle;
+exports.resolveStyleRecord = resolveStyleRecord;
 //# sourceMappingURL=useResolvedStyle.cjs.map

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
-var KitsThemeProvider_native = require('../Contexts/Theme/KitsThemeProvider.cjs');
+var KitsThemeProvider_native = require('../contexts/Theme/KitsThemeProvider.cjs');
 
 function useKitsColorScheme(colorScheme, variant) {
   const { resolveToken, colorMode } = KitsThemeProvider_native.useKitsTheme();

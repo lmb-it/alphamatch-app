@@ -1,8 +1,8 @@
 import { jsx } from 'react/jsx-runtime';
 import React from 'react';
 import { createAccordion } from '@gluestack-ui/core/accordion/creator';
-import { View, Text, Pressable, Platform } from 'react-native';
-import { useStyleContext, tva, withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { View, Platform, Text, Pressable } from 'react-native';
+import { tva, withStyleContext, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 import { H3 } from '@expo/html-elements';
 import { cssInterop } from 'nativewind';
 import { UIIcon, PrimitiveIcon } from '@gluestack-ui/core/icon/creator';

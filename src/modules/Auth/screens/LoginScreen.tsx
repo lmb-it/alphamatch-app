@@ -1,5 +1,5 @@
-import React, {useRef, useCallback, useMemo, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import React, {useRef, useCallback, useMemo, useState, useEffect} from 'react';
+import {Keyboard, TouchableOpacity} from 'react-native';
 import {
   Button,
   Flex,
@@ -15,7 +15,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
-import {authActions, selectAuthLoading, selectUser} from '@src/modules/Auth';
+import {authActions, selectAuthLoading, selectUser, selectPendingVerification} from '@src/modules/Auth';
 import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import {getLoginFormElements, type ILoginForm} from '../constants/loginFormElements';
 import type {ILoginPayload} from '@src/modules/Auth';
@@ -31,7 +31,18 @@ const LoginScreen: React.FC = () => {
   const dispatch = useDispatch();
   const loading = useSelector(selectAuthLoading);
   const cachedUser = useSelector(selectUser);
+  const pendingVerification = useSelector(selectPendingVerification);
   useAuthErrorToast();
+
+  // Navigate to OTP screen when sendOtp saga succeeds
+  useEffect(() => {
+    if (pendingVerification?.context === 'phoneVerification') {
+      navigation.navigate('VerifyOTP', {
+        phone: pendingVerification.contactEmail,
+        context: 'login',
+      });
+    }
+  }, [pendingVerification, navigation]);
   const formRef = useRef<IUseFormReturn<ILoginForm>>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -48,10 +59,10 @@ const LoginScreen: React.FC = () => {
 
   const handleSubmit = useCallback(
     (data: ILoginForm, setIsSubmitting: (v: boolean) => void) => {
+      Keyboard.dismiss();
       const isPhone = /^\d/.test(data.identifier);
       if (isPhone) {
         dispatch(authActions.sendOtp({phone: data.identifier, context: 'login'}));
-        navigation.navigate('VerifyOTP', {phone: data.identifier, context: 'login'});
       } else {
         const payload: ILoginPayload = {
           contactEmail: data.identifier,

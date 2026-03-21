@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {authActions} from '../store/auth.slice';
 import authService from '../api/auth.service';
 import {configureGoogleSignIn} from '../services/googleAuth';
+import {Box} from "@lmb-it/kitsconcerto";
 
 type SplashNav = NativeStackNavigationProp<AuthStackParamList, 'Splash'>;
 
@@ -84,13 +85,13 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.imageWrapper, {opacity: fadeAnim}]}>
+      <Box entering={'fadeInUp'} animationDuration={1000} style={styles.imageWrapper}>
         <Image
           source={splashLogo}
           style={styles.logo}
           resizeMode="contain"
         />
-      </Animated.View>
+      </Box>
     </View>
   );
 }
@@ -101,13 +102,13 @@ const styles = StyleSheet.create({
     backgroundColor: BRAND_TEAL,
   },
   imageWrapper: {
-    flex: 1,
+    height:'100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   logo: {
-    width: 260,
-    height: 120,
+    width: 500,
+    height: 300,
     tintColor: '#FFFFFF',
   },
 });

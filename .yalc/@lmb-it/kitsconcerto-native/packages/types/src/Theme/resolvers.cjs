@@ -86,13 +86,6 @@ function resolveTokenValue(theme, colorMode, token, platform = "web") {
   }
   return token;
 }
-function isSemanticToken(value, theme) {
-  if (SEMANTIC_KEYS.has(value)) return true;
-  if (theme) {
-    return value in theme.semanticTokens.light || value in theme.semanticTokens.dark;
-  }
-  return false;
-}
 function isThemeToken(value) {
   if (typeof value !== "string") return false;
   if (DOT_NOTATION_RE.test(value)) return true;
@@ -101,7 +94,6 @@ function isThemeToken(value) {
   return false;
 }
 
-exports.isSemanticToken = isSemanticToken;
 exports.isThemeToken = isThemeToken;
 exports.resolveTokenValue = resolveTokenValue;
 //# sourceMappingURL=resolvers.cjs.map

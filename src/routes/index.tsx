@@ -9,17 +9,32 @@
 import React from 'react';
 import {StatusBar, useColorScheme, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RootState} from '@src/redux';
 import {persistor} from '@src/redux/store';
 import {AuthNavigator} from './AuthNavigator';
 import {MainTabNavigator} from './MainTabNavigator';
+import WelcomeScreen from '@src/modules/Auth/screens/WelcomeScreen';
 import {Text} from '@lmb-it/kitsconcerto';
+
+const WelcomeStack = createNativeStackNavigator();
+
+function WelcomeNavigator() {
+  return (
+    <WelcomeStack.Navigator screenOptions={{headerShown: false}}>
+      <WelcomeStack.Screen name="Welcome" component={WelcomeScreen} />
+    </WelcomeStack.Navigator>
+  );
+}
 
 export default function Routes() {
   const isDarkMode = useColorScheme() === 'dark';
-  const {isAuthenticated, token} = useSelector((state: RootState) => state.auth);
+  const {isAuthenticated, token, user} = useSelector((state: RootState) => state.auth);
+
+  const showWelcome = isAuthenticated && !!token && !!user && !user.welcomeSeen;
+  const showMain = isAuthenticated && !!token && !!user?.welcomeSeen;
 
   const handleReset = () => {
     Alert.alert('Reset All', 'Clear redux, persisted state & AsyncStorage?', [
@@ -40,7 +55,13 @@ export default function Routes() {
     <>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
-        {isAuthenticated && token ? <MainTabNavigator /> : <AuthNavigator />}
+        {showMain ? (
+          <MainTabNavigator />
+        ) : showWelcome ? (
+          <WelcomeNavigator />
+        ) : (
+          <AuthNavigator />
+        )}
       </NavigationContainer>
       {/*{__DEV__ && (*/}
       {/*  <TouchableOpacity style={styles.fab} onPress={handleReset} activeOpacity={0.8}>*/}

@@ -81,4 +81,9 @@ export default {
     const res = await api.post(URLs.auth.verifyOtp, data);
     return res.data;
   },
+
+  markWelcomeSeen: async () => {
+    const res = await api.post(URLs.auth.welcomeSeen);
+    return res.data;
+  },
 };

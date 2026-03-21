@@ -15,11 +15,7 @@
  *   - Extract `sub` (Apple user ID) and `email` from the decoded JWT
  */
 import {Platform} from 'react-native';
-import appleAuth, {
-  AppleRequestOperation,
-  AppleRequestScope,
-  AppleCredentialState,
-} from '@invertase/react-native-apple-authentication';
+import appleAuth from '@invertase/react-native-apple-authentication';
 
 /**
  * Returns true if Apple Sign-In is available on this device (iOS 13+).
@@ -38,10 +34,10 @@ export async function signInWithApple(): Promise<string> {
   }
 
   const credential = await appleAuth.performRequest({
-    requestedOperation: AppleRequestOperation.LOGIN,
+    requestedOperation: appleAuth.Operation.LOGIN,
     requestedScopes: [
-      AppleRequestScope.EMAIL,
-      AppleRequestScope.FULL_NAME,
+      appleAuth.Scope.EMAIL,
+      appleAuth.Scope.FULL_NAME,
     ],
   });
 
@@ -49,7 +45,7 @@ export async function signInWithApple(): Promise<string> {
     credential.user,
   );
 
-  if (credentialState !== AppleCredentialState.AUTHORIZED) {
+  if (credentialState !== appleAuth.State.AUTHORIZED) {
     throw new Error('Apple Sign-In authorization failed');
   }
 

@@ -1,8 +1,8 @@
 'use strict';
 
 var React = require('react');
-var index_native = require('../Contexts/Main/index.cjs');
-require('../Contexts/DialogContext.cjs');
+var index_native = require('../contexts/Main/index.cjs');
+require('../contexts/DialogContext.cjs');
 
 const useKitsConcerto = () => React.useContext(index_native.MainContext);
 

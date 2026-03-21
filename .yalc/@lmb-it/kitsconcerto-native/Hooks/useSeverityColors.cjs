@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var KitsThemeProvider_native = require('../Contexts/Theme/KitsThemeProvider.cjs');
+var KitsThemeProvider_native = require('../contexts/Theme/KitsThemeProvider.cjs');
 
 function useSeverityColors(severity) {
   const { theme, resolveToken, colorMode } = KitsThemeProvider_native.useKitsTheme();

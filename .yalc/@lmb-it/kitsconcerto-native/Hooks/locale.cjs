@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var index_native = require('../Contexts/Locale/index.cjs');
+var index_native = require('../contexts/Locale/index.cjs');
 
 const useLanguage = () => React.useContext(index_native.LocaleContext);
 

@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { MainContext } from '../Contexts/Main/index.js';
-import '../Contexts/DialogContext.js';
+import { MainContext } from '../contexts/Main/index.js';
+import '../contexts/DialogContext.js';
 
 const useKitsConcerto = () => useContext(MainContext);
 

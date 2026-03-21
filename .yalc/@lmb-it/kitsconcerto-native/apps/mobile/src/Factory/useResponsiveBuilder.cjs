@@ -60,7 +60,6 @@ require('react-icons/ai');
 require('react-icons/io');
 require('../../../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
 require('yup');
-require('../../../../packages/types/src/Css/map/index.cjs');
 require('i18next');
 require('react-i18next');
 require('../Core/AutoComplete/index.cjs');

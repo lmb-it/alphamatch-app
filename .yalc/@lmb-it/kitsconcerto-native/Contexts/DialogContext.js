@@ -1,9 +1,9 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { createContext, useRef, useState, useCallback, useEffect, useMemo, useContext } from 'react';
-import KitsToast from '../Components/Molecules/KitsToast/index.js';
-import KitsConfirm from '../Components/Molecules/KitsConfirm/index.js';
-import KitsDialogControlled from '../Components/Molecules/KitsDialog/index.js';
-import KitsConfirmPopup from '../Components/Molecules/KitsConfirmPopup/index.js';
+import KitsToast from '../components/Toast/index.js';
+import KitsConfirm from '../components/ConfirmDialog/index.js';
+import KitsDialogControlled from '../components/Dialog/index.js';
+import KitsConfirmPopup from '../components/ConfirmPopup/index.js';
 
 const PopupContext = createContext(null);
 const PopupProvider = ({ children }) => {

@@ -17,6 +17,7 @@ export const URLs = {
     phoneLogin: '/auth/phone-login',
     validatePhone: '/auth/validate-phone',
     verifyOtp: '/auth/verify-otp',
+    welcomeSeen: '/auth/welcome-seen',
   },
   jobs: {
     feed: '/jobs',

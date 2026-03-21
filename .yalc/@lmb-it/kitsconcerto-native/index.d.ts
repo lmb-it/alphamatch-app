@@ -1,22 +1,16 @@
-import * as React$1 from 'react';
-import React__default, { ComponentType, ReactNode, ReactElement, Ref, CSSProperties, RefObject, MouseEventHandler, ElementType, JSX, ChangeEvent, FC, PropsWithChildren, FunctionComponent, Dispatch, SetStateAction, RefCallback } from 'react';
 import * as react_jsx_runtime from 'react/jsx-runtime';
+import * as React$1 from 'react';
+import React__default, { ReactElement, ReactNode, Ref, CSSProperties, RefObject, MouseEventHandler, ElementType, JSX, PropsWithChildren, ComponentType, FunctionComponent, FC, Dispatch, SetStateAction, RefCallback } from 'react';
 import * as react_native from 'react-native';
 import { ViewStyle, ColorValue as ColorValue$1, ViewProps, TextProps as TextProps$1, ImageProps, Text as Text$1, ScrollViewProps, GestureResponderEvent, NativeSyntheticEvent, TextInputKeyPressEventData, TargetedEvent, NativeScrollEvent, StyleProp, TextInput } from 'react-native';
-import { FieldValues, UseFormReturn, ControllerFieldState, UseFieldArrayReturn, ControllerRenderProps, Control, UseFormGetValues, SubmitErrorHandler, DeepPartial as DeepPartial$1, FieldError } from 'react-hook-form';
-import * as Yup from 'yup';
-import { AnyObject } from 'yup';
-import { DatePickerOptions } from '@react-native-community/datetimepicker';
-import { FaFilePdf, FaFileAudio, FaFileCsv, FaFileImage } from 'react-icons/fa';
-import { AiFillFileUnknown } from 'react-icons/ai';
-import { IoLogoJavascript } from 'react-icons/io';
 import * as _gluestack_ui_utils_nativewind_utils from '@gluestack-ui/utils/nativewind-utils';
 import { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import * as tailwind_merge from '/Volumes/Data/IT/AlphaMatch/KitsConcerto/node_modules/tailwind-merge/dist/index.d.ts';
+import { FieldValues, UseFormReturn, ControllerFieldState, UseFieldArrayReturn, ControllerRenderProps, SubmitErrorHandler, DeepPartial as DeepPartial$1, Control, UseFormGetValues, FieldError } from 'react-hook-form';
+import * as Yup from 'yup';
+import { AnyObject } from 'yup';
+import { DatePickerOptions } from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
-import { AxiosResponse } from 'axios';
-
-declare const IconMap: Record<string, ComponentType<any>>;
 
 export type EnteringAnimation =
     | 'fadeIn'
@@ -60,51 +54,6 @@ export interface IKitsAnimation {
     animationDelay?: number;
 }
 
-/**
- * Optional platform-specific overrides (Web injects router `To`, Native doesn't)
- */
-export interface ILinkOverrides {
-    To?: any; // Web: import { To } from "react-router-dom"
-}
-
-/**
- * Permission types (used in both menu & page)
- */
-export interface Permissions<T = string> {
-    permissionsRequired?: T | T[];
-    permissionsOptional?: T[];
-    loginNotRequired?: boolean;
-}
-
-/**
- * Section/page definition
- */
-export interface IPageISection<
-    T = string,
-    L extends ILinkOverrides = ILinkOverrides
-> extends Permissions<T> {
-    id?: string;
-    icon?: ReactNode;
-    title: string;
-    path?: L["To"];
-    collapsable?:boolean;
-    defaultOpen?:boolean;
-    badge?:string;
-    element?: ReactNode | null;
-}
-
-/**
- * Recursive menu definition
- */
-export interface IMenuItem<
-    T = string,
-    L extends ILinkOverrides = ILinkOverrides
-> extends IPageISection<T, L> {
-    hide?: boolean;
-    content?: ReactElement;
-    links?: IMenuItem<T, L>[];
-}
-
 // --- Basic Building Blocks ---
 
 
@@ -120,9 +69,7 @@ export type IFormGrid = IStyleClasses;
 // These are direct props passed to the underlying UI components.
 
 export type ITextInputProps = IKitsInputText | IKitsInputMask;
-export type IPasswordProps = Omit<IKitsInputPassword, 'value' | 'onChange'>; // Example
-export type IDateProps = IKitsInputCalendar;
-export type INumberProps = IKitsInputNumber;
+export type IPasswordProps = Omit<IKitsInputPassword, 'value' | 'onChange'>;
 
 // types/user.types.ts
 
@@ -180,8 +127,6 @@ export type IChildrenParams<F extends FieldValues, T extends FieldValues> = [
 export type IChildren<F extends FieldValues, T extends FieldValues> =
     | ((...args: IChildrenParams<F, T>) => ReactElement)
     | ReactElement;
-
-export type Shapes = "dropdown" | "multiselect" | "autocomplete" | "listBox" | "treeSelect" | "cascade";
 /** A value that can either be static or dynamically calculated by a LogicFunction. */
 export type DynamicValue<T extends FieldValues, R> = R | LogicFunction<T, R>;
 
@@ -410,11 +355,6 @@ export interface IPhone<T extends FieldValues = any> extends IElementBase<T> {
     includedCountries?: string[];
 }
 
-export interface IButton extends IButtonProps<any> {
-    label: string;
-    ref?: Ref<IButton> | undefined
-}
-
 export interface IObjectGroup<T extends FieldValues = any> extends IElementBase<T> {
     type: 'Object';
     elements: DynamicValue<T, IFormElement<T>[]>;
@@ -595,45 +535,6 @@ export type IFormComponent<T extends FieldValues> = UseFormManagerEvents<T> & ( 
     animation?: IKitsAnimation;
 };
 
-export interface UseFieldLogicElementProps<T extends FieldValues> extends GroupFieldConfigs<T>{
-    element: IFormElement<T>;
-    control: Control<T>;
-    getValues: UseFormGetValues<T>;
-    focusedField?: string;
-    setFocusedField?: React__default.Dispatch<React__default.SetStateAction<string>>;
-    fieldLogic: UseFieldLogicReturn<T>;
-}
-
-export interface FieldWrapperProps<T extends FieldValues> extends GroupFieldConfigs<T>{
-    /**
-     * The full configuration object for a single form element.
-     */
-    element: IFormElement<T>;
-
-    /**
-     * The `control` object from react-hook-form, to be passed down to the `useFieldLogic` hook.
-     */
-    control: Control<T>;
-
-    /**
-     * The `getValues` function from react-hook-form, to be passed down to the `useFieldLogic` hook.
-     */
-    getValues: UseFormGetValues<T>;
-
-    /**
-     * The actual "dumb" field component (e.g., `<InputText />`, `<Select />`) that this
-     * wrapper will render inside itself.
-     */
-    children: (props:UseFieldLogicReturn<T>)=>ReactElement;
-
-    focusedField?: string;
-    setFocusedField: React__default.Dispatch<React__default.SetStateAction<string>>;
-
-    grid?:IStyleClasses;
-
-    onGridChange?:(value:string)=>void
-}
-
 /**
  * Defines the props required by the central `useFieldLogic` hook.
  * This is the contract for providing a field's configuration to the logic engine.
@@ -729,34 +630,6 @@ export interface UseFieldLogicReturn<T extends FieldValues> {
     animation?: IKitsAnimation;
 }
 
-
-// --- Component Props ---
-
-
-/** Base props for a "dumb" field component (e.g., InputText.tsx). */
-export interface BaseFieldProps {
-    // Props from useController
-    field: ControllerRenderProps<any, any>;
-    fieldState: ControllerFieldState;
-    // Resolved dynamic props
-    label?: ILabelElement;
-    placeholder?: string;
-    isDisabled: boolean;
-    isRequired: boolean;
-}
-
-// Example of specific field component props
-export interface InputTextFieldProps extends BaseFieldProps {
-    // Add any specific props that the InputText component needs
-    leftAddon?: React__default.ReactNode;
-    rightAddon?: React__default.ReactNode;
-}
-
-export interface SelectFieldProps extends BaseFieldProps {
-    list?: any[];
-    // ... other select props
-}
-
 // ─── Inlined core types (originally from @lmb-it/kitsconcertomobile) ────
 
 export type SortOrder$1 = 1 | 0 | -1 | null | undefined;
@@ -786,20 +659,6 @@ export interface PaginatorPageChangeEvent$1 {
     page: number;
     pageCount: number;
 }
-
-// ─── DataView Types ─────────────────────────────────────────────────
-
-export type IDVFilters =
-    | IDVMultiselectFilter
-    | IDVRangeFilter
-    | IDVDropdownFilter
-    | IDVButtonsFilter
-    | IDVCheckboxFilter
-    | IDVTriStateFilter
-    | IDVDateFilter
-    | IDVNumberFilter
-    | IDVTextFilter
-    | IDVPhoneFilter;
 
 export interface IDVMessages {
     emptyMessage?: string;
@@ -859,72 +718,6 @@ export interface IDataViewContextValues {
 
     refValues: IDataViewRefValues;
     dataList: any[];
-}
-
-export interface IDVMultiselectFilter {
-    type: "multiSelect";
-    list?: {
-        label: string;
-        value: any;
-    }[];
-}
-
-export interface IDVDropdownFilter {
-    type: "dropdown";
-    list?: {
-        label: string;
-        value: any;
-    }[];
-}
-
-export interface IDVButtonsFilter {
-    type: "buttons";
-    list?: {
-        label: string;
-        value: any;
-    }[];
-    isMultiple?: boolean;
-}
-
-export interface IDVDateFilter {
-    type: "date";
-    isRanged?: {
-        min?: Date;
-        max?: Date;
-    };
-}
-
-export interface IDVNumberFilter {
-    type: "number";
-    min?: number;
-    max?: number;
-}
-
-export interface IDVPhoneFilter {
-    type: "phone";
-}
-
-export interface IDVCheckboxFilter {
-    type: "checkbox";
-
-    list: {
-        label: string;
-        value: string | number | boolean;
-    }[];
-}
-
-export interface IDVTriStateFilter {
-    type: "tristate";
-}
-
-export interface IDVRangeFilter {
-    type: "range";
-    min?: number;
-    max?: number;
-}
-
-export interface IDVTextFilter {
-    type: "text";
 }
 
 export interface IDVPaginationRequest {
@@ -1310,461 +1103,9 @@ export interface IDataTableContextValues<T extends Record<string, any> = any> {
     dataList: T[];
 }
 
-declare const sizingProperties = {
-    w: "width",
-    width: "width",
-    h: "height",
-    height: "height",
-    minW: "minWidth",
-    minWidth: "minWidth",
-    maxW: "maxWidth",
-    maxWidth: "maxWidth",
-    minH: "minHeight",
-    minHeight: "minHeight",
-    maxH: "maxHeight",
-    maxHeight: "maxHeight",
-}
-declare const listingProperties = {
-    listStyleType: null,
-    listStyle: null,
-};
-declare const borderProperties = {
-    // Border
-    borderWidth: "borderWidth",
-    borderColor: "borderColor",
-    borderStyle: "borderStyle",
-    borderRadius: "borderRadius",
-    borderTopLeftRadius: "borderTopLeftRadius",
-    borderTopRightRadius: "borderTopRightRadius",
-    borderBottomLeftRadius: "borderBottomLeftRadius",
-    borderBottomRightRadius: "borderBottomRightRadius",
-    borderTopWidth: "borderTopWidth",
-    borderBottomWidth: "borderBottomWidth",
-    borderLeftWidth: "borderLeftWidth",
-    borderRightWidth: "borderRightWidth",
-    borderTopColor: "borderTopColor",
-    borderBottomColor: "borderBottomColor",
-    borderLeftColor: "borderLeftColor",
-    borderRightColor: "borderRightColor",
-}
-declare const pxProperties = {
-    // Padding & Margin
-    p: "padding",
-    pt: "paddingTop",
-    pr: "paddingRight",
-    pb: "paddingBottom",
-    pl: "paddingLeft",
-    px: "paddingHorizontal", // custom logic required
-    py: "paddingVertical", // custom logic required
-
-    m: "margin",
-    mt: "marginTop",
-    mr: "marginRight",
-    mb: "marginBottom",
-    ml: "marginLeft",
-    padding: "padding",
-    paddingTop: "paddingTop",
-    paddingRight: "paddingRight",
-    paddingBottom: "paddingBottom",
-    paddingLeft: "paddingLeft",
-    paddingVertical: "paddingVertical",
-    paddingHorizontal: "paddingHorizontal",
-    margin: "margin",
-    marginTop: "marginTop",
-    marginRight: "marginRight",
-    marginBottom: "marginBottom",
-    marginLeft: "marginLeft",
-    marginInline: "marginInline",
-    mx: null, // custom logic required
-    my: null, // custom logic required
-    ...sizingProperties,
-    ...borderProperties,
-    ...listingProperties,
-    // Position
-    top: "top",
-    right: "right",
-    bottom: "bottom",
-    left: "left",
-    position: "position",
-    zIndex: "zIndex",
-
-    // Flexbox
-    display: "display", // RN only accepts "flex" or "none"
-    flexBasis: "flexBasis",
-    flex: "flex",
-    flexGrow: "flexGrow",
-    flexShrink: "flexShrink",
-    flexDirection: "flexDirection",
-    direction: "flexDirection",
-    flexWrap: "flexWrap",
-    alignItems: "alignItems",
-    alignSelf: "alignSelf",
-    alignContent: "alignContent",
-    justifyContent: "justifyContent",
-    colSpan: null,
-    rowGap: null,
-    columnGap: null,
-    gap: 'gap', // handled manually if needed via margin tricks
-
-    // Text
-    fontSize: "fontSize",
-    fontWeight: "fontWeight",
-    fontFamily: "fontFamily",
-    fontStyle: "fontStyle",
-    fontColor: "color",
-    color: "color",
-    lineHeight: "lineHeight",
-    letterSpacing: "letterSpacing",
-    textAlign: "textAlign",
-    textTransform: "textTransform",
-    textDecoration: "textDecorationLine",
-    whiteSpace: null,
-    textOverflow: null, // RN handles this with `numberOfLines`, `ellipsizeMode`
-
-
-    // Background
-    bgColor: "backgroundColor",
-    backgroundColor: "backgroundColor",
-
-    // Shadow
-    shadow: "shadowColor", // needs custom mapping for Android/iOS
-    boxShadow: null, // not supported directly in RN
-    shadowColor: 'shadowColor',
-    shadowOffset: 'shadowOffset',
-    shadowRadius: 'shadowRadius',
-    shadowOpacity: 'shadowOpacity',
-    elevation: 'elevation',
-
-    // Opacity / Effects
-    opacity: "opacity",
-    objectFit: "resizeMode", // for Image only
-    overflow: "overflow", // "visible" | "hidden" (RN doesn't support scroll here)
-
-    // Transforms
-    rotate: null, // custom logic via `transform`
-    translateX: null,
-    translateY: null,
-    translate: null,
-    transformOrigin: null,
-
-    // Transition / Animation (not supported natively in RN)
-    transition: null,
-    transitionDuration: null,
-    transitionFunction: null,
-    transitionDelay: null,
-    animation: null,
-    animationDuration: null,
-    animationDelay: null,
-    animationFunction: null,
-    animationFill: null,
-    animationIteration: null,
-
-    // Interactivity
-    pointerEvents: "pointerEvents",
-    userSelect: null, // RN does not support `userSelect`
-    cursor: null,
-    appearance: null,
-    outline: null,
-};
-
-declare const propertiesWithoutCssEquivalent = {
-    px: null,
-    py: null,
-    mx: null,
-    my: null,
-    appearance: null,
-    rotate: null,
-    columns: null,
-    rows: null,
-    borderRadiusTop: null,
-    borderRadiusBottom: null,
-    borderRadiusRight: null,
-    borderRadiusLeft: null,
-    _hover: null,
-    // Border shorthands — no direct RN equivalent, parsed in style.ts
-    border: null,
-    borderTop: null,
-    borderBottom: null,
-    borderLeft: null,
-    borderRight: null,
-    borderX: null,
-    borderY: null,
-    translateX: null,
-    translateY: null,
-    animationIteration: null,
-    colOffset: null, // CSS does not have an equivalent for this
-};
-
-declare const nonPxProperties = {}
-
-declare const allProperties: Record<string, any> = {
-    ...pxProperties,
-    ...nonPxProperties,
-    ...propertiesWithoutCssEquivalent,
-};
-
-export type SizingNumbering =
-    '1rem'
-    | '2rem'
-    | '3rem'
-    | '4rem'
-    | '5rem'
-    | '6rem'
-    | '7rem'
-    | '8rem'
-    | '9rem'
-    | '10rem'
-    | '11rem'
-    | '12rem'
-    | '13rem'
-    | '14rem'
-    | '15rem'
-    | '16rem'
-    | '17rem'
-    | '18rem'
-    | '19rem'
-    | '20rem'
-    | '21rem'
-    | '22rem'
-    | '23rem'
-    | '24rem'
-    | '25rem'
-    | '26rem'
-    | '27rem'
-    | '28rem'
-    | '29rem'
-    | '30rem'
-    | '31rem'
-    | '32rem'
-    | '33rem'
-    | '34rem'
-    | '35rem'
-    | '36rem'
-    | '37rem'
-    | '38rem'
-    | '39rem'
-    | '40rem'
-    | '41rem'
-    | '42rem'
-    | '43rem'
-    | '44rem'
-    | '45rem'
-    | '46rem'
-    | '47rem'
-    | '48rem'
-    | '49rem'
-    | '50rem'
-    | '51rem'
-    | '52rem'
-    | '53rem'
-    | '54rem'
-    | '55rem'
-    | '56rem'
-    | '57rem'
-    | '58rem'
-    | '59rem'
-    | '60rem'
-    | '61rem'
-    | '62rem'
-    | '63rem'
-    | '64rem'
-    | '65rem'
-    | '66rem'
-    | '67rem'
-    | '68rem'
-    | '69rem'
-    | '70rem'
-    | '71rem'
-    | '72rem'
-    | '73rem'
-    | '74rem'
-    | '75rem'
-    | '76rem'
-    | '77rem'
-    | '78rem'
-    | '79rem'
-    | '80rem'
-    | '81rem'
-    | '82rem'
-    | '83rem'
-    | '84rem'
-    | '85rem'
-    | '86rem'
-    | '87rem'
-    | '88rem'
-    | '89rem'
-    | '90rem'
-    | '91rem'
-    | '92rem'
-    | '93rem'
-    | '94rem'
-    | '95rem'
-    | '96rem'
-    | '97rem'
-    | '98rem'
-    | '99rem'
-    | '100rem'
-    | '101rem'
-    | '102rem'
-    | '103rem'
-    | '104rem'
-    | '105rem'
-    | '106rem'
-    | '107rem'
-    | '108rem'
-    | '109rem'
-    | '110rem'
-    | '111rem'
-    | '112rem'
-    | '113rem'
-    | '114rem'
-    | '115rem'
-    | '116rem'
-    | '117rem'
-    | '118rem'
-    | '119rem'
-    | '120rem'
-    | '121rem'
-    | '122rem'
-    | '123rem'
-    | '124rem'
-    | '125rem'
-    | '126rem'
-    | '127rem'
-    | '128rem'
-    | '129rem'
-    | '130rem'
-    | '131rem'
-    | '132rem'
-    | '133rem'
-    | '134rem'
-    | '135rem'
-    | '136rem'
-    | '137rem'
-    | '138rem'
-    | '139rem'
-    | '140rem'
-    | '141rem'
-    | '142rem'
-    | '143rem'
-    | '144rem'
-    | '145rem'
-    | '146rem'
-    | '147rem'
-    | '148rem'
-    | '149rem'
-    | '150rem'
-    | '151rem'
-    | '152rem'
-    | '153rem'
-    | '154rem'
-    | '155rem'
-    | '156rem'
-    | '157rem'
-    | '158rem'
-    | '159rem'
-    | '160rem'
-    | '161rem'
-    | '162rem'
-    | '163rem'
-    | '164rem'
-    | '165rem'
-    | '166rem'
-    | '167rem'
-    | '168rem'
-    | '169rem'
-    | '170rem'
-    | '171rem'
-    | '172rem'
-    | '173rem'
-    | '174rem'
-    | '175rem'
-    | '176rem'
-    | '177rem'
-    | '178rem'
-    | '179rem'
-    | '180rem'
-    | '181rem'
-    | '182rem'
-    | '183rem'
-    | '184rem'
-    | '185rem'
-    | '186rem'
-    | '187rem'
-    | '188rem'
-    | '189rem'
-    | '190rem'
-    | '191rem'
-    | '192rem'
-    | '193rem'
-    | '194rem'
-    | '195rem'
-    | '196rem'
-    | '197rem'
-    | '198rem'
-    | '199rem'
-
-
-export type Numbering0_32 =
-    | 0
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6
-    | 7
-    | 8
-    | 9
-    | 10
-    | 11
-    | 12
-    | 13
-    | 14
-    | 15
-    | 16
-    | 17
-    | 18
-    | 19
-    | 20
-    | 21
-    | 22
-    | 23
-    | 24
-    | 25
-    | 26
-    | 27
-    | 28
-    | 29
-    | 30
-    | 31
-    | 32;
-export type FlexValues = 'none' | 'auto' | 'initial' | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6
-    | 7
-    | 8
-    | 9
-    | 10
-    | 11
-    | 12
-    | 13
-    | 14
-    | 15
-    | 16
-    | 17
-    | 18
-    | 19
-    | 20
 export type Numbering0_12 = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-export type TimingNumbering = 100 | 150 | 200 | 300 | 400 | 500 | 1000
 export type SizingValue = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 export type HighSizingValue = '4xl' | '5xl' | '6xl' | '7xl' | '8xl'
-export type FlexAlignmentsValues = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly'
-export type AlignmentsValues = 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline'
 export type AnimationsValues =
     'fadein'
     | 'fadeout'
@@ -1789,8 +1130,6 @@ export type AnimationsValues =
     | 'zoominleft'
     | 'zoomninright'
     | 'zoominup';
-export type SidesValues = 'top' | 'bottom' | 'right' | 'left';
-export type MeasurementValues = 'full' | 'screen' | 'min' | 'max' | 'auto';
 
 
 export type Various<T> = T;
@@ -1803,10 +1142,6 @@ export type KitsBreakpoint =
     | 'xl'
     | 'xxl'
     | 'xxxl';
-
-export type KitsPlatform = 'ios' | 'android';
-export type KitsOrientation = 'portrait' | 'landscape';
-export type KitsDevice = 'phone' | 'tablet';
 
 export type KitsResponsiveObject<T> = {
     [K in KitsBreakpoint]?: Various<T>;
@@ -2323,45 +1658,6 @@ export type IStyleClasses = ICssStyling & {
     _focus?: ICssStyling;
 };
 
-// Factory/constants/breakpoints.native.ts
-
-declare const GUTTER = 8; // ~0.5rem
-declare const FIELD_MARGIN = 16; // ~1rem
-declare const FIELD_LABEL_MARGIN = 8;
-declare const HELPER_TEXT_MARGIN = 4;
-declare const SPACER = 16;
-
-// packages/types/src/… (e.g. style/index.ts or similar)
-// Breakpoint thresholds (dp) aligned with the web pixel thresholds so that
-// array-style responsive values behave consistently across platforms.
-// base: 0  → phones < 480dp
-// xs:   480 → large phones / phablets
-// sm:   576 → small tablets
-// md:   768 → tablets
-// lg:   992 → large tablets / landscape
-// xl:   1200 → desktops / TVs
-declare const breakpoints = {
-    base: 0,
-    xs: 480,
-    sm: 576,
-    md: 768,
-    lg: 992,
-    xl: 1200,
-    xxl: 1600,
-    xxxl: 1920,
-} as const;
-
-// packages/types/src/style/Responsive/index.ts
-
-// These reflect the keys in your breakpoint map.
-export type Breakpoint = 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl';
-
-// Valid platforms
-export type PlatformKey = 'web' | 'ios' | 'android';
-
-// (Optional) Orientation if you support portrait/landscape
-export type Orientation = 'portrait' | 'landscape';
-
 export type IRadioCheckboxListItem<T = any> = {
     id?: string;
     label?: string;
@@ -2410,27 +1706,6 @@ declare enum EKeyFilter {
     Alphanumeric = "alphanum",
     Email = "email",
 }
-declare enum EDateFormat {
-    dayOfMonthNoLeadingZero = "d", // Day of the month (no leading zero)
-    dayOfMonthLeadingZero = "dd", // Day of the month (with leading zero)
-    abbreviatedMonth = "M", // Abbreviated month name (e.g., Jan)
-    fullMonth = "MM", // Full month name (e.g., January)
-    twoDigitYear = "y", // Two-digit year (e.g., 21)
-    fourDigitYear = "yy", // Four-digit year (e.g., 2021)
-    mm_dd_yy = "mm/dd/yy", // Short date format (e.g., 09/13/2023)
-    MM_dd_yyyy = "MM dd, yy", // Long date format (e.g., September 13, 2023)
-    dayOfWeek = "DD", // Full day of the week (e.g., Tuesday)
-    shortDayOfWeek = "D", // Full day of the week (e.g., Tuesday)
-    dayOfYearNoLeadingZeros = "o", // Day of the year (no leading zeros)
-    dayOfYearThreeDigit = "oo", // Day of the year (three digit)
-    "yy/MM/dd" = "yy/MM/dd", // Custom date format (e.g., 2023/September/13)
-    yy_M_dd = "yy/M/dd", // Custom date format (e.g., 2023/Sep/13)
-    dd_m_yy = "dd/m/yy", // Another custom date format (e.g., 13/9/2023)
-    dd_mm_yy = "dd/mm/yy", // Another custom date format (e.g., 13/09/2023)
-    MM_yy = "MM yy", // Year and month (e.g., September 2023)
-    MM_dd = "MM dd", // Month and day (e.g., September 13)
-    customDate = "",
-}
 
 export interface IButtonProps<IconT> extends IStyleClasses{
     id?:string;
@@ -2463,12 +1738,6 @@ export interface IButtonProps<IconT> extends IStyleClasses{
     testID?: string;
 }
 
-// Internal shared state/logic interface
-export interface IButtonState {
-    isPressed: boolean;
-    isHovered: boolean;
-}
-
 export type ElementProps<T = ViewProps> = IStyleClasses & IKitsAnimation & T & {
     ref?: React$1.Ref<any>;
     onClick?:MouseEventHandler<any> | Function
@@ -2486,13 +1755,6 @@ export type LabelVariant =
     | "link";
 
 export type TextProps = ElementProps<TextProps$1>;
-
-export interface IBoxComponent extends ElementProps {
-    ref?: Ref<ViewProps> | undefined;
-    className?: string;
-    /** Wrap children in ScrollView (native only) */
-    scrollable?: boolean;
-}
 
 export type IFlexComponent<T = ViewProps> = Omit<ElementProps<T>, 'style'> & {
     // ref?: Ref<T> | undefined;
@@ -2541,16 +1803,6 @@ export interface ISVGComponent extends ElementProps<React.SVGProps<SVGSVGElement
     ref?: Ref<SVGSVGElement> | undefined;
 }
 
-export interface NativeModalProps {
-    isOpen?: boolean;
-    onClose?: () => void;
-    children?: ReactNode;
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'full';
-    className?: string;
-}
-
-export type IModalComponent = NativeModalProps & IStyleClasses;
-
 export type ICardComponent<T = any> = ElementProps<T> & {
     footer?: ReactNode | ((props: T) => ReactNode);
     header?: ReactNode | ((props: T) => ReactNode);
@@ -2565,6 +1817,8 @@ export type ICardComponent<T = any> = ElementProps<T> & {
     };
     localProps?:T;
     ref?: Ref<T> | undefined;
+    /** Press handler — wraps card in Pressable on native, adds onClick on web */
+    onPress?: () => void;
 } & IStyleClasses
 
 export type IImageComponent = IStyleClasses & ImageProps & {
@@ -2773,18 +2027,22 @@ export interface ILabelProps {
     elementId: string; // kept for API parity, unused on native
     as?: ITextComponent['as'] | IHeadingComponent['as']
     required?: boolean;
+    /** Element-level style from theme.components[name].elements.label */
+    style?: Record<string, any>;
 }
 
 export interface IKitsContainer
     extends IFormSingleElement,
         Omit<
             ElementProps,
-            "onChange" | "onBlur" | "onFocus" | "value" | "defaultValue" | "ref" | "style" | "label"
+            "onChange" | "onBlur" | "onFocus" | "value" | "defaultValue" | "ref" | "style" | "label" | "color"
         >,
         IStyleClasses {
     children?:ReactNode
     containerStyle?: IStyleClasses;
     additionalClassName?: string;
+    /** Per-element styles (IStyleClasses) passed from the parent form input component */
+    elementStyles?: Record<string, Record<string, any>>;
 }
 
 export interface IEditableProps {
@@ -2868,7 +2126,7 @@ export interface IGlobalEvents {
     onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void; // Used mostly on ScrollView/FlatList
 }
 
-export interface IKitsInputTextBase extends IFormSingleElement, IGlobalEvents {
+export interface IKitsInputTextBase extends  Omit<IFormSingleElement, 'onFocus'>, IGlobalEvents {
     value?: string;
 
     placeholder?: string;
@@ -2911,7 +2169,7 @@ export interface IKitsInputText extends IKitsInputTextBase {
     keyboardNavId?: string;
 }
 
-export interface IKitsInputTextareaBase extends IFormSingleElement,IGlobalEvents {
+export interface IKitsInputTextareaBase extends  Omit<IFormSingleElement, 'onFocus'>,IGlobalEvents {
     value?: string;
 
     rows?: number;
@@ -2992,11 +2250,6 @@ export interface IKitsInputCalendar<T = any> extends IFormSingleElement {
     };
 }
 
-export interface downloadableFileResponse {
-  url?: string | null;
-  file_name?: string | null;
-}
-
 export type FetchSuccess<T = any, Y = {}, X = {}> = {
   success: true;
   data: T;
@@ -3012,55 +2265,6 @@ export type FetchError = {
 
 export type ServerResponse<T = any, Y = {}, X = {}> = FetchSuccess<T, Y, X> | FetchError;
 
-export type FetchTablePaginationData = {
-  requested_page_size: number;
-  actual_page_size: number;
-  page_index: number;
-  page_count: number;
-  total: number;
-};
-export type FetchTableDataRes<T> = T[];
-
-declare type Booleanish = boolean | 'true' | 'false';
-declare type Numberish = number | string;
-declare type Nullable<T = void> = T | null | undefined;
-
-export interface FormTarget<T = any> {
-    name: string;
-    id: string;
-    value: Nullable<T>;
-    checked?: boolean;
-    [key: string]: any;
-}
-
-export interface FormBooleanTarget {
-    name: string;
-    id: string;
-    value: boolean;
-    checked: boolean;
-    [key: string]: any;
-}
-
-export interface FormEvent<T = any, E = React$1.SyntheticEvent> {
-    originalEvent?: E;
-    value: Nullable<T>;
-    checked?: boolean;
-    stopPropagation(): void;
-    preventDefault(): void;
-    target: FormTarget<T>;
-}
-
-export interface FormBooleanEvent<E = React$1.SyntheticEvent> {
-    originalEvent?: E;
-    value: boolean;
-    checked: boolean;
-    stopPropagation(): void;
-    preventDefault(): void;
-    target: FormBooleanTarget;
-}
-
-export type Timeout = ReturnType<typeof setTimeout> | null
-
 // ─── Inlined tree types (originally from @lmb-it/kitsconcertomobile) ────
 
 export type ExpandedKeys = { [key: string]: boolean };
@@ -3069,8 +2273,6 @@ export type TreeCheckboxSelectionKeyType = {
     checked: boolean;
     partialChecked?: boolean;
 };
-
-export type TreeCheckboxSelectionKeys = TreeCheckboxSelectionKeyType;
 
 export interface TreeSelectionEvent {
     originalEvent: React$1.SyntheticEvent;
@@ -3146,21 +2348,6 @@ export type TreeNodeTemplateOptions = {
     element: JSX.Element;
     props: TreeProps;
     expanded: boolean;
-}
-
-export interface IToolbarProps<T> {
-    props: ITreeViewProps<T>;
-    filterValue: string;
-    setFilterValue: (val: string) => void;
-    treeRef: TreeRef | null;
-    selectedNode: TreeNode<ITreeItem<T>> | null;
-    expandAll: () => void;
-    collapseAll: () => void;
-    onAddNode: (key?: any) => void;
-    onAddNodeItem: (key?: any) => void;
-    onDeleteNode: (key?: any) => void;
-    onEditNode: (key?: any) => void;
-    build: () => void;
 }
 
 export interface ServerMethod {
@@ -3313,41 +2500,6 @@ export interface ITreeViewProps<T=any>
     hideToolbar?: boolean;
 }
 
-export interface IRef {
-    value?: string | number | string[] | number[] | null;
-    setValue?: (value: string | number | string[] | number[] | null) => void;
-}
-export interface ITreeSelectNode {
-    key: string;
-    label?: string;
-    data?: any;
-    icon?: React.ReactNode;
-
-    children?: ITreeSelectNode[];
-
-    selectable?: boolean;
-    disabled?: boolean;
-
-    style?: any;
-    className?: string;
-}
-
-export interface TreeViewProps {
-    nodes: ITreeSelectNode[];
-    selectionMode?: 'single' | 'multiple' | 'checkbox';
-    value?: any;
-    expandedKeys?: Record<string, boolean>;
-
-    filter?: boolean;
-    filterBy?: string;
-
-    nodeTemplate?: (node: ITreeSelectNode) => ReactNode;
-
-    onChange?: (e: ChangeEvent<{ value: any }>) => void;
-    onToggle?: (e: ChangeEvent<{ value: any }>) => void;
-}
-
-
 // 1. Data Definitions
 export type IListItem = Record<string, any> | string | number;
 
@@ -3431,20 +2583,6 @@ export interface ITreeSelectCore<S, P> extends ISelectCore<S, P> {
     emptyMessage?: string;
 }
 
-// Generic Type for the Hook
-export type ISelect = ISelectCore<any, any>;
-
-export interface IContextValues<T=any> {
-    onChange: (e: any, item?: any) => void;
-    selectedValue: any;
-    list: ITreeItem<T>[];
-    labelKey: string;
-    valueKey: string;
-    hideError?: boolean;
-    outputValueKey: string;
-    childrenKey: string | null;
-}
-
 export interface ISelectType {
     shape?: "cascade" | "dropdown" | "multiselect" | "autocomplete" | "listBox" | "treeSelect"
 }
@@ -3465,120 +2603,6 @@ export type ISelectElement =
     | IListBoxSelect
     | ITreeSelect;
 
-export type IAddressSearchResults = (
-  pSearchTerm: string,
-  pCountryISO?: string
-) => Promise<
-  AxiosResponse<{
-    result: {
-      confidence: string
-      more_results_available: boolean
-      suggestions?: {
-        global_address_key: string
-        text: string
-        format: string
-      }[]
-    }
-  }>
->
-export type ICountrySearchResults = (pCountryISO?:string) => Promise<AxiosResponse<{
-    result: {
-        country_iso_3: string;
-        country_name: string;
-        datasets: {
-            id: string;
-            name: string;
-        }[]
-    }
-}>>
-export type IEmailSearchResults = (pEmail:string) => Promise<AxiosResponse<{
-    result: {
-        result: {
-            verbose_output: string;
-            email: string;
-            confidence: string;
-        },
-        metadata: {
-            domain_detail: {
-                type: string;
-            }
-        }
-    }
-}>>
-export type IAddressExperianFormat = {
-    global_address_key: string;
-    confidence: string;
-    address: {
-        address_line_1: string;
-        address_line_2: string;
-        address_line_3: string;
-        locality: string;
-        region: string;
-        postal_code: string;
-        country: string;
-    },
-    components: {
-        language: string;
-        country_name: string;
-        country_iso_3: string;
-        country_iso_2: string;
-        postal_code: {
-            full_name: string;
-            primary: string;
-        },
-        building: {
-            building_number: string;
-        },
-        street: {
-            full_name: string;
-            name: string;
-            type: string;
-        },
-        locality: {
-            region: {
-                name: string;
-                code: string;
-            },
-            town: {
-                name: string;
-            }
-        }
-    }
-}
-export type IAddressFormatResults = (pGlobalAddressKey:string) => Promise<AxiosResponse<{
-    result: IAddressExperianFormat
-}>>
-export type IPhoneValidationResults = (pPhoneNumber: any, pCountryCode?:string) => Promise<AxiosResponse<{
-    result: {
-        number: string;
-        validated_phone_number: string;
-        formatted_phone_number: string;
-        phone_type: string;
-        confidence: string;
-        ported_date: string;
-        disposable_number: string;
-    },
-    metadata: {
-        phone_detail: {
-            original_operator_name: string;
-            original_network_status: string;
-            original_home_network_identity: string;
-            original_country_prefix: string;
-            original_country_name: string;
-            original_country_iso: string;
-            operator_name: string;
-            network_status: string;
-            home_network_identity: string;
-            country_prefix: string;
-            country_name: string;
-            country_iso: string;
-            is_ported: string;
-            cache_value_days: string;
-            date_cached: string;
-        }
-    }
-}>>
-
 export type IAddressFormat = {
     formatted_address?: string;
     city?: string;
@@ -3592,52 +2616,6 @@ export interface IKitsInputLocation
     provider?: "google" | "experian";
     api_key?: string;
     forceSelection?: boolean;
-}
-
-
-
-export interface ILocationDetailsResponse {
-    result: {
-        address_components: {
-            long_name: string;
-            short_name: string;
-            types: string[];
-        }[];
-        formatted_address: string;
-        // add other fields as necessary
-    };
-    // add other fields as necessary
-}
-
-export interface ILocationResponse {
-    predictions: Prediction[];
-    status: string;
-}
-
-export interface Prediction {
-    description: string;
-    matched_substrings: MatchedSubString[];
-    place_id: string;
-    reference: string;
-    structured_formatting: StructuredFormatting;
-    terms: Term[];
-    types: string[];
-}
-
-export interface MatchedSubString {
-    length: number;
-    offset: number;
-}
-
-export interface StructuredFormatting {
-    main_text: string;
-    main_text_matched_substrings: MatchedSubString[];
-    secondary_text: string;
-}
-
-export interface Term {
-    offset: number;
-    value: string;
 }
 
 /** Structured phone output when outputFormat is "object" */
@@ -3688,17 +2666,6 @@ export interface IKitsPhoneInput
     }>;
 }
 
-export interface IKitsInputRating extends Omit<IFormSingleElement, 'leftAddon' | 'rightAddon' | 'style'> {
-    value?: any;
-    starsNumber?: number;
-    readOnly?: boolean;
-    cancelIcon?: ReactElement;
-    onIcon?: ReactElement;
-    offIcon?: ReactElement;
-    onChange?: (event: FormEvent<number>) => void;
-    containerStyle?:IStyleClasses
-}
-
 export interface IKitsInputColorPicker extends IFormSingleElement {
     /** Controlled value (string or object depending on format) */
     value?: any;
@@ -3746,19 +2713,6 @@ export interface ISliderProps extends ElementProps, IStyleClasses {
     onChange?(e: { value: number | [number, number] }): void;
     onSlideEnd?(e: SliderChangeEvent): void;
 }
-
-declare const fileTypeIcon:Record<string, any> = {
-    pdf: FaFilePdf,
-    mp3: FaFileAudio,
-    wav: FaFileAudio,
-    csv: FaFileCsv,
-    png: FaFileImage,
-    jpg: FaFileImage,
-    jpeg: FaFileImage,
-    gif: FaFileImage,
-    js: IoLogoJavascript,
-    unknown: AiFillFileUnknown,
-};
 
 declare const imagesTypes = {
     "png": "image/png",
@@ -4991,177 +3945,6 @@ export type FileTypeMap = typeof filesTypes;
 export type IImagesExtTypeKeys = keyof ImageTypeMap;
 export type IFilesExtTypeKeys = keyof FileTypeMap;
 
-// If you still need the old names:
-export type IMemes = IImagesExtTypeKeys | IFilesExtTypeKeys;
-
-export type ISelectedFileType = { uri: string } | File | string;
-export type ISelectedFile = { name: string; ext: string; file: ISelectedFileType };
-
-/* =========================
-   INTERNAL HELPERS
-   ========================= */
-
-export type MimeOrArray = string | readonly string[];
-
-declare const toArray = (v: MimeOrArray): string[] => (Array.isArray(v) ? [...v] : [v as unknown as string]);
-
-/**
- * Returns all mime candidates for an ext (new API)
- */
-declare const getTypes = (ext: IFilesExtTypeKeys | IImagesExtTypeKeys): string[] => {
-    const key = String(ext).toLowerCase() as IMemes;
-
-    if (key in imagesTypes) return toArray(imagesTypes[key as IImagesExtTypeKeys]);
-    if (key in filesTypes) return toArray(filesTypes[key as IFilesExtTypeKeys]);
-
-    return [];
-};
-
-/**
- * OLD BEHAVIOR: returns ONE string (preferred mime)
- * Keeps the rest of your components unchanged.
- */
-declare const getMeme = (ext: IFilesExtTypeKeys | IImagesExtTypeKeys): string => {
-    return getTypes(ext)[0] ?? "";
-};
-
-/**
- * OLD BEHAVIOR: alias of getMeme (backward compatible)
- */
-declare const getType = (ext: IFilesExtTypeKeys | IImagesExtTypeKeys): string => {
-    return getMeme(ext);
-};
-
-declare const toMemes = (ext: (IFilesExtTypeKeys | IImagesExtTypeKeys)[])=>{
-
-    let _accepted: string[] = [];
-
-    ext.forEach((value)=>{
-        getTypes(value).forEach(type=>{
-            _accepted.push(type)
-        })
-
-    })
-
-    return _accepted;
-}
-/* =========================
-   ACCEPTED LISTS
-   ========================= */
-
-// Old “ext lists” are no longer needed for key typing, but keep if your code imports them
-declare const imagesExt = Object.keys(imagesTypes) as IImagesExtTypeKeys[];
-declare const filesExt = Object.keys({ ...filesTypes, ...imagesTypes }) as IMemes[];
-
-// Old “meme lists”: these are FLAT string[] lists
-declare const imagesMemes = imagesExt.flatMap((k) => getTypes(k));
-declare const filesMemes = filesExt.flatMap((k) => getTypes(k));
-
-/* =========================
-   VALIDATION
-   ========================= */
-
-declare const checkExtAgainstAccepted = (filename: string, accepted: string[]) => {
-    if (accepted.length === 0) return true;
-
-    const ext = filename.split(".").pop();
-    const fileExt = ext ? ext.toLowerCase() : "";
-
-    // validate ext exists in our maps
-    if (!(fileExt in imagesTypes) && !(fileExt in filesTypes)) return false;
-
-    // NEW: allow multiple mime candidates
-    const mimeCandidates = getTypes(fileExt as IMemes);
-
-    return mimeCandidates.some((m) => accepted.includes(m));
-};
-
-declare function convertSize(sizeInBytes:number) {
-    const KB = 1024;
-    const MB = 1024 * KB;
-
-    if (sizeInBytes < KB) {
-
-        return `${sizeInBytes} Bytes`;
-    } else if (sizeInBytes < MB) {
-        return `${(sizeInBytes / KB).toFixed(2)} KB`;
-    } else {
-        return `${(sizeInBytes / MB).toFixed(2)} MB`;
-    }
-}
-declare const fileValidation = (props:
-                                 { min?: number, max?: number, acceptedTypes:string[] | string, minSize?:number, maxSize?:number } = {min: 1, max: 1, acceptedTypes:'*', minSize:0, maxSize:5242880}) => yup.mixed()
-  .test('fileSizeMax', `File size should be less that ${convertSize(props.maxSize ?? 0)}`,  (value) =>{
-
-      const checkFile = (file:any)=>{
-          if(file instanceof File){
-              if(!props.minSize && props.maxSize){
-                  return file.size <= props.maxSize
-              }
-          }
-          return true;
-      }
-
-      if(Array.isArray(value)){
-
-          return value.every(checkFile);
-      }else{
-          return checkFile(value);
-      }
-  })
-  .test('fileSizeMin', `File size should be over ${convertSize(props.minSize ?? 0)}` ,  (value) =>{
-      const checkFile = (file:any)=>{
-          if(file instanceof File){
-              if(props.minSize && !props.maxSize){
-                  return file.size >= props.minSize
-              }
-
-          }
-          return true;
-      }
-
-      if(Array.isArray(value)){
-
-          return value.every(checkFile);
-      }else{
-          return checkFile(value);
-      }
-  })
-  .test('fileType', `File type not accepted` ,  (value) =>{
-      const checkFile = (file:any)=>{
-          if(props.acceptedTypes == '*'){
-              return true;
-          }
-          if(file instanceof File){
-              const fileExtension = file.name.split('.').pop() ?? '';
-              return props.acceptedTypes.includes(fileExtension.toLowerCase());
-          }
-          return true;
-      }
-
-      if(Array.isArray(value)){
-
-          return value.every(checkFile);
-      }else{
-          return checkFile(value);
-      }
-  })
-  .test('fileLengthMin', `The minimum files allowed is ${props.min}` ,  (value) =>{
-      if(Array.isArray(value) && props.min){
-
-          return value.length >= props.min;
-      }else{
-          return true;
-      }
-  })
-  .test('fileLengthMax', `The maximum files allowed is ${props.max}` ,  (value) =>{
-      if(Array.isArray(value) && props.max){
-          return value.length <= props.max;
-      }else{
-          return true;
-      }
-  })
-
 export type IFileUploaderTypes = "File" | "Image";
 
 export type File$1 = {
@@ -5212,6 +3995,10 @@ export interface IFileUploader<T = File$1>
         ClickDragLabel?: string;
         selectedFile?: string;
     };
+    /** Width of the uploader preview area. Defaults to 'auto' (full width). */
+    previewWidth?: string | number;
+    /** Height of the uploader preview area. Defaults to 'auto'. */
+    previewHeight?: string | number;
     /** Custom render function for the uploader UI */
     children?: FileUploaderTemplate<T>;
 }
@@ -5273,7 +4060,7 @@ export interface IAlertComponent {
 export interface IAlertProps {
     status?: "error" | "success" | "warning" | "info" | "brand";
     variant?: "subtle" | "solid" | "left-accent" | "top-accent";
-    children: React$1.ReactNode;
+    children?: React$1.ReactNode | string;
     className?: string;
 
     title?: string;
@@ -5486,21 +4273,6 @@ export type ConfirmDialogProps = {
     unstyled?: boolean;
 }
 
-/**
- * Object returned by the {@link confirmDialog} method.
- */
-export interface ConfirmDialogReturn {
-    /**
-     * Used to show the dialog.
-     */
-    show(): void;
-    /**
-     * Used to hide the dialog.
-     */
-    hide(): void;
-}
-
-
 export type Types = Severity;
 
 export interface IDialogButton {
@@ -5555,11 +4327,6 @@ export interface IDialogProps
     icon?: string | ReactNode;
     header?:ReactNode;
     footer?:ReactNode;
-}
-
-export interface IDialogRef {
-    open: (props: Omit<IDialogProps, "visible">) => void;
-    close: () => void;
 }
 
 export interface IDialogState extends IDialogProps {
@@ -5683,114 +4450,6 @@ export interface IDetailListProps<T extends Record<string, any> = any> {
     headerActions?: ReactNode;
     /** Inject extra buttons for a specific row, rendered to the left of the Edit button */
     itemActions?: (item: IDetailItem<T>, row: T) => ReactNode;
-}
-
-export type ColorsType =
-  | 'Amber'
-  | 'Blue Grey'
-  | 'Blue'
-  | 'Brown'
-  | 'Cyan'
-  | 'Deep Orange'
-  | 'Deep Purple'
-  | 'Green'
-  | 'Grey'
-  | 'Indigo'
-  | 'Light Blue'
-  | 'Light Green'
-  | 'Lime'
-  | 'Orange'
-  | 'Pink'
-  | 'Purple'
-  | 'Red'
-  | 'Teal'
-  | 'Yellow'
-
-export type Shades = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
-
-export type Colors = { [key in ColorsType]: { [shade in Shades]: string } }
-
-export interface IModalFormProps {
-  isOpen: boolean
-  onClose: () => void
-}
-export interface IStatisticsProps {
-  stats: IStats[]
-}
-export interface IWidgetChartProp<T> {
-  //<Widget.BarChart
-  data: T
-  type: 'BarChart' | 'LineChart' | 'PieChart'| 'RadarChart'| 'PolarAreaChart' | 'DoughnutChart'
-  label: string
-  id?: string
-  info?: string
-  aspectRatio?: number
-  height?: string;
-  enableExportButton?: boolean
-  isLoading?: boolean
-  colors: {
-    labels: string
-    gridLines: string
-  }
-  containerProps?:IContainerProps;
-  horizontal?:boolean;
-  isDarkMode: boolean
-  centerDisplay?: (total: number) => string
-  enableMultipleDatasets?: boolean
-}
-
-export interface ChartData<T> {
-  labels?: any[];
-  xLabels?: any[];
-  yLabels?: any[];
-  datasets: any[];
-}
-
-export type IBarChartProps = IWidgetData<ChartData<'bar'>>
-export type ILineChartProps = IWidgetData<ChartData<'line'>>
-export type IPieChartProps = IWidgetData<ChartData<'pie'>>
-export type IRadarChartProps = IWidgetData<ChartData<'radar'>>
-export type IPolarAreaChartProps = IWidgetData<ChartData<'polarArea'>>
-export type IDoughnutChartProps = IWidgetData<ChartData<'doughnut'>>
-
-export type IOneOfTypes = IBarChartProps | ILineChartProps | IPieChartProps | IRadarChartProps | IDoughnutChartProps | IPolarAreaChartProps
-
-export type IWidgetBarIncomingProp = IWidgetChartProp<IBarChartProps> //<Widget.Bar
-export type IWidgetLineIncomingProp = IWidgetChartProp<ILineChartProps> //<Widget.Line
-export type IWidgetPieIncomingProp = IWidgetChartProp<IPieChartProps> //<Widget.Pie
-export type IWidgetRadarIncomingProp = IWidgetChartProp<IRadarChartProps> //<Widget.Pie
-export type IWidgetPolarAreaIncomingProp = IWidgetChartProp<IPolarAreaChartProps> //<Widget.Pie
-export type IWidgetDoughnutIncomingProp = IWidgetChartProp<IDoughnutChartProps> //<Widget.Doughnut
-
-export type IWidgetChartContextProps = IWidgetChartProp<IOneOfTypes> //<Widget
-
-export interface IStats {
-  label: string
-  stats: {
-    label: string
-    value: number
-  }[]
-}
-
-export interface settings1 {
-  [x: string]: any
-}
-
-export interface settings2 {
-  label: string
-  value: settings1
-}
-
-export interface IWidgetData<T> {
-  data: T
-  stats?: IStats[]
-  datasets?: {
-    fixedOptions: settings1
-    variableOptions: settings2[]
-  }
-  settings?: {
-    [x: string]: any
-  }
 }
 
 // Base, platform-agnostic
@@ -6134,16 +4793,6 @@ export type IconName =
     | `pi pi-${string}`
 
 /**
- * Optional cross-platform injection types
- * (Web passes its real types; Native can use `any`)
- */
-export interface INonCrossPlatformTypes {
-    MenuItem?: any; // Web: MenuItem from primereact/menuitem
-    Theme?: any;    // Web: PrimeReactPTOptions
-    Element?: any;  // Web: JSX.Element
-}
-
-/**
  * Language structure
  */
 export type ILanguage = {
@@ -6304,50 +4953,115 @@ export interface IKitsThemeLineHeights {
     [key: string]: number;
 }
 
-export type ComponentSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+// ─────────────────────────────────────────────────────────────
+// Element Slot System
+//
+// Each component config is composed of element slots (root, label,
+// container, etc.). Every slot accepts { props?, style? }.
+//
+// HOW TO ADD A NEW ELEMENT SLOT:
+//   1. Add the key with type `IElementSlotConfig` to the relevant
+//      interface below (IFormElementSlots, IButtonElementSlots, etc.)
+//   2. In the component, read `elementStyles[key]` and apply it
+//      to the correct DOM/RN element
+//   3. Document the new slot in UML/Claude/kitsconcerto_doc.md
+// ─────────────────────────────────────────────────────────────
 
-/** Per-component theme config: behavioral prop defaults + visual style overrides */
-export interface IComponentThemeConfig<P = Record<string, any>> {
-    /** Default prop values (e.g. rounded, size, severity). User props always win. */
+/** Config for a single element slot — accepts both props and style */
+export interface IElementSlotConfig<P = Record<string, any>> {
+    /** Default prop values for this element. User props always win. */
     props?: Partial<P>;
-    /** CSS style overrides applied to the component root (borderRadius, fontSize, etc.). */
-    style?: Record<string, any>;
+    /** CSS style overrides (IStyleClasses) for this element. */
+    style?: IStyleClasses;
 }
+
+/** Element slots for form inputs wrapped in KitsContainer */
+export interface IFormElementSlots {
+    /** The input element itself — props (inputSize, etc.) + style */
+    root?: IElementSlotConfig;
+    /** Outermost wrapping Flex (KitsContainer root) */
+    container?: IElementSlotConfig;
+    /** The label element */
+    label?: IElementSlotConfig;
+    /** The input group wrapper (Flex around leftAddon + input + rightAddon) */
+    inputGroup?: IElementSlotConfig;
+    /** Left addon wrapper */
+    leftAddon?: IElementSlotConfig;
+    /** Right addon wrapper */
+    rightAddon?: IElementSlotConfig;
+    /** Helper text element */
+    helperText?: IElementSlotConfig;
+    /** Error message element */
+    error?: IElementSlotConfig;
+}
+
+/** Element slots for Button */
+export interface IButtonElementSlots {
+    /** The button element itself */
+    root?: IElementSlotConfig;
+    /** The icon inside the button */
+    icon?: IElementSlotConfig;
+    /** The text label inside the button */
+    label?: IElementSlotConfig;
+}
+
+/** Element slots for Card */
+export interface ICardElementSlots {
+    /** The card root element */
+    root?: IElementSlotConfig;
+    /** Card header area */
+    header?: IElementSlotConfig;
+    /** Card title text */
+    title?: IElementSlotConfig;
+    /** Card body content area */
+    content?: IElementSlotConfig;
+    /** Card footer area */
+    footer?: IElementSlotConfig;
+}
+
+/**
+ * Per-component theme config — composed entirely of element slots.
+ * Each slot accepts `{ props?, style? }`.
+ * The `root` slot replaces the old flat `props` / `style`.
+ *
+ * @typeParam E — Element slots shape (IFormElementSlots, IButtonElementSlots, etc.)
+ */
+export type IComponentThemeConfig<E = Record<string, IElementSlotConfig>> = Partial<E>;
 
 /** Typed component defaults map */
 export interface IKitsComponentDefaults {
-    Button?: IComponentThemeConfig<{ rounded?: boolean; size?: string; severity?: string; outlined?: boolean; raised?: boolean }>;
+    Button?: IComponentThemeConfig<IButtonElementSlots>;
 
     // Base groups — apply to all members of the group
-    Input?: IComponentThemeConfig<{ inputSize?: string }>;
-    Select?: IComponentThemeConfig;
+    Input?: IComponentThemeConfig<IFormElementSlots>;
+    Select?: IComponentThemeConfig<IFormElementSlots>;
 
     // Input group members (inherit from Input)
-    InputText?: IComponentThemeConfig<{ inputSize?: string }>;
-    InputNumber?: IComponentThemeConfig<{ inputSize?: string }>;
-    InputMask?: IComponentThemeConfig<{ inputSize?: string }>;
-    InputPassword?: IComponentThemeConfig<{ inputSize?: string }>;
-    Textarea?: IComponentThemeConfig;
-    Datepicker?: IComponentThemeConfig<{ inputSize?: string }>;
-    ColorPicker?: IComponentThemeConfig<{ inputSize?: string }>;
-    PhoneInput?: IComponentThemeConfig<{ inputSize?: string }>;
+    InputText?: IComponentThemeConfig<IFormElementSlots>;
+    InputNumber?: IComponentThemeConfig<IFormElementSlots>;
+    InputMask?: IComponentThemeConfig<IFormElementSlots>;
+    InputPassword?: IComponentThemeConfig<IFormElementSlots>;
+    Textarea?: IComponentThemeConfig<IFormElementSlots>;
+    Datepicker?: IComponentThemeConfig<IFormElementSlots>;
+    ColorPicker?: IComponentThemeConfig<IFormElementSlots>;
+    PhoneInput?: IComponentThemeConfig<IFormElementSlots>;
 
     // Select group members (inherit from Select)
-    DropdownSelect?: IComponentThemeConfig;
-    MultiSelect?: IComponentThemeConfig;
-    TreeSelect?: IComponentThemeConfig;
-    AutoComplete?: IComponentThemeConfig;
-    ListBox?: IComponentThemeConfig;
-    CascadeSelect?: IComponentThemeConfig;
+    DropdownSelect?: IComponentThemeConfig<IFormElementSlots>;
+    MultiSelect?: IComponentThemeConfig<IFormElementSlots>;
+    TreeSelect?: IComponentThemeConfig<IFormElementSlots>;
+    AutoComplete?: IComponentThemeConfig<IFormElementSlots>;
+    ListBox?: IComponentThemeConfig<IFormElementSlots>;
+    CascadeSelect?: IComponentThemeConfig<IFormElementSlots>;
 
     // Form container (wraps all form elements)
-    FormContainer?: IComponentThemeConfig;
+    FormContainer?: IComponentThemeConfig<IFormElementSlots>;
 
     // Standalone
-    Card?: IComponentThemeConfig<{ variant?: string; size?: string }>;
-    Switch?: IComponentThemeConfig;
-    Checkbox?: IComponentThemeConfig;
-    Radio?: IComponentThemeConfig;
+    Card?: IComponentThemeConfig<ICardElementSlots>;
+    Switch?: IComponentThemeConfig<IFormElementSlots>;
+    Checkbox?: IComponentThemeConfig<IFormElementSlots>;
+    Radio?: IComponentThemeConfig<IFormElementSlots>;
 
     [componentName: string]: IComponentThemeConfig<any> | undefined;
 }
@@ -6454,281 +5168,11 @@ export interface IMainContextValues<TMenuItem = any, TComponent = JSX.Element> {
     appendToHeader?: (element: ReactNode) => void;
 }
 
-export type INativeProps<T> = T & {
-    className?:string;
-    as?:string;
-    style?:any,
-    _extra?:{className:string}
-}
-export interface IResponsiveElement<T> {
-    cssProps: IStyleClasses;
-    nativeProps: INativeProps<T>
-    additionalStyles?: IStyleClasses;
-    additionalClasses?: string;
-    scrollable?: boolean;
-    entering?: EnteringAnimation;
-    exiting?: ExitingAnimation;
-    as?:
-        | "Skeleton"
-        | "VStack"
-        | "HStack"
-        | "Center"
-        | "Heading"
-        | "Text"
-        | "Grid"
-        | "GridItem"
-        | "Card"
-        | "Sidebar"
-        | "Button"
-        | "ButtonGroup"
-        | "Image"
-        | "List"
-        | "ListItem"
-        | "a"
-        | "Svg"
-        | "Box"
-        | "Router"
-        | "span"
-        | "Pressable"
-        | "Modal"
-        | "AlertDialog"
-        | "Toast"
-        | "Divider"
-        | "Toolbar"
-        | "TabView"
-        | "Stepper"
-        | "Timeline"
-        | "ScrollView";
-    ref?: any;
-}
-
 export type UseDisclosureReturnType = {
     isOpen: boolean;
     onOpen: () => void;
     onClose: () => void;
     onToggle: () => void;
-};
-
-declare const defaultSeverityTheme: ISeverityThemeMap = {
-    success: {
-        solid: 'green.500',
-        bgTint: 'green.50',
-        iconFg: 'green.600',
-        iconBg: 'green.100',
-        text: 'green.700',
-        border: 'green.500',
-    },
-    info: {
-        solid: 'blue.500',
-        bgTint: 'blue.50',
-        iconFg: 'blue.600',
-        iconBg: 'blue.100',
-        text: 'blue.700',
-        border: 'blue.500',
-    },
-    warning: {
-        solid: 'yellow.500',
-        bgTint: 'yellow.50',
-        iconFg: 'yellow.600',
-        iconBg: 'yellow.100',
-        text: 'yellow.700',
-        border: 'yellow.500',
-    },
-    danger: {
-        solid: 'red.500',
-        bgTint: 'red.50',
-        iconFg: 'red.600',
-        iconBg: 'red.100',
-        text: 'red.700',
-        border: 'red.500',
-    },
-    help: {
-        solid: 'teal.500',
-        bgTint: 'teal.50',
-        iconFg: 'teal.600',
-        iconBg: 'teal.100',
-        text: 'teal.700',
-        border: 'teal.500',
-    },
-    secondary: {
-        solid: 'gray.500',
-        bgTint: 'gray.50',
-        iconFg: 'gray.600',
-        iconBg: 'gray.100',
-        text: 'gray.700',
-        border: 'gray.400',
-    },
-    brand: {
-        solid: 'cyan.500',
-        bgTint: 'cyan.50',
-        iconFg: 'cyan.600',
-        iconBg: 'cyan.100',
-        text: 'cyan.700',
-        border: 'cyan.500',
-    },
-};
-
-declare const defaultTheme: IKitsTheme = {
-    colors: {
-        blue: {
-            50: '#EFF6FF', 100: '#DBEAFE', 200: '#BFDBFE', 300: '#93C5FD', 400: '#60A5FA',
-            500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8', 800: '#1E40AF', 900: '#1E3A8A',
-        },
-        green: {
-            50: '#F0FDF4', 100: '#DCFCE7', 200: '#BBF7D0', 300: '#86EFAC', 400: '#4ADE80',
-            500: '#22C55E', 600: '#16A34A', 700: '#15803D', 800: '#166534', 900: '#14532D',
-        },
-        red: {
-            50: '#FEF2F2', 100: '#FEE2E2', 200: '#FECACA', 300: '#FCA5A5', 400: '#F87171',
-            500: '#EF4444', 600: '#DC2626', 700: '#B91C1C', 800: '#991B1B', 900: '#7F1D1D',
-        },
-        yellow: {
-            50: '#FEFCE8', 100: '#FEF9C3', 200: '#FEF08A', 300: '#FDE047', 400: '#FACC15',
-            500: '#EAB308', 600: '#CA8A04', 700: '#A16207', 800: '#854D0E', 900: '#713F12',
-        },
-        orange: {
-            50: '#FFF7ED', 100: '#FFEDD5', 200: '#FED7AA', 300: '#FDBA74', 400: '#FB923C',
-            500: '#F97316', 600: '#EA580C', 700: '#C2410C', 800: '#9A3412', 900: '#7C2D12',
-        },
-        purple: {
-            50: '#FAF5FF', 100: '#F3E8FF', 200: '#E9D5FF', 300: '#D8B4FE', 400: '#C084FC',
-            500: '#8B5CF6', 600: '#7C3AED', 700: '#6D28D9', 800: '#5B21B6', 900: '#4C1D95',
-        },
-        teal: {
-            50: '#F0FDFA', 100: '#CCFBF1', 200: '#99F6E4', 300: '#5EEAD4', 400: '#2DD4BF',
-            500: '#14B8A6', 600: '#0D9488', 700: '#0F766E', 800: '#115E59', 900: '#134E4A',
-        },
-        cyan: {
-            50: '#ECFEFF', 100: '#CFFAFE', 200: '#A5F3FC', 300: '#67E8F9', 400: '#22D3EE',
-            500: '#06B6D4', 600: '#0891B2', 700: '#0E7490', 800: '#155E75', 900: '#164E63',
-        },
-        pink: {
-            50: '#FDF2F8', 100: '#FCE7F3', 200: '#FBCFE8', 300: '#F9A8D4', 400: '#F472B6',
-            500: '#EC4899', 600: '#DB2777', 700: '#BE185D', 800: '#9D174D', 900: '#831843',
-        },
-        gray: {
-            50: '#F9FAFB', 100: '#F3F4F6', 200: '#E5E7EB', 300: '#D1D5DB', 400: '#9CA3AF',
-            500: '#6B7280', 600: '#4B5563', 700: '#374151', 800: '#1F2937', 900: '#111827',
-        },
-        indigo: {
-            50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE', 300: '#A5B4FC', 400: '#818CF8',
-            500: '#6366F1', 600: '#4F46E5', 700: '#4338CA', 800: '#3730A3', 900: '#312E81',
-        },
-    },
-    semanticTokens: {
-        light: {
-            primary: '#20aab0',
-            secondary: 'gray.600',
-            success: 'green.500',
-            danger: 'red.500',
-            warning: 'yellow.500',
-            info: 'blue.400',
-            text: 'gray.900',
-            'text-secondary': 'gray.500',
-            bg: '#FFFFFF',
-            'bg-subtle': 'gray.50',
-            border: 'gray.200',
-            divider: 'gray.200',
-            'surface-ground': 'gray.50',
-            'surface-card': '#FFFFFF',
-            'surface-overlay': 'gray.300',
-            'surface-hover': 'gray.100',
-        },
-        dark: {
-            primary: 'teal.400',
-            secondary: 'gray.400',
-            success: 'green.400',
-            danger: 'red.400',
-            warning: 'yellow.400',
-            info: 'blue.300',
-            text: 'gray.50',
-            'text-secondary': 'gray.400',
-            bg: 'gray.900',
-            'bg-subtle': 'gray.800',
-            border: 'gray.700',
-            divider: 'gray.700',
-            'surface-ground': 'gray.900',
-            'surface-card': 'gray.800',
-            'surface-overlay': 'gray.700',
-            'surface-hover': 'gray.700',
-        },
-    },
-    spacing: {
-        '0': '0',
-        '0.5': '0.125rem',
-        '1': '0.25rem',
-        '1.5': '0.375rem',
-        '2': '0.5rem',
-        '3': '0.75rem',
-        '4': '1rem',
-        '5': '1.25rem',
-        '6': '1.5rem',
-        '8': '2rem',
-        '10': '2.5rem',
-        '12': '3rem',
-        '16': '4rem',
-        '20': '5rem',
-        '24': '6rem',
-    },
-    radii: {
-        none: '0',
-        sm: '0.125rem',
-        base: '0.25rem',
-        md: '0.375rem',
-        lg: '0.5rem',
-        xl: '0.75rem',
-        '2xl': '1rem',
-        '3xl': '1.5rem',
-        full: '9999px',
-    },
-    shadows: {
-        none: 'none',
-        sm: '0 1px 2px 0 rgba(0,0,0,0.05)',
-        base: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-        md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
-        lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-        xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-        '2xl': '0 25px 50px -12px rgba(0,0,0,0.25)',
-        inner: 'inset 0 2px 4px 0 rgba(0,0,0,0.05)',
-    },
-    fonts: {
-        heading: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-        body: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-        mono: 'SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
-    },
-    fontSizes: {
-        xs: '0.75rem',
-        sm: '0.875rem',
-        md: '1rem',
-        lg: '1.125rem',
-        xl: '1.25rem',
-        '2xl': '1.5rem',
-        '3xl': '1.875rem',
-        '4xl': '2.25rem',
-        '5xl': '3rem',
-        '6xl': '3.75rem',
-    },
-    fontWeights: {
-        light: 300,
-        normal: 400,
-        medium: 500,
-        semibold: 600,
-        bold: 700,
-    },
-    lineHeights: {
-        none: 1,
-        tight: 1.25,
-        snug: 1.375,
-        normal: 1.5,
-        relaxed: 1.625,
-        loose: 2,
-    },
-    severity: defaultSeverityTheme,
-    components: {},
-    config: {
-        initialColorMode: 'light',
-        useSystemColorMode: false,
-    },
 };
 
 /** Deep-merge source into target, returning a new object. Source values win. */
@@ -6769,188 +5213,26 @@ declare function extendTheme(overrides: KitsThemeOverride): IKitsTheme {
     return deepMerge(defaultTheme, overrides as Record<string, any>);
 }
 
-/**
- * Resolves a theme token string to a platform-appropriate value.
- *
- * Resolution order:
- * 1. Raw values (#hex, rgb, hsl, transparent) — pass through
- * 2. Semantic tokens ('primary', 'danger') — look up in semanticTokens[colorMode]
- * 3. Dot-notation ('blue.500') — look up in theme.colors
- * 4. Prefixed tokens ('$spacing.4', '$radii.lg', '$shadows.md', '$fontSizes.lg')
- * 5. Legacy var() — pass through on web, resolved separately on native
- * 6. Legacy dash-notation ('blue-500') — look up in theme.colors
- */
-declare function resolveTokenValue(
-    theme: IKitsTheme,
-    colorMode: ColorMode,
-    token: string,
-    platform: 'web' | 'native' = 'web',
-): string {
-    if (typeof token !== 'string') return token;
+declare const Box: ({ children, ref, ...props }: PropsWithChildren<IFlexComponent>) => react_jsx_runtime.JSX.Element;
 
-    // 1. Raw values — pass through
-    if (
-        token.startsWith('#') ||
-        token.startsWith('rgb') ||
-        token.startsWith('hsl') ||
-        token === 'transparent' ||
-        token === 'inherit' ||
-        token === 'currentColor'
-    ) {
-        return token;
-    }
+declare const Text: React__default.FC<ITextComponent>;
 
-    // 2. Semantic token lookup
-    const semantics = theme.semanticTokens[colorMode];
-    if (semantics && token in semantics) {
-        const resolved = semantics[token]!;
-        return resolveTokenValue(theme, colorMode, resolved, platform);
-    }
+declare const Heading: React__default.FC<IHeadingComponent>;
 
-    // 3. Dot-notation: 'blue.500'
-    const dotMatch = token.match(DOT_NOTATION_RE);
-    if (dotMatch) {
-        const [, family, shade] = dotMatch;
-        const scale = theme.colors[family!] as ColorScale | undefined;
-        if (scale && shade! in scale) {
-            const hex = scale[shade as unknown as keyof ColorScale];
-            return platform === 'web' ? `var(--kits-${family}-${shade})` : hex;
-        }
-    }
+declare const Image: ({ style, ref, src, ...props }: IImageComponent) => react_jsx_runtime.JSX.Element;
 
-    // 4. Prefixed tokens: $spacing.4, $radii.lg, $shadows.md, $fontSizes.lg
-    if (token.startsWith('$')) {
-        const dotIdx = token.indexOf('.');
-        if (dotIdx > 1) {
-            const category = token.substring(1, dotIdx);
-            const key = token.substring(dotIdx + 1);
-
-            switch (category) {
-                case 'spacing':
-                    if (key in theme.spacing) {
-                        return platform === 'web' ? `var(--kits-space-${key})` : theme.spacing[key]!;
-                    }
-                    break;
-                case 'radii':
-                    if (key in theme.radii) {
-                        return platform === 'web' ? `var(--kits-radii-${key})` : theme.radii[key]!;
-                    }
-                    break;
-                case 'shadows':
-                    if (key in theme.shadows) {
-                        return platform === 'web' ? `var(--kits-shadow-${key})` : theme.shadows[key]!;
-                    }
-                    break;
-                case 'fontSizes':
-                    if (key in theme.fontSizes) {
-                        return platform === 'web' ? `var(--kits-fontSize-${key})` : theme.fontSizes[key]!;
-                    }
-                    break;
-                case 'fonts':
-                    if (key in theme.fonts) {
-                        return platform === 'web' ? `var(--kits-font-${key})` : theme.fonts[key as keyof typeof theme.fonts]!;
-                    }
-                    break;
-            }
-        }
-    }
-
-    // 5. Legacy var() — pass through
-    if (token.startsWith('var(')) {
-        return token;
-    }
-
-    // 6. Legacy dash-notation: 'blue-500'
-    const dashMatch = token.match(DASH_NOTATION_RE);
-    if (dashMatch) {
-        const [, family, shade] = dashMatch;
-        const scale = theme.colors[family!] as ColorScale | undefined;
-        if (scale && shade! in scale) {
-            const hex = scale[shade as unknown as keyof ColorScale];
-            return platform === 'web' ? `var(--kits-${family}-${shade})` : hex;
-        }
-    }
-
-    return token;
-}
-
-/**
- * Checks if a given string is a known semantic token name.
- * Used by the web style pipeline to detect tokens that should be resolved.
- */
-declare function isSemanticToken(value: string, theme?: IKitsTheme): boolean {
-    if (SEMANTIC_KEYS.has(value)) return true;
-    if (theme) {
-        return value in theme.semanticTokens.light || value in theme.semanticTokens.dark;
-    }
-    return false;
-}
-
-/**
- * Checks if a value looks like a theme token (dot-notation, $prefix, or semantic).
- */
-declare function isThemeToken(value: string): boolean {
-    if (typeof value !== 'string') return false;
-    if (DOT_NOTATION_RE.test(value)) return true;
-    if (value.startsWith('$')) return true;
-    if (SEMANTIC_KEYS.has(value)) return true;
-    return false;
-}
+declare function Icon({ name, size, color, strokeWidth, ...rest }: IIconProps): react_jsx_runtime.JSX.Element;
 
 export type NativeLoaderProps = ILoaderProps<ColorValue$1, StyleProp<ViewStyle>, Record<string, unknown>>;
 declare const Loader: ({ color, size, animating, style }: NativeLoaderProps) => react_jsx_runtime.JSX.Element;
 
-declare function Icon({ name, size, color, strokeWidth, ...rest }: IIconProps): react_jsx_runtime.JSX.Element;
+declare const Divider: React__default.FC<IDividerComponent>;
 
-declare const KitsContainer: FC<PropsWithChildren<IKitsContainer>>;
+declare const Skeleton$1: React__default.FC<ISkeleton>;
 
-declare const KitsInputText: ({ ref, ...rawProps }: IKitsInputText) => react_jsx_runtime.JSX.Element;
+declare const Svg: ({ className, children, ref, ...props }: PropsWithChildren<ISVGComponent>) => react_jsx_runtime.JSX.Element;
 
-declare const KitsInputNumber: ({ ref, ...rawProps }: IKitsInputNumber) => react_jsx_runtime.JSX.Element;
-
-declare const KitsInputMask: ({ ref, ...rawProps }: IKitsInputMask) => react_jsx_runtime.JSX.Element;
-
-declare const KitsInputColorPicker: ({ ref, ...rawProps }: IKitsInputColorPicker) => react_jsx_runtime.JSX.Element;
-
-export type NativeTextareaRef = {
-    focus(): void;
-    blur(): void;
-    clear(): void;
-};
-declare const KitsInputTextarea: React__default.ForwardRefExoticComponent<Omit<IKitsInputTextarea, "ref"> & React__default.RefAttributes<NativeTextareaRef>>;
-
-declare const KitsInputPassword: ({ ref, ...rawProps }: IKitsInputPassword) => react_jsx_runtime.JSX.Element;
-
-declare const KitsPhoneComponent: ({ ref, isWithCountryCode, label, value, placeholder, onChange, invalid, disabled, required, errors, hideError, id, defaultCountry, inputSize, isFloatedLabel, leftAddon, rightAddon, includedCountries, excludedCountries, outputFormat, ...props }: IKitsPhoneInput) => react_jsx_runtime.JSX.Element;
-
-declare const KitsInputLocation: ({ id, label, errors, invalid, value, hideError, onAddressClick, onChange, disabled, placeholder, countryISO, helperText, provider, api_key, labelKey, valueKey, list, ...rest }: IKitsInputLocation) => react_jsx_runtime.JSX.Element;
-
-declare const KitsInputCalendar: <T = DatePickerOptions>({ ref, ...rawProps }: IKitsInputCalendar<T>) => react_jsx_runtime.JSX.Element;
-
-declare const KitsInputSwitch: React__default.FC<IKitsInputSwitch>;
-
-declare const Editable: FC<IEditableProps>;
-
-declare const KitsCheckbox: <T>({ id, label, required, errors, hideError, isFloatedLabel, helperText, item, value, checked, defaultValue, onChange, limit, appearanceMode, disabled, invalid, attached, containerStyle }: IKitsCheckboxProps<T>) => react_jsx_runtime.JSX.Element;
-
-declare const KitsRadio: <T>({ id, label, required, errors, hideError, isFloatedLabel, helperText, item, value, defaultValue, onChange, appearanceMode, disabled, invalid, containerStyle }: IKitsRadioProps<T>) => react_jsx_runtime.JSX.Element;
-
-declare const KitsAutoComplete: FunctionComponent<IAutoCompleteElement>;
-declare const KitsDropdown: FunctionComponent<IDropdownSelect>;
-declare const KitsMultiSelect: FunctionComponent<IMultiSelect>;
-
-declare const KitsTreeSelect: FunctionComponent<ITreeSelect>;
-
-declare const KitsListBox: FunctionComponent<IListBoxSelect>;
-declare const KitsCascadeSelect: FunctionComponent<ICascadeSelect>;
-
-declare const FormSelect: ({ ref, ...props }: ISelectElement & ISelectType) => react_jsx_runtime.JSX.Element;
-
-declare const FilePicker: FC<IFileUploader>;
-
-declare const KitsSliders: FC<ISliderProps>;
-
-declare const Label: FunctionComponent<ILabelProps>;
+declare const Link: React__default.FC<ILinkComponent>;
 
 declare const cardStyle: _gluestack_ui_utils_nativewind_utils.TVReturnType<{
     size: {
@@ -7139,9 +5421,7 @@ export interface BadgeProps {
   style?: any;
 }
 
-declare const SelectButton: (props: SelectButtonProps) => react_jsx_runtime.JSX.Element;
-
-declare const TriStateCheckbox: (props: TriStateCheckboxProps) => react_jsx_runtime.JSX.Element;
+declare const Card: (rawProps: ICardComponent<Omit<ICardProps, "title">>) => react_jsx_runtime.JSX.Element;
 
 declare const Grid: React__default.ForwardRefExoticComponent<Omit<React__default.PropsWithChildren<IGridComponent>, "ref"> & React__default.RefAttributes<any>>;
 
@@ -7152,29 +5432,13 @@ declare const Flex: {
     displayName: string;
 };
 
-declare const Image: ({ style, ref, src, ...props }: IImageComponent) => react_jsx_runtime.JSX.Element;
-
-declare const Text: React__default.FC<ITextComponent>;
-
-declare const Translate: ({ label, children }: PropsWithChildren<ITranslateComponent>) => react_jsx_runtime.JSX.Element;
-
-declare const Heading: React__default.FC<IHeadingComponent>;
-
 declare const Center: ({ className, children, ref, ...props }: PropsWithChildren<IFlexComponent>) => react_jsx_runtime.JSX.Element;
-
-declare const Box: ({ children, ref, ...props }: PropsWithChildren<IFlexComponent>) => react_jsx_runtime.JSX.Element;
-
-declare const Card: (rawProps: ICardComponent<Omit<ICardProps, "title">>) => react_jsx_runtime.JSX.Element;
 
 declare const Collapse: React__default.FC<ICollapseProps>;
 
 declare const List: ({ className, children, ref, ...props }: PropsWithChildren<IFlexComponent>) => react_jsx_runtime.JSX.Element;
 
 declare const ListItem: ({ className, children, ref, ...props }: PropsWithChildren<IFlexComponent>) => react_jsx_runtime.JSX.Element;
-
-declare const Link: React__default.FC<ILinkComponent>;
-
-declare const Svg: ({ className, children, ref, ...props }: PropsWithChildren<ISVGComponent>) => react_jsx_runtime.JSX.Element;
 
 declare const HStack: React__default.FC<PropsWithChildren<IStackProps>>;
 
@@ -7184,390 +5448,113 @@ declare const KitsScrollView: ({ children, ref, ...props }: PropsWithChildren<IS
 
 declare const KitsAnimatePresence: ({ children }: React__default.PropsWithChildren) => react_jsx_runtime.JSX.Element;
 
-declare const Divider: React__default.FC<IDividerComponent>;
+declare const Container: FunctionComponent<PropsWithChildren<IContainerProps>>;
 
 declare function Button(rawProps: IButtonProps<IconName | string | ElementType | ReactElement>): react_jsx_runtime.JSX.Element;
 
-declare function useButton(props: IButtonProps<any>): {
-    state: IButtonState;
-    handlers: {
-        onClick: React__default.MouseEventHandler<any>;
-        onPressIn: () => void;
-        onPressOut: () => void;
-        onMouseEnter: () => void;
-        onMouseLeave: () => void;
-    };
-    _nativeProps: {
-        id?: string;
-        type?: "submit" | "button";
-        ref?: React__default.Ref<any>;
-        children?: string | ReactNode;
-        severity?: "secondary" | "success" | "info" | "warning" | "help" | "danger" | "contrast" | "brand" | undefined;
-        icon?: any;
-        iconPos?: "left" | "right" | "top" | "bottom";
-        size?: "sm" | "md" | "lg";
-        outlined?: boolean;
-        raised?: boolean;
-        rounded?: boolean;
-        label?: string;
-        isLoadingText?: string;
-        tooltip?: string;
-        tooltipOptions?: {
-            position?: string;
-        };
-        style?: IStyleClasses;
-        className?: string;
-        testID?: string;
-        p?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        padding?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        pt?: KitsResponsiveValue<react_native.ViewStyle["paddingTop"] | `${number}${string}`>;
-        paddingTop?: KitsResponsiveValue<react_native.ViewStyle["paddingTop"] | `${number}${string}`>;
-        pr?: KitsResponsiveValue<react_native.ViewStyle["paddingRight"] | `${number}${string}`>;
-        paddingRight?: KitsResponsiveValue<react_native.ViewStyle["paddingRight"] | `${number}${string}`>;
-        pb?: KitsResponsiveValue<react_native.ViewStyle["paddingBottom"] | `${number}${string}`>;
-        paddingBottom?: KitsResponsiveValue<react_native.ViewStyle["paddingBottom"] | `${number}${string}`>;
-        pl?: KitsResponsiveValue<react_native.ViewStyle["paddingLeft"] | `${number}${string}`>;
-        paddingLeft?: KitsResponsiveValue<react_native.ViewStyle["paddingLeft"] | `${number}${string}`>;
-        px?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        paddingX?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        py?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        paddingY?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        paddingHorizontal?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        paddingVertical?: KitsResponsiveValue<react_native.ViewStyle["padding"] | `${number}${string}`>;
-        m?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        margin?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        mt?: KitsResponsiveValue<react_native.ViewStyle["marginTop"] | `${number}${string}`>;
-        marginTop?: KitsResponsiveValue<react_native.ViewStyle["marginTop"] | `${number}${string}`>;
-        mr?: KitsResponsiveValue<react_native.ViewStyle["marginRight"] | `${number}${string}`>;
-        marginRight?: KitsResponsiveValue<react_native.ViewStyle["marginRight"] | `${number}${string}`>;
-        mb?: KitsResponsiveValue<react_native.ViewStyle["marginBottom"] | `${number}${string}`>;
-        marginBottom?: KitsResponsiveValue<react_native.ViewStyle["marginBottom"] | `${number}${string}`>;
-        ml?: KitsResponsiveValue<react_native.ViewStyle["marginLeft"] | `${number}${string}`>;
-        marginLeft?: KitsResponsiveValue<react_native.ViewStyle["marginLeft"] | `${number}${string}`>;
-        mx?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        marginX?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        my?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        marginY?: KitsResponsiveValue<react_native.ViewStyle["margin"] | `${number}${string}`>;
-        marginInline?: KitsResponsiveValue<number | `${number}${string}`>;
-        w?: KitsResponsiveValue<react_native.ViewStyle["width"] | "full" | "screen" | string | `${number}${string}`>;
-        width?: KitsResponsiveValue<react_native.ViewStyle["width"] | "full" | "screen" | string | `${number}${string}`>;
-        minW?: KitsResponsiveValue<react_native.ViewStyle["minWidth"] | "full" | "screen" | string | `${number}${string}`>;
-        minWidth?: KitsResponsiveValue<react_native.ViewStyle["minWidth"] | "full" | "screen" | string | `${number}${string}`>;
-        maxW?: KitsResponsiveValue<react_native.ViewStyle["maxWidth"] | "full" | "screen" | string | `${number}${string}`>;
-        maxWidth?: KitsResponsiveValue<react_native.ViewStyle["maxWidth"] | "full" | "screen" | string | `${number}${string}`>;
-        h?: KitsResponsiveValue<react_native.ViewStyle["height"] | "full" | "screen" | string | `${number}${string}`>;
-        height?: KitsResponsiveValue<react_native.ViewStyle["height"] | "full" | "screen" | string | `${number}${string}`>;
-        minH?: KitsResponsiveValue<react_native.ViewStyle["minHeight"] | "full" | "screen" | string | `${number}${string}`>;
-        minHeight?: KitsResponsiveValue<react_native.ViewStyle["minHeight"] | "full" | "screen" | string | `${number}${string}`>;
-        maxH?: KitsResponsiveValue<react_native.ViewStyle["maxHeight"] | "full" | "screen" | string | `${number}${string}`>;
-        maxHeight?: KitsResponsiveValue<react_native.ViewStyle["maxHeight"] | "full" | "screen" | string | `${number}${string}`>;
-        borderRadius?: KitsResponsiveValue<react_native.ViewStyle["borderRadius"]>;
-        borderRadiusTop?: KitsResponsiveValue<react_native.ViewStyle["borderTopLeftRadius"] | react_native.ViewStyle["borderTopRightRadius"]>;
-        borderRadiusBottom?: KitsResponsiveValue<react_native.ViewStyle["borderBottomLeftRadius"] | react_native.ViewStyle["borderBottomRightRadius"]>;
-        borderRadiusRight?: KitsResponsiveValue<react_native.ViewStyle["borderTopRightRadius"] | react_native.ViewStyle["borderBottomRightRadius"]>;
-        borderRadiusLeft?: KitsResponsiveValue<react_native.ViewStyle["borderTopLeftRadius"] | react_native.ViewStyle["borderBottomLeftRadius"]>;
-        borderTopLeftRadius?: KitsResponsiveValue<react_native.ViewStyle["borderTopLeftRadius"]>;
-        borderBottomLeftRadius?: KitsResponsiveValue<react_native.ViewStyle["borderBottomLeftRadius"]>;
-        borderTopRightRadius?: KitsResponsiveValue<react_native.ViewStyle["borderTopRightRadius"]>;
-        borderBottomRightRadius?: KitsResponsiveValue<react_native.ViewStyle["borderBottomRightRadius"]>;
-        borderWidth?: KitsResponsiveValue<react_native.ViewStyle["borderWidth"]>;
-        borderW?: KitsResponsiveValue<react_native.ViewStyle["borderWidth"]>;
-        borderX?: KitsResponsiveValue<react_native.ViewStyle["borderLeftWidth"] | react_native.ViewStyle["borderRightWidth"]>;
-        borderY?: KitsResponsiveValue<react_native.ViewStyle["borderTopWidth"] | react_native.ViewStyle["borderBottomWidth"]>;
-        borderTop?: KitsResponsiveValue<react_native.ViewStyle["borderTopWidth"]>;
-        borderBottom?: KitsResponsiveValue<react_native.ViewStyle["borderBottomWidth"]>;
-        borderRight?: KitsResponsiveValue<react_native.ViewStyle["borderRightWidth"]>;
-        borderLeft?: KitsResponsiveValue<react_native.ViewStyle["borderLeftWidth"]>;
-        borderStyle?: KitsResponsiveValue<react_native.ViewStyle["borderStyle"]>;
-        borderColor?: KitsResponsiveValue<react_native.ViewStyle["borderColor"] | ColorValue | react_native.ColorValue>;
-        borderStartStartRadius?: null;
-        borderStartEndRadius?: null;
-        borderEndStartRadius?: null;
-        borderEndEndRadius?: null;
-        borderCollapse?: null;
-        borderSpacing?: null;
-        border?: null | "none";
-        borderBlock?: null;
-        borderBlockColor?: null;
-        borderBlockStyle?: null;
-        borderBlockWidth?: null;
-        borderBlockEnd?: null;
-        borderBlockStart?: null;
-        borderInline?: null;
-        borderInlineColor?: null;
-        borderInlineStyle?: null;
-        borderInlineWidth?: null;
-        borderInlineEnd?: null;
-        borderInlineStart?: null;
-        borderTopColor?: KitsResponsiveValue<react_native.ViewStyle["borderColor"]>;
-        borderTopStyle?: KitsResponsiveValue<react_native.ViewStyle["borderStyle"]>;
-        borderTopWidth?: KitsResponsiveValue<react_native.ViewStyle["borderTopWidth"]>;
-        borderBottomColor?: KitsResponsiveValue<react_native.ViewStyle["borderColor"]>;
-        borderBottomStyle?: KitsResponsiveValue<react_native.ViewStyle["borderStyle"]>;
-        borderBottomWidth?: KitsResponsiveValue<react_native.ViewStyle["borderBottomWidth"]>;
-        borderLeftColor?: KitsResponsiveValue<react_native.ViewStyle["borderColor"]>;
-        borderLeftStyle?: KitsResponsiveValue<react_native.ViewStyle["borderStyle"]>;
-        borderLeftWidth?: KitsResponsiveValue<react_native.ViewStyle["borderLeftWidth"]>;
-        borderRightColor?: KitsResponsiveValue<react_native.ViewStyle["borderColor"]>;
-        borderRightStyle?: KitsResponsiveValue<react_native.ViewStyle["borderStyle"]>;
-        borderRightWidth?: KitsResponsiveValue<react_native.ViewStyle["borderRightWidth"]>;
-        backgroundColor?: KitsResponsiveValue<ColorValue | react_native.ColorValue>;
-        bgColor?: KitsResponsiveValue<ColorValue | react_native.ColorValue>;
-        backgroundImage?: null;
-        bgImage?: null;
-        backgroundRepeat?: null;
-        bgRepeat?: null;
-        backgroundSize?: null;
-        bgSize?: null;
-        backgroundPosition?: null;
-        bgPosition?: null;
-        gap?: KitsResponsiveValue<number | string>;
-        rowGap?: KitsResponsiveValue<number | string>;
-        columnGap?: KitsResponsiveValue<number | string>;
-        flex?: KitsResponsiveValue<number>;
-        flexDirection?: KitsResponsiveValue<"row" | "column" | "row-reverse" | "column-reverse">;
-        direction?: KitsResponsiveValue<"row" | "column" | "row-reverse" | "column-reverse">;
-        flexWrap?: KitsResponsiveValue<"wrap" | "nowrap" | "wrap-reverse">;
-        flexGrow?: KitsResponsiveValue<number>;
-        flexShrink?: KitsResponsiveValue<number>;
-        flexBasis?: KitsResponsiveValue<string>;
-        flexOrder?: null;
-        templateAreas?: KitsResponsiveValue<string>;
-        gridTemplateRows?: KitsResponsiveValue<string>;
-        gridTemplateColumns?: KitsResponsiveValue<string>;
-        columns?: KitsResponsiveValue<number>;
-        rows?: KitsResponsiveValue<number>;
-        area?: KitsResponsiveValue<number | string>;
-        rowSpan?: KitsResponsiveValue<number | string>;
-        rowOffset?: KitsResponsiveValue<number | string>;
-        colSpan?: KitsResponsiveValue<number | string>;
-        colOffset?: KitsResponsiveValue<Numbering0_12>;
-        rowStart?: KitsResponsiveValue<number | string>;
-        rowEnd?: KitsResponsiveValue<number | string>;
-        colStart?: KitsResponsiveValue<number | string>;
-        colEnd?: KitsResponsiveValue<number | string>;
-        boxShadow?: KitsResponsiveValue<react_native.ViewStyle["shadowColor"] | react_native.ViewStyle["shadowOffset"] | react_native.ViewStyle["shadowOpacity"] | react_native.ViewStyle["shadowRadius"]>;
-        shadow?: KitsResponsiveValue<react_native.ViewStyle["shadowColor"] | react_native.ViewStyle["shadowOffset"] | react_native.ViewStyle["shadowOpacity"] | react_native.ViewStyle["shadowRadius"]>;
-        opacity?: KitsResponsiveValue<react_native.ViewStyle["opacity"]>;
-        shadowColor?: KitsResponsiveValue<react_native.ViewStyle["shadowColor"]>;
-        shadowOffset?: KitsResponsiveValue<react_native.ViewStyle["shadowOffset"]>;
-        shadowRadius?: KitsResponsiveValue<react_native.ViewStyle["shadowRadius"]>;
-        shadowOpacity?: KitsResponsiveValue<react_native.ViewStyle["shadowOpacity"]>;
-        elevation?: KitsResponsiveValue<react_native.ViewStyle["elevation"]>;
-        objectFit?: any;
-        objectPosition?: any;
-        appearance?: null;
-        cursor?: any;
-        outline?: null;
-        pointerEvents?: react_native.ViewStyle["pointerEvents"];
-        userSelect?: any;
-        translateX?: KitsResponsiveValue<number>;
-        translateY?: KitsResponsiveValue<number>;
-        translate?: KitsResponsiveValue<number>;
-        transformOrigin?: null;
-        rotate?: KitsResponsiveValue<"0deg" | "90deg" | "-90deg" | "180deg" | "-180deg">;
-        transitionProperty?: null;
-        transitionDuration?: null;
-        transitionFunction?: null;
-        transitionDelay?: null;
-        display?: KitsResponsiveValue<react_native.ViewStyle["display"]>;
-        overflow?: KitsResponsiveValue<react_native.ViewStyle["overflow"] | "auto">;
-        overflowY?: KitsResponsiveValue<"visible" | "hidden">;
-        overflowX?: KitsResponsiveValue<"visible" | "hidden">;
-        position?: KitsResponsiveValue<react_native.ViewStyle["position"] | "fixed" | "sticky">;
-        top?: KitsResponsiveValue<react_native.ViewStyle["top"]>;
-        bottom?: KitsResponsiveValue<react_native.ViewStyle["bottom"]>;
-        right?: KitsResponsiveValue<react_native.ViewStyle["right"]>;
-        left?: KitsResponsiveValue<react_native.ViewStyle["left"]>;
-        zIndex?: KitsResponsiveValue<react_native.ViewStyle["zIndex"]>;
-        aspectRatio?: KitsResponsiveValue<number | string>;
-        transition?: KitsResponsiveValue<string>;
-        animation?: AnimationsValues;
-        animationDuration?: number;
-        animationDelay?: number;
-        animationIteration?: "linear" | "ease-in" | "ease-out" | "ease-in-out";
-        animationFunction?: "auto" | 0 | 50 | 100;
-        animationFill?: "none" | "forwards" | "backwards" | "both";
-        justifyContent?: KitsResponsiveValue<"flex-start" | "flex-end" | "center" | "space-between" | "space-around" | "space-evenly">;
-        alignContent?: KitsResponsiveValue<"flex-start" | "flex-end" | "center" | "space-between" | "space-around" | "stretch">;
-        alignItems?: KitsResponsiveValue<"flex-start" | "flex-end" | "center" | "stretch" | "baseline">;
-        alignSelf?: KitsResponsiveValue<"auto" | "flex-start" | "flex-end" | "center" | "stretch" | "baseline">;
-        verticalAlign?: any;
-        listStyleType?: null;
-        listStyle?: null;
-        letterSpacing?: KitsResponsiveValue<number | string>;
-        fontSize?: KitsResponsiveValue<number | "base" | Omit<SizingValue, "md"> | HighSizingValue>;
-        fontWeight?: KitsResponsiveValue<"normal" | "bold" | "light" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900">;
-        fontColor?: KitsResponsiveValue<ColorValue | react_native.ColorValue | string>;
-        fontFamily?: KitsResponsiveValue<string>;
-        fontStyle?: KitsResponsiveValue<"normal" | "italic">;
-        textAlign?: KitsResponsiveValue<"auto" | "left" | "right" | "center" | "justify">;
-        textDecoration?: "underline" | "line-through" | "none";
-        textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
-        lineHeight?: KitsResponsiveValue<number | `${number}${string}`>;
-        textOverflow?: "ellipsis" | "clip" | null;
-        whiteSpace?: "nowrap" | "normal" | null;
-        numberOfLines?: KitsResponsiveValue<number>;
-        _hover?: ICssStyling;
-        _focus?: ICssStyling;
-    };
-    isDisabled: boolean;
-};
-
 declare const Badge: (props: BadgeProps) => react_jsx_runtime.JSX.Element;
 
-declare function KitsDialogControlled({ state, onHide }: IKitsDialogControlled): react_jsx_runtime.JSX.Element;
+declare const CustomAccordion: ({ accordionTitle, accordionItems, isLoading, allOpenedByDefault, localProps, }: IAccordionProps<any>) => react_jsx_runtime.JSX.Element;
 
-declare function KitsConfirm(props: IConfirmDialogProps): react_jsx_runtime.JSX.Element;
-
-declare const KitsToast: ({ ref }: {
-    ref?: Ref<IKitsToastRef>;
-}) => react_jsx_runtime.JSX.Element;
-
-declare const CircularProgress: ({ size, strokeWidth, value, color, trackColor, loading, children, }: ICircularProgressProps) => react_jsx_runtime.JSX.Element;
-
-declare const Tooltip: ({ children, label, tooltipProps, ...props }: TooltipProps) => react_jsx_runtime.JSX.Element;
+declare const AlertIcon: React__default.FC<{
+    status: IAlertComponent["status"];
+}>;
+declare const AlertTitle: React__default.FC<{
+    children: React__default.ReactNode;
+    color?: string;
+}>;
+declare const AlertDescription: React__default.FC<{
+    children: React__default.ReactNode;
+    color?: string;
+}>;
 
 declare const Alert: ({ status, variant, className, withIcon, children, title, description }: IAlertProps) => react_jsx_runtime.JSX.Element;
-
-declare const CustomAccordion: ({ accordionTitle, accordionItems, isLoading, allOpenedByDefault, localProps, }: IAccordionProps<any>) => react_jsx_runtime.JSX.Element;
 
 export interface IBreadCrumbProps {
 }
 declare const BreadCrumb: FunctionComponent<IBreadCrumbProps>;
 
+declare function KitsDialogControlled({ state, onHide }: IKitsDialogControlled): react_jsx_runtime.JSX.Element;
+
+declare function KitsConfirm(props: IConfirmDialogProps): react_jsx_runtime.JSX.Element;
+
+declare function KitsConfirmPopup(_props: IConfirmPopupProps & {
+    onHide?: () => void;
+}): react_jsx_runtime.JSX.Element;
+
+declare const KitsToast: ({ ref }: {
+    ref?: Ref<IKitsToastRef>;
+}) => react_jsx_runtime.JSX.Element;
+
+declare const Tooltip: ({ children }: TooltipProps) => react_jsx_runtime.JSX.Element;
+
 declare const CustomPopover: FC<IPopoverProps>;
 
-declare const SkeletonRows: (props: ISkeletonRowsProps) => any;
+declare const SkeletonRows: ({ rowsLength }: ISkeletonRowsProps) => react_jsx_runtime.JSX.Element;
 
-declare const Container$1: FunctionComponent<PropsWithChildren<IContainerProps>>;
-
-declare const Bar: FunctionComponent<Omit<IWidgetBarIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-declare const Line: FunctionComponent<Omit<IWidgetLineIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-declare const Pie: FunctionComponent<Omit<IWidgetPieIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-declare const Radar: FunctionComponent<Omit<IWidgetRadarIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-declare const PolarArea: FunctionComponent<Omit<IWidgetPolarAreaIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-declare const Doughnut: FunctionComponent<Omit<IWidgetDoughnutIncomingProp, 'type' | 'colors' | 'isDarkMode'>>;
-
-declare const index_native_Bar: typeof Bar;
-declare const index_native_Doughnut: typeof Doughnut;
-declare const index_native_Line: typeof Line;
-declare const index_native_Pie: typeof Pie;
-declare const index_native_PolarArea: typeof PolarArea;
-declare const index_native_Radar: typeof Radar;
-declare namespace index_native {
-  export {
-    index_native_Bar as Bar,
-    index_native_Doughnut as Doughnut,
-    index_native_Line as Line,
-    index_native_Pie as Pie,
-    index_native_PolarArea as PolarArea,
-    index_native_Radar as Radar,
-  };
-}
-
-declare const Skeleton$1: React__default.FC<ISkeletonText>;
-
-declare const Skeleton: React__default.FC<ISkeleton>;
+declare const Skeleton: React__default.FC<ISkeletonText>;
 
 declare const DetailList: <T extends Record<string, any>>({ title, description, data, items, headerActions, itemActions, }: IDetailListProps<T>) => react_jsx_runtime.JSX.Element;
 
+declare const CircularProgress: ({ size, strokeWidth, value, color, trackColor, loading, children, }: ICircularProgressProps) => react_jsx_runtime.JSX.Element;
+
+declare const Translate: ({ label, children }: PropsWithChildren<ITranslateComponent>) => react_jsx_runtime.JSX.Element;
+
+declare const KitsContainer: FC<PropsWithChildren<IKitsContainer>>;
+
+declare const KitsInputText: ({ ref, ...rawProps }: IKitsInputText) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputNumber: ({ ref, ...rawProps }: IKitsInputNumber) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputMask: ({ ref, ...rawProps }: IKitsInputMask) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputColorPicker: ({ ref, ...rawProps }: IKitsInputColorPicker) => react_jsx_runtime.JSX.Element;
+
+export type NativeTextareaRef = {
+    focus(): void;
+    blur(): void;
+    clear(): void;
+};
+declare const KitsInputTextarea: React__default.ForwardRefExoticComponent<Omit<IKitsInputTextarea, "ref"> & React__default.RefAttributes<NativeTextareaRef>>;
+
+declare const KitsInputPassword: ({ ref, ...rawProps }: IKitsInputPassword) => react_jsx_runtime.JSX.Element;
+
+declare const KitsPhoneComponent: ({ ref, isWithCountryCode, label, value, placeholder, onChange, invalid, disabled, required, errors, hideError, id, defaultCountry, inputSize, isFloatedLabel, leftAddon, rightAddon, includedCountries, excludedCountries, outputFormat, ...props }: IKitsPhoneInput) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputLocation: ({ id, label, errors, invalid, value, hideError, onAddressClick, onChange, disabled, placeholder, countryISO, helperText, provider, api_key, labelKey, valueKey, list, ...rest }: IKitsInputLocation) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputCalendar: <T = DatePickerOptions>({ ref, ...rawProps }: IKitsInputCalendar<T>) => react_jsx_runtime.JSX.Element;
+
+declare const KitsInputSwitch: React__default.FC<IKitsInputSwitch>;
+
+declare const KitsSliders: FC<ISliderProps>;
+
+declare const Editable: FC<IEditableProps>;
+
+declare const KitsCheckbox: <T>({ ref, ...rawProps }: IKitsCheckboxProps<T>) => react_jsx_runtime.JSX.Element;
+
+declare const KitsRadio: <T>({ ref, ...rawProps }: IKitsRadioProps<T>) => react_jsx_runtime.JSX.Element;
+
+declare const SelectButton: (props: SelectButtonProps) => react_jsx_runtime.JSX.Element;
+
+declare const TriStateCheckbox: (props: TriStateCheckboxProps) => react_jsx_runtime.JSX.Element;
+
+declare const KitsAutoComplete: FunctionComponent<IAutoCompleteElement>;
+declare const KitsDropdown: FunctionComponent<IDropdownSelect>;
+declare const KitsMultiSelect: FunctionComponent<IMultiSelect>;
+
+declare const KitsTreeSelect: FunctionComponent<ITreeSelect>;
+
+declare const KitsListBox: FunctionComponent<IListBoxSelect>;
+declare const KitsCascadeSelect: FunctionComponent<ICascadeSelect>;
+
+declare const FormSelect: ({ ref, ...props }: ISelectElement & ISelectType) => react_jsx_runtime.JSX.Element;
+
+declare const FilePicker: FC<IFileUploader>;
+
+declare const Label: FunctionComponent<ILabelProps>;
+
 declare const Form: <T extends FieldValues>({ elements, onSubmit, onInvalidSubmit, outputFormat, id, grid, onChangeSingleValue, onChange, submitButtonProps, onMount, ref, children, animation }: IFormComponent<T>) => react_jsx_runtime.JSX.Element;
-
-declare const Select: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-declare const InputText: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a number input component.
- * All logic is handled by the useFieldLogic hook, making this a simple, declarative component.
- */
-declare const InputNumber: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a password input with an optional strength meter.
- * All logic is handled by the useFieldLogic hook.
- */
-declare const Password: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a group of checkboxes.
-
- */
-declare const Radios: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a group of checkboxes.
- */
-declare const Checkboxes: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a textarea component.
-
- */
-declare const Textarea: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a file or image uploader.
- * It uses useFieldLogic for standard field state and useFormContext for form-level
- * configurations like outputFormat and error handling.
- */
-declare const FileUploader: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a switch (toggle) component.
- */
-declare const Switch: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a phone number input with auto-detected country flag.
- * Value is an E.164 string (e.g., "+15551234567").
- */
-declare const Phone: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-export interface ContainerProps<T extends FieldValues> extends UseFieldLogicElementProps<T> {
-    parentPath?: string;
-}
-declare const Container: <T extends FieldValues>({ element, control, groupField, getValues, parentPath, fieldLogic }: ContainerProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a date picker component.
-
- */
-declare const DateField: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a location/address search input.
- * All logic is handled by the useFieldLogic hook, making this a simple, declarative component.
- */
-declare const Location: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a color picker input.
-
- */
-declare const ColorPicker: <T extends FieldValues>({ element, control, getValues, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a repeatable group of fields (a field array), preserving all the logic
- * for default values, min/max repeats, and custom action buttons.
- */
-declare const Group: <T extends FieldValues>({ element, control, getValues, groupField, focusedField, setFocusedField, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Renders a static, non-repeatable group of fields (a nested object).
- * It provides a layout wrapper and recursively renders its children with the correct nested path.
- */
-declare const ObjectElement: <T extends FieldValues>({ element, control, getValues, groupField, focusedField, setFocusedField, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
-
-/**
- * Combined element: groups multiple child inputs under one logical field.
- *
- * - Renders a single KitsContainer with one label and one validation error.
- * - Child elements render with `attached: true` (no individual containers/labels).
- * - The parent's value is computed from child values via the `output` template.
- */
-declare const CombinedElement: <T extends FieldValues>({ element, control, getValues, groupField, focusedField, setFocusedField, fieldLogic, }: UseFieldLogicElementProps<T>) => react_jsx_runtime.JSX.Element;
 
 /**
  * The core logic engine for an individual form field.
@@ -7673,8 +5660,6 @@ declare const DataView: (props: IDataViewProps) => react_jsx_runtime.JSX.Element
 declare const useDataView: () => IDataViewContextValues;
 
 declare const TreeView: <T = any>(props: ITreeViewProps<T>) => react_jsx_runtime.JSX.Element;
-
-declare const AuthLayout: () => any;
 
 declare const LocaleContext: React__default.Context<ILocaleContextValues>;
 declare const LocaleContextProvider: FC<PropsWithChildren<ILocaleContextProps>>;
@@ -7786,30 +5771,71 @@ declare const useKitsConcerto: () => IMainContextValues<any, React$1.JSX.Element
 export interface UseComponentDefaultsResult<T> {
     /** Props with theme defaults merged in (user props always win) */
     mergedProps: T;
-    /** CSS style overrides from theme.components[name].style */
+    /**
+     * CSS style from root slot — backwards compat for components
+     * that read themeStyle instead of elementStyles.root
+     */
     themeStyle: Record<string, any>;
+    /**
+     * Per-element style maps. Each key is a slot name, value is the
+     * merged IStyleClasses (not yet resolved to CSSProperties).
+     * Use `useResolvedElementStyles(elementStyles)` to resolve.
+     */
+    elementStyles: Record<string, Record<string, any>>;
 }
 /**
  * Merges theme-level component defaults with user-supplied props.
- * Supports base-group inheritance: e.g. `useComponentDefaults('InputNumber', rawProps, 'Input')`
- * merges Input base config first, then InputNumber overrides, then user props.
+ *
+ * Element slots (`root`, `label`, `container`, etc.) are direct keys
+ * on the component config. Each slot accepts `{ props?, style? }`.
+ *
+ * The `root` slot's `props` are merged into `mergedProps` alongside
+ * user props (user always wins). The `root` slot's `style` is returned
+ * as both `themeStyle` (backwards compat) and `elementStyles.root`.
+ *
+ * Supports base-group inheritance: e.g. `useComponentDefaults('InputText', rawProps, 'Input')`
+ * merges Input base config first, then InputText overrides, then user props.
  *
  * @example
- * function InputNumber(rawProps: IKitsInputNumber) {
- *   const { mergedProps: props, themeStyle } = useComponentDefaults('InputNumber', rawProps, 'Input');
- *   // themeStyle = { ...theme.components.Input.style, ...theme.components.InputNumber.style }
- * }
+ * const { mergedProps, themeStyle, elementStyles } = useComponentDefaults('InputText', rawProps, 'Input');
+ * // mergedProps  → base.root.props + config.root.props + user props
+ * // themeStyle   → base.root.style + config.root.style (backwards compat)
+ * // elementStyles.root      → root element style
+ * // elementStyles.label     → label element style
+ * // elementStyles.container → container element style
  */
 declare function useComponentDefaults<T extends Record<string, any>>(componentName: string, props: T, baseGroup?: string): UseComponentDefaultsResult<T>;
 
 /**
+ * Pure function: resolves theme tokens and maps CSS prop aliases to standard style keys.
+ * Platform-agnostic — output is compatible with both web CSSProperties and native ViewStyle.
+ * Extracted for reuse by useResolvedElementStyles without hook constraints.
+ */
+declare function resolveStyleRecord(themeStyle: Record<string, any>, resolveToken: (token: string) => string): Record<string, any>;
+/**
  * Resolves theme tokens in a style object and maps KitsConcerto
- * CSS prop names to standard React CSSProperties keys.
+ * CSS prop aliases to standard style keys (platform-agnostic).
  *
  * Used by components that don't use ResponsiveElement (e.g. PrimeReact form controls)
  * to apply theme.components[name].style as inline styles.
  */
-declare function useResolvedStyle(themeStyle: Record<string, any>): React.CSSProperties;
+declare function useResolvedStyle(themeStyle: Record<string, any>): Record<string, any>;
+
+/**
+ * Resolves all element slot styles at once, converting IStyleClasses
+ * aliases and theme tokens to platform-appropriate style objects per slot.
+ *
+ * Platform-agnostic — output is compatible with both web CSSProperties
+ * and native ViewStyle since resolveStyleRecord is platform-agnostic.
+ *
+ * @example
+ * const { elementStyles } = useComponentDefaults('InputText', rawProps, 'Input');
+ * const resolved = useResolvedElementStyles(elementStyles);
+ * // resolved.container → resolved styles for the container
+ * // resolved.label     → resolved styles for the label
+ * // resolved.root      → resolved styles for the input element
+ */
+declare function useResolvedElementStyles(elementStyles: Record<string, Record<string, any>>): Record<string, Record<string, any>>;
 
 /**
  * Derives color-related style props from a colorScheme name and optional variant.
@@ -7921,6 +5947,8 @@ export type PossibleRef<T> = Ref<T> | undefined | null;
  * pointing to the same DOM/native element.
  */
 declare function mergeRefs<T>(...refs: PossibleRef<T>[]): RefCallback<T>;
+
+declare const IconMap: Record<string, ComponentType<any>>;
 
 declare const localeFiles: {
     ar: {
@@ -13378,5 +11406,5 @@ declare const localeFiles: {
     };
 };
 
-export { CustomAccordion as Accordion, Alert, KitsAnimatePresence as AnimatePresence, AnyFile, AuthLayout, Badge, Box, BreadCrumb, Button, Card, Center, Checkboxes, CircularProgress, Collapse, ColorPicker, CombinedElement, Container$1 as Container, Container as ContainerElement, CustomPopover, DataView, DataViewContext, DateField, DetailList as DetailsList, Divider, EDateFormat, EKeyFilter, Editable, FIELD_LABEL_MARGIN, FIELD_MARGIN, FileUploader, Flex, Form, FormSelect, GUTTER, Form as GoForm, Datatable as GoTable, Grid, GridItem, Group, HELPER_TEXT_MARGIN, HStack, Heading, Icon, IconMap, Image, InputNumber, KitsInputSwitch as InputSwitch, InputText, KeyboardNavContext, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, Select as ListBox, ListItem, Loader, LocaleContext, LocaleContextProvider, Location, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, Select as NormalSelect, ObjectElement, Password, Phone, Radios, SPACER, KitsScrollView as ScrollView, Select, SelectButton, Skeleton, SkeletonRows, Skeleton$1 as SkeletonText, Svg, Switch, TableContext, Select as TagsSelect, Text, Textarea, ThemeContextProvider, Tooltip, Translate, TreeView, TriStateCheckbox, VStack, index_native as Widgets, borderProperties, breakpoints, capitalizeFirstLetter, checkExtAgainstAccepted, checkNameDuplication, convertSize, dateTimeFormat, deepMerge, defaultSeverityTheme, defaultTheme, downloadCanvas, dynamicList, extendTheme, fileTypeIcon, fileValidation, filesExt, filesMemes, filesTypes, fontSizeMapping, formFileValidation, getCombinedChildIds, getCustomDateTime, getDateElements, getDefaultValues, getMeme, getParams, getPropertyByPath, getType, getTypes, getURLParams, imagesExt, imagesMemes, imagesTypes, isNumber, isSemanticToken, isThemeToken, isToday, isValidURL, listingProperties, localeFiles, allProperties as mapCssProperties, mergeRefs, nonPxProperties, propertiesWithoutCssEquivalent, pxProperties, resolveTokenValue, schemaBuilder, sizeMapping, sizingProperties, timeAgo, timeSince, toArray, toMemes, useAllSeverityColors, useButton, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFocusStyles, useFormFieldKeyboardNav, useFormManager, useKeyboardNav, useKeyboardNavProvider, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedStyle, useScrollState, useSelectionController, useSeverityColors, useTable, useTheme };
-export type { AlignmentsValues, AnimationsValues, BaseFieldProps, Booleanish, Breakpoint, CallbackProps, ChartData, ColorMode, ColorScale, ColorValue, Colors, ColorsType, ComponentSize, ConfirmDialogOptions, ConfirmDialogProps, ConfirmDialogReturn, CustomSubmitButtonProps, DataTableSelectionSingleChangeEvent, DeepPartial, DetailItemInputType, DialogProps, DynamicValue, ElementProps, EnteringAnimation, ExitingAnimation, ExpandedKeys, FetchError, FetchSuccess, FetchTableDataRes, FetchTablePaginationData, FieldWrapperProps, File$1 as File, FileTypeMap, FileUploaderTemplate, FileUploaderTemplateParams, FlexAlignmentsValues, FlexValues, FormBooleanEvent, FormBooleanTarget, FormEvent, FormTarget, GroupFieldConfigs, HighSizingValue, IAccordionProps, IAddressExperianFormat, IAddressFormat, IAddressFormatResults, IAddressSearchResults, IAlertComponent, IAlertProps, IAlignment, IAnimation, IAutoCompleteCore, IAutoCompleteElement, IBarChartProps, IBg, IBodyTemplate, IBorder, IBoxComponent, IButton, IButtonParams, IButtonProps, IButtonState, IButtonsFilter, ICardComponent, ICascadeSelect, ICascadeSelectCore, ICheckbox, ICheckboxFilter, IChildren, IChildrenParams, ICircularProgressProps, ICollapseProps, IColorPicker, IColumn, IColumnBase, ICombined, IComponentThemeConfig, IConfirmDialogProps, IConfirmPopupProps, IContainer, IContainerProps, IContextValues, ICountrySearchResults, ICssStyling, IDVButtonsFilter, IDVCheckboxFilter, IDVDateFilter, IDVDropdownFilter, IDVFilters, IDVMessages, IDVMultiselectFilter, IDVNumberFilter, IDVPaginationRequest, IDVPaginationResponse, IDVPaginationState, IDVPhoneFilter, IDVRangeFilter, IDVTextFilter, IDVTriStateFilter, IDataTableContextValues, IDataTableProps, IDataViewContextValues, IDataViewProps, IDataViewRefValues, IDatatableRefValues, IDate, IDateFilter, IDateProps, IDetailItem, IDetailListProps, IDialogButton, IDialogProps, IDialogRef, IDialogState, IDisplay, IDividerComponent, IDoughnutChartProps, IDropdownCore, IDropdownFilter, IDropdownSelect, IEditableProps, IEditors, IEffects, IElementBase, IElementStyle, IEmail, IEmailSearchResults, IFile, IFileUploader, IFileUploaderElement, IFileUploaderTypes, IFilesExtTypeKeys, IFilters, IFlexAlignment, IFlexComponent, IFormAddon, IFormComponent, IFormContextPropsFormData, IFormContextPropsJSON, IFormElement, IFormGrid, IFormListsElements, IFormSelect, IFormSelectElements, IFormSingleElement, IGrid, IGridComponent, IGridItem, IGridItemComponent, IGroup, IGroupSettings, IHeadingComponent, IIconProps, IImageComponent, IImagesExtTypeKeys, IInteractivity, IKeyedColumn, IKitsAnimation, IKitsCheckboxProps, IKitsComponentDefaults, IKitsContainer, IKitsDialogControlled, IKitsInputCalendar, IKitsInputColorPicker, IKitsInputLocation, IKitsInputMask, IKitsInputNumber, IKitsInputPassword, IKitsInputRating, IKitsInputSwitch, IKitsInputText, IKitsInputTextarea, IKitsPhoneInput, IKitsRadioProps, IKitsTheme, IKitsThemeColors, IKitsThemeConfig, IKitsThemeContextValues, IKitsThemeFontSizes, IKitsThemeFontWeights, IKitsThemeFonts, IKitsThemeLineHeights, IKitsThemeRadii, IKitsThemeShadows, IKitsThemeSpacing, IKitsToastRef, ILabelElement, ILabelProps, ILanguage, ILayout, ILineChartProps, ILinkComponent, ILinkOverrides, IList, IListBoxCore, IListBoxElement, IListBoxSelect, IListItem, IListing, ILoaderProps, ILocaleContextProps, ILocaleContextValues, ILocation, ILocationDetailsResponse, ILocationResponse, IMainContextProps, IMainContextValues, IMemes, IMenuItem, IMessages, IMinusButton, IModalComponent, IModalFormProps, IMultiSelect, IMultiSelectCore, IMultiselect, IMultiselectFilter, INativeProps, INonCrossPlatformTypes, INumberFilter, INumberInput, INumberProps, IObjectGroup, IOneOfTypes, IPageISection, IPaginationRequest, IPaginationResponse, IPassword, IPasswordProps, IPhone, IPhoneFilter, IPhoneObjectValue, IPhoneValidationResults, IPhoneValue, IPieChartProps, IPlusButton, IPolarAreaChartProps, IPopoverProps, IRTLDetection, IRadarChartProps, IRadioCheckboxListItem, IRadioGroup, IRangeFilter, IRef, IRepeatableSettings, IResponsiveElement, ISVGComponent, IScrollViewComponent, ISelect, ISelectBase, ISelectCore, ISelectElement, ISelectType, ISelectedFile, ISelectedFileType, ISeverityColorSlots, ISeverityThemeMap, ISizing, ISkeleton, ISkeletonRowsProps, ISkeletonText, ISliderProps, ISpacing, IStackProps, IStatisticsProps, IStats, IStyleClasses, ISwitch, ITags, IText, ITextComponent, ITextFieldProps, ITextFilter, ITextInput, ITextInputProps, ITextarea, IThemeContextProps, IThemeContextValues, IToastFunction, IToastParams, IToolbarProps, ITransforms, ITransition, ITranslateComponent, ITreeItem, ITreeSelect, ITreeSelectCore, ITreeSelectElement, ITreeSelectNode, ITreeViewProps, ITriStateFilter, IUnkeyedColumn, IUseFormReturn, IUserAvatar, IWidgetBarIncomingProp, IWidgetChartContextProps, IWidgetChartProp, IWidgetData, IWidgetDoughnutIncomingProp, IWidgetLineIncomingProp, IWidgetPieIncomingProp, IWidgetPolarAreaIncomingProp, IWidgetRadarIncomingProp, IconName, IconType, ImageTypeMap, InputTextFieldProps, KitsBreakpoint, KitsConditionalObject, KitsDevice, KitsOrientation, KitsPlatform, KitsResponsiveObject, KitsResponsiveValue, KitsThemeOverride, LabelVariant, LogicFunction, MeasurementValues, MimeOrArray, NativeLinkProps, NativeModalProps, Nullable, Numbering0_12, Numbering0_32, Numberish, OnSubmitHandler, Orientation, PaginationState, Permissions, PlatformKey, PrimeTooltipProps, SelectFieldProps, SemanticColorTokens, ServerMethod, ServerResponse, ServerSideProps, SetManyOpts, Severity, Shades, Shapes, SidesValues, SizingNumbering, SizingValue, SliderChangeEvent, SortOrder$1 as SortOrder, TextLabels, TextProps, Timeout, TimingNumbering, ToastPosition, ToastSeverity, ToastSize, TooltipDataAttributes, TooltipProps, TreeChangeProps, TreeCheckboxSelectionKeyType, TreeCheckboxSelectionKeys, TreeNode, TreeNodeClickEvent, TreeNodeTemplateOptions, TreeProps, TreeRef, TreeSelectionEvent, TreeViewProps, Types, UseComponentDefaultsResult, UseDisclosureReturnType, UseFieldLogicElementProps, UseFieldLogicProps, UseFieldLogicReturn, UseFormManagerEvents, UseFormManagerReturn, ValidationProps, Various, children, clearFunction, downloadableFileResponse, settings1, settings2 };
+export { CustomAccordion as Accordion, Alert, AlertDescription, AlertIcon, AlertTitle, KitsAnimatePresence as AnimatePresence, AnyFile, Badge, Box, BreadCrumb, Button, Card, Center, CircularProgress, Collapse, Container, CustomPopover, DataView, DataViewContext, DetailList as DetailsList, Divider, Editable, Flex, Form, FormSelect, Form as GoForm, Datatable as GoTable, Grid, GridItem, HStack, Heading, Icon, IconMap, Image, KitsInputSwitch as InputSwitch, KeyboardNavContext, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsConfirmPopup, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, ListItem, Loader, LocaleContext, LocaleContextProvider, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, KitsScrollView as ScrollView, FormSelect as Select, SelectButton, Skeleton$1 as Skeleton, SkeletonRows, Skeleton as SkeletonText, Svg, TableContext, Text, ThemeContextProvider, Tooltip, Translate, KitsTreeSelect as TreeSelect, TreeView, TriStateCheckbox, VStack, capitalizeFirstLetter, checkNameDuplication, dateTimeFormat, deepMerge, downloadCanvas, dynamicList, extendTheme, fontSizeMapping, formFileValidation, getCombinedChildIds, getCustomDateTime, getDateElements, getDefaultValues, getParams, getPropertyByPath, getURLParams, isNumber, isToday, isValidURL, localeFiles, mergeRefs, resolveStyleRecord, schemaBuilder, sizeMapping, timeAgo, timeSince, useAllSeverityColors, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFocusStyles, useFormFieldKeyboardNav, useFormManager, useKeyboardNav, useKeyboardNavProvider, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedElementStyles, useResolvedStyle, useScrollState, useSelectionController, useSeverityColors, useTable, useTheme };
+export type { UseComponentDefaultsResult, UseFormManagerReturn };

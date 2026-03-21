@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useKitsTheme } from '../Contexts/Theme/KitsThemeProvider.js';
+import { useKitsTheme } from '../contexts/Theme/KitsThemeProvider.js';
 
 const CSS_PROP_MAP = {
   bg: "backgroundColor",
@@ -35,24 +35,25 @@ const EXPAND_MAP = {
   borderX: ["borderLeft", "borderRight"],
   borderY: ["borderTop", "borderBottom"]
 };
+function resolveStyleRecord(themeStyle, resolveToken) {
+  if (!themeStyle || Object.keys(themeStyle).length === 0) return {};
+  const resolved = {};
+  for (const [key, value] of Object.entries(themeStyle)) {
+    const resolvedValue = typeof value === "string" ? resolveToken(value) : value;
+    if (key in EXPAND_MAP) {
+      for (const cssKey of EXPAND_MAP[key]) {
+        resolved[cssKey] = resolvedValue;
+      }
+      continue;
+    }
+    resolved[CSS_PROP_MAP[key] ?? key] = resolvedValue;
+  }
+  return resolved;
+}
 function useResolvedStyle(themeStyle) {
   const { resolveToken } = useKitsTheme();
-  return useMemo(() => {
-    if (!themeStyle || Object.keys(themeStyle).length === 0) return {};
-    const resolved = {};
-    for (const [key, value] of Object.entries(themeStyle)) {
-      const resolvedValue = typeof value === "string" ? resolveToken(value) : value;
-      if (key in EXPAND_MAP) {
-        for (const cssKey of EXPAND_MAP[key]) {
-          resolved[cssKey] = resolvedValue;
-        }
-        continue;
-      }
-      resolved[CSS_PROP_MAP[key] ?? key] = resolvedValue;
-    }
-    return resolved;
-  }, [themeStyle, resolveToken]);
+  return useMemo(() => resolveStyleRecord(themeStyle, resolveToken), [themeStyle, resolveToken]);
 }
 
-export { useResolvedStyle as default };
+export { useResolvedStyle as default, resolveStyleRecord };
 //# sourceMappingURL=useResolvedStyle.js.map

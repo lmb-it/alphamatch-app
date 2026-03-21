@@ -5,6 +5,7 @@ import LoginScreen from '@src/modules/Auth/screens/LoginScreen';
 import RegisterScreen from '@src/modules/Auth/screens/RegisterScreen';
 import ForgotPasswordScreen from '@src/modules/Auth/screens/ForgotPasswordScreen';
 import VerifyOTPScreen from '@src/modules/Auth/screens/VerifyOTPScreen';
+import VerifyEmailScreen from '@src/modules/Auth/screens/VerifyEmailScreen';
 import LanguageSelectionScreen from '@src/modules/Auth/screens/LanguageSelectionScreen';
 
 export type AuthStackParamList = {
@@ -14,6 +15,7 @@ export type AuthStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   VerifyOTP: {phone: string; context: 'login' | 'register'};
+  VerifyEmail: {email: string};
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -29,6 +31,7 @@ export function AuthNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
+      <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
     </Stack.Navigator>
   );
 }

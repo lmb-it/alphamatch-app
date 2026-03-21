@@ -1,8 +1,3 @@
-const GUTTER = 8;
-const FIELD_MARGIN = 16;
-const FIELD_LABEL_MARGIN = 8;
-const HELPER_TEXT_MARGIN = 4;
-const SPACER = 16;
 const breakpoints = {
   base: 0,
   xs: 480,
@@ -14,5 +9,5 @@ const breakpoints = {
   xxxl: 1920
 };
 
-export { FIELD_LABEL_MARGIN, FIELD_MARGIN, GUTTER, HELPER_TEXT_MARGIN, SPACER, breakpoints };
+export { breakpoints };
 //# sourceMappingURL=index.js.map

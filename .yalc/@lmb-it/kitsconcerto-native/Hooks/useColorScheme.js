@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useKitsTheme } from '../Contexts/Theme/KitsThemeProvider.js';
+import { useKitsTheme } from '../contexts/Theme/KitsThemeProvider.js';
 
 function useKitsColorScheme(colorScheme, variant) {
   const { resolveToken, colorMode } = useKitsTheme();

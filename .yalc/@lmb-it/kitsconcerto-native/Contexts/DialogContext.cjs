@@ -4,10 +4,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var jsxRuntime = require('react/jsx-runtime');
 var React = require('react');
-var index_native = require('../Components/Molecules/KitsToast/index.cjs');
-var index_native$1 = require('../Components/Molecules/KitsConfirm/index.cjs');
-var index_native$2 = require('../Components/Molecules/KitsDialog/index.cjs');
-var index_native$3 = require('../Components/Molecules/KitsConfirmPopup/index.cjs');
+var index_native = require('../components/Toast/index.cjs');
+var index_native$1 = require('../components/ConfirmDialog/index.cjs');
+var index_native$2 = require('../components/Dialog/index.cjs');
+var index_native$3 = require('../components/ConfirmPopup/index.cjs');
 
 const PopupContext = React.createContext(null);
 const PopupProvider = ({ children }) => {

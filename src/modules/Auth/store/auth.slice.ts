@@ -138,7 +138,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.pendingVerification = {
         contactEmail: action.payload.phone,
-        context: 'emailVerification',
+        context: 'phoneVerification',
       };
     },
     sendOtpFailure(state, action: PayloadAction<string>) {
@@ -233,6 +233,20 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+    },
+
+    // ── Mark Welcome Seen ──
+    markWelcomeSeen(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    markWelcomeSeenSuccess(state, action: PayloadAction<IUser>) {
+      state.user = action.payload;
+      state.loading = false;
+    },
+    markWelcomeSeenFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
     },
 
     // ── Utility ──

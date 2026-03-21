@@ -1242,26 +1242,15 @@ const toMemes = (ext) => {
 };
 const imagesExt = Object.keys(imagesTypes);
 const filesExt = Object.keys({ ...filesTypes, ...imagesTypes });
-const imagesMemes = imagesExt.flatMap((k) => getTypes(k));
-const filesMemes = filesExt.flatMap((k) => getTypes(k));
-const checkExtAgainstAccepted = (filename, accepted) => {
-  if (accepted.length === 0) return true;
-  const ext = filename.split(".").pop();
-  const fileExt = ext ? ext.toLowerCase() : "";
-  if (!(fileExt in imagesTypes) && !(fileExt in filesTypes)) return false;
-  const mimeCandidates = getTypes(fileExt);
-  return mimeCandidates.some((m) => accepted.includes(m));
-};
+imagesExt.flatMap((k) => getTypes(k));
+filesExt.flatMap((k) => getTypes(k));
 
-exports.checkExtAgainstAccepted = checkExtAgainstAccepted;
 exports.filesExt = filesExt;
-exports.filesMemes = filesMemes;
 exports.filesTypes = filesTypes;
 exports.getMeme = getMeme;
 exports.getType = getType;
 exports.getTypes = getTypes;
 exports.imagesExt = imagesExt;
-exports.imagesMemes = imagesMemes;
 exports.imagesTypes = imagesTypes;
 exports.toMemes = toMemes;
 //# sourceMappingURL=filesTypes.cjs.map

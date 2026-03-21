@@ -68,67 +68,78 @@ export const alphaMatchTheme = extendTheme({
   },
   components: {
     Button: {
-      props: {
-        rounded: true,
-        size: 'lg',
-        severity: 'primary',
-      },
-      style: {
-        borderRadius: 28,
-        fontWeight: '600',
-        // paddingHorizontal: 24,
-        height: 52,
-        // minHeight: 52,
-      },
+      root: {
+        props: {
+          rounded: true,
+          size: 'lg',
+          severity: 'primary',
+        },
+        style: {
+          borderRadius: 28,
+          fontWeight: '600',
+          // paddingHorizontal: 24,
+          height: 52,
+          // minHeight: 52,
+        },
+      }
     },
     Select: {
-      props: {
-        inputSize: 'lg',
-      },
-      style: {
-        borderRadius: 50,
-        borderWidth: 1,
-        borderColor: '#EEEEEE',
-        paddingHorizontal: 16,
-        height: 52,
-        minHeight: 52,
-        backgroundColor: '#F9FAFC',
-        fontSize: 14,
-        color: '#263238',
-      },
+      root: {
+        props: {
+          inputSize: 'lg',
+        },
+        style: {
+          borderRadius: 50,
+          borderWidth: 1,
+          borderColor: '#EEEEEE',
+          paddingHorizontal: 16,
+          height: 52,
+          minHeight: 52,
+          backgroundColor: '#F9FAFC',
+          fontSize: 14,
+          color: '#263238',
+        },
+      }
     },
     Input: {
-      props: {
-        inputSize: 'lg',
-      },
-      style: {
-        borderRadius: 50,
-        borderWidth: 1,
-        borderColor: '#EEEEEE',
-        paddingHorizontal: 16,
-        height: 52,
-        minHeight: 52,
-        backgroundColor: '#F9FAFC',
-        fontSize: 14,
-        color: '#263238',
-      },
+      root: {
+        props: {
+          inputSize: 'lg',
+        },
+        style: {
+          borderRadius: 50,
+          borderWidth: 1,
+          borderColor: '#EEEEEE',
+          paddingHorizontal: 16,
+          height: 52,
+          minHeight: 52,
+          backgroundColor: '#F9FAFC',
+          fontSize: 14,
+          color: '#263238',
+        },
+      }
     },
     FormContainer: {
-      style: {
-        gap: 8,
-      },
+
+      root: {
+        style: {
+          gap: 8,
+        },
+      }
     },
     Card: {
-      props: {
-        variant: 'elevated',
-      },
-      style: {
-        borderRadius: 16,
-        padding: 16,
-        backgroundColor: '#FFFFFF',
-        borderWidth: 1,
-        borderColor: '#F3F4F6',
-      },
+      root: {
+        props: {
+          variant: 'elevated',
+        },
+        style: {
+          borderRadius: 16,
+          padding: 16,
+          backgroundColor: '#FFFFFF',
+          borderWidth: 1,
+          borderColor: '#F3F4F6',
+        },
+      }
     },
   },
   config: {

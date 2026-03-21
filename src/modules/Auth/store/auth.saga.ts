@@ -28,13 +28,47 @@ function* loginSaga(action: ReturnType<typeof authActions.login>): Generator {
 function* registerSaga(action: ReturnType<typeof authActions.register>): Generator {
   try {
     const res: any = yield call(authService.register, action.payload);
-    const token = res.data.token;
-    yield call(AsyncStorage.setItem, 'auth_token', token);
 
-    // Backend returns token + account — auto-login the user
-    yield put(authActions.loginSuccess({user: res.data.account, token}));
+    // Backend now returns pendingVerification — user must verify email code
+    yield put(
+      authActions.registerSuccess({
+        pendingVerification: {
+          contactEmail: res.data.contactEmail,
+          context: 'emailVerification',
+        },
+      }),
+    );
   } catch (e: any) {
     yield put(authActions.registerFailure(parseApiError(e).message));
+  }
+}
+
+function* verifyEmailSaga(action: ReturnType<typeof authActions.verifyEmail>): Generator {
+  try {
+    const res: any = yield call(authService.verifyEmail, action.payload);
+    const token = res.data.token;
+    yield call(AsyncStorage.setItem, 'auth_token', token);
+    yield put(authActions.verifyEmailSuccess({user: res.data.account, token}));
+  } catch (e: any) {
+    yield put(authActions.verifyEmailFailure(parseApiError(e).message));
+  }
+}
+
+function* resendCodeSaga(action: ReturnType<typeof authActions.resendCode>): Generator {
+  try {
+    yield call(authService.resendCode, action.payload);
+    yield put(authActions.resendCodeSuccess());
+  } catch (e: any) {
+    yield put(authActions.resendCodeFailure(parseApiError(e).message));
+  }
+}
+
+function* markWelcomeSeenSaga(): Generator {
+  try {
+    const res: any = yield call(authService.markWelcomeSeen);
+    yield put(authActions.markWelcomeSeenSuccess(res.data));
+  } catch (e: any) {
+    yield put(authActions.markWelcomeSeenFailure(parseApiError(e).message));
   }
 }
 
@@ -92,6 +126,7 @@ function* sendOtpSaga(action: ReturnType<typeof authActions.sendOtp>): Generator
 
     yield put(authActions.sendOtpSuccess({phone, context}));
   } catch (e: any) {
+    console.log(e)
     yield put(authActions.sendOtpFailure(parseApiError(e).message));
   }
 }
@@ -132,14 +167,23 @@ function* postLoginBootstrapSaga(): Generator {
 export default function* authSaga(): Generator {
   yield takeLatest(authActions.login.type, loginSaga);
   yield takeLatest(authActions.register.type, registerSaga);
+  yield takeLatest(authActions.verifyEmail.type, verifyEmailSaga);
+  yield takeLatest(authActions.resendCode.type, resendCodeSaga);
   yield takeLatest(authActions.socialLogin.type, socialLoginSaga);
   yield takeLatest(authActions.sendOtp.type, sendOtpSaga);
   yield takeLatest(authActions.verifyOtp.type, verifyOtpSaga);
+  yield takeLatest(authActions.markWelcomeSeen.type, markWelcomeSeenSaga);
   yield takeLatest(authActions.logout.type, logoutSaga);
   yield takeLatest(authActions.fetchMe.type, fetchMeSaga);
-  // Bootstrap data after any login success path (including fetchMe on cold start with persisted token)
+  // Bootstrap data after any login success path
   yield takeLatest(
-    [authActions.loginSuccess.type, authActions.socialLoginSuccess.type, authActions.verifyOtpSuccess.type, authActions.fetchMeSuccess.type],
+    [
+      authActions.loginSuccess.type,
+      authActions.socialLoginSuccess.type,
+      authActions.verifyOtpSuccess.type,
+      authActions.verifyEmailSuccess.type,
+      authActions.fetchMeSuccess.type,
+    ],
     postLoginBootstrapSaga,
   );
 }

@@ -3,7 +3,6 @@ import 'react-icons/ai';
 import 'react-icons/io';
 import '../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.js';
 import 'yup';
-import '../../packages/types/src/Css/map/index.js';
 import { resolveTokenValue } from '../../packages/types/src/Theme/resolvers.js';
 
 function buildNativeColorMap(theme, colorMode) {
