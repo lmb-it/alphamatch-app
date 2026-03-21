@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  SafeAreaView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,6 +15,7 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 // Assuming selectCareers provides a list of objects like { identifier, title, category, businessModel }
 import {selectCareers, selectCareersLoading, tradingAccountActions} from '@src/modules/TradingAccount';
 import type {ICareerOption} from '../models/tradingAccount.types';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 
@@ -67,7 +67,7 @@ export default function CareerSelectionScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AlphaLayout showDecorations={false} scrollEnabled={false}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg">
         <View style={styles.header}>
           <Heading as="h2" bold color="text-primary" style={styles.heading}>
@@ -156,15 +156,11 @@ export default function CareerSelectionScreen() {
           </View>
         )}
       </Flex>
-    </SafeAreaView>
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
   header: {
     paddingHorizontal: 20,
     paddingTop: 20,

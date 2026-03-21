@@ -18,13 +18,13 @@ import {
   StyleSheet,
   RefreshControl,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {selectActiveWorkspaceType} from '@src/modules/Workspace';
 import {JobCard} from '@src/components/shared/JobCard';
 import {ProposalCard} from '@src/components/shared/ProposalCard';
 import type {MyJobsStackNavigationProp} from '@src/routes/MyJobsStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -95,9 +95,7 @@ const MyJobsScreen: React.FC = () => {
   const workerProposals = FIXTURE_WORKER_PROPOSALS[workerFilter] ?? [];
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
-
+    <AlphaLayout showDecorations={false} scrollEnabled={false} showBackButton={false}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>{isTradeMode ? TITLE_WORKER : TITLE_CLIENT}</Text>
@@ -167,15 +165,13 @@ const MyJobsScreen: React.FC = () => {
 
         <View style={styles.bottomPad} />
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default MyJobsScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safeTop: {backgroundColor: '#F9FAFC'},
   header: {paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4},
   title: {fontSize: 22, fontWeight: '700', color: '#111827'},
   filtersScroll: {

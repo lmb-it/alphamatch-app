@@ -123,11 +123,7 @@ const MyAccountScreen: React.FC = () => {
         ) : (
           <View style={[styles.coverImage, {backgroundColor: primaryColor}]} />
         )}
-        {/* Gradient fadeout merging into status bar */}
-        <LinearGradient
-          colors={['rgba(0,0,0,0.45)', 'transparent']}
-          style={styles.coverGradientTop}
-        />
+
         {/* Bottom fade */}
         <LinearGradient
           colors={['transparent', 'rgba(249,250,252,0.6)']}

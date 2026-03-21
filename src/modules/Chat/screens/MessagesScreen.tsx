@@ -8,12 +8,12 @@
  */
 import React from 'react';
 import {View, Text, ScrollView, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {selectActiveWorkspaceType} from '@src/modules/Workspace';
 import {ChatListItem} from '@src/components/shared/ChatListItem';
 import type {MessagesStackNavigationProp} from '@src/routes/MessagesStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -41,8 +41,7 @@ const MessagesScreen: React.FC = () => {
   const chats = isTradeMode ? FIXTURE_WORKER_CHATS : FIXTURE_CLIENT_CHATS;
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <AlphaLayout showDecorations={false} scrollEnabled={false} showBackButton={false}>
       <View style={styles.header}>
         <Text style={styles.title}>{TITLE_MESSAGES}</Text>
       </View>
@@ -62,15 +61,13 @@ const MessagesScreen: React.FC = () => {
         ))}
         <View style={styles.bottomPad} />
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default MessagesScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#FFFFFF'},
-  safeTop: {backgroundColor: '#FFFFFF'},
   header: {paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8},
   title: {fontSize: 22, fontWeight: '700', color: '#111827'},
   bottomPad: {height: 100},

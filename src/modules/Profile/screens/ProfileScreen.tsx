@@ -13,7 +13,6 @@
  */
 import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -86,8 +85,7 @@ const ProfileScreen: React.FC = () => {
   const workspaceName = isTradeMode ? activeItem?.label ?? 'Trading Account' : LABEL_PERSONAL_MODE;
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <AlphaLayout showDecorations={false} scrollEnabled={false} showBackButton={false}>
       <Text style={styles.pageTitle}>{TITLE}</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -207,15 +205,13 @@ const ProfileScreen: React.FC = () => {
         onConfirm={handleLogout}
         onCancel={() => setShowLogout(false)}
       />
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safeTop: {backgroundColor: '#F9FAFC'},
   pageTitle: {fontSize: 22, fontWeight: '700', color: '#111827', marginHorizontal: 20, marginTop: 12, marginBottom: 8},
   modeCard: {
     flexDirection: 'row',

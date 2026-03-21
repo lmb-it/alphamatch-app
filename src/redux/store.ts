@@ -22,7 +22,7 @@ import rootSaga from './rootSaga';
 // Strip transient fields (error, loading) from auth on rehydration
 const authTransform = createTransform(
   null, // inbound: persist as-is
-  (outbound: any) => ({...outbound, error: null, loading: false, pendingVerification: null, resetContact: null}), // outbound: reset transient fields
+  (outbound: any) => ({...outbound, error: null, loading: false, pendingVerification: null, resetContact: null, welcomeIntent: null}), // outbound: reset transient fields
   {whitelist: ['auth']},
 );
 

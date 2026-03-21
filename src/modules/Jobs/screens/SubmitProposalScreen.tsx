@@ -4,8 +4,7 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {X} from 'lucide-react-native';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const LABEL_TITLE = 'Submit a Bid';
 const LABEL_PRICE = 'Your Bid Price (USD)';
@@ -15,19 +14,11 @@ const LABEL_SUBMIT = 'Submit Bid';
 const LABEL_CANCEL = 'Cancel';
 
 const SubmitProposalScreen: React.FC = () => {
-  const navigation = useNavigation();
   const [price, setPrice] = useState('');
   const [proposal, setProposal] = useState('');
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <Text style={styles.title}>{LABEL_TITLE}</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <X size={22} color="#111827" />
-        </TouchableOpacity>
-      </View>
+    <AlphaLayout title={LABEL_TITLE} closeIcon showDecorations={false} headerStyle="solid" scrollEnabled={false}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.fieldLabel}>{LABEL_PRICE}</Text>
         <TextInput
@@ -57,21 +48,17 @@ const SubmitProposalScreen: React.FC = () => {
         <TouchableOpacity style={styles.submitBtn} activeOpacity={0.85}>
           <Text style={styles.submitBtnText}>{LABEL_SUBMIT}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancelBtn} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.7}>
           <Text style={styles.cancelText}>{LABEL_CANCEL}</Text>
         </TouchableOpacity>
       </SafeAreaView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default SubmitProposalScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#FFFFFF'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  title: {fontSize: 18, fontWeight: '700', color: '#111827'},
   content: {padding: 20, gap: 8},
   fieldLabel: {fontSize: 13, fontWeight: '600', color: '#374151', marginTop: 12},
   priceInput: {backgroundColor: '#F9FAFB', borderRadius: 12, padding: 14, fontSize: 22, fontWeight: '700', color: '#111827', borderWidth: 1.5, borderColor: '#E5E7EB'},

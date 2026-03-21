@@ -6,13 +6,12 @@
  */
 import React, {useEffect} from 'react';
 import {View, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RouteProp} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Text, Heading, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
-import {ArrowLeft, Award, ChevronRight} from 'lucide-react-native';
+import {Award, ChevronRight} from 'lucide-react-native';
 import {
   tradingAccountActions,
   selectTierStatus,
@@ -20,6 +19,7 @@ import {
 } from '@src/modules/TradingAccount';
 import {TierBadge} from '../components/TierBadge';
 import {TierProgressBar} from '../components/TierProgressBar';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 import type {ProfileStackParamList} from '@src/routes/ProfileStackNavigator';
 
 type ScreenNav = NativeStackNavigationProp<ProfileStackParamList, 'TierStatus'>;
@@ -43,7 +43,7 @@ export default function TierStatusScreen() {
   }, [accountRef, dispatch]);
 
   const formatDate = (iso: string | null) => {
-    if (!iso) return '—';
+    if (!iso) return '\u2014';
     try {
       return new Date(iso).toLocaleDateString('en-AU', {
         year: 'numeric',
@@ -56,7 +56,7 @@ export default function TierStatusScreen() {
   };
 
   const formatMethod = (method: string | null) => {
-    if (!method) return '—';
+    if (!method) return '\u2014';
     const labels: Record<string, string> = {
       document_points: 'Document Verification',
       electronic_verification: 'Electronic Verification',
@@ -67,20 +67,11 @@ export default function TierStatusScreen() {
   };
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text fontSize={16} fontWeight="700" color="text-primary">
-          {t('trading.tier.tierStatus')}
-        </Text>
-        <View style={{width: 22}} />
-      </View>
-
+    <AlphaLayout
+      title={t('trading.tier.tierStatus')}
+      showDecorations={false}
+      headerStyle="solid"
+      scrollEnabled={false}>
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={primaryColor} />
@@ -145,7 +136,7 @@ export default function TierStatusScreen() {
                   .replace('{current}', String(tierStatus.points.current))
                   .replace(
                     '{required}',
-                    String(tierStatus.points.required ?? '—'),
+                    String(tierStatus.points.required ?? '\u2014'),
                   )}
                 showLabel={false}
               />
@@ -194,22 +185,11 @@ export default function TierStatusScreen() {
           )}
         </ScrollView>
       )}
-    </View>
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#F3F4F6',
-  },
   center: {
     flex: 1,
     justifyContent: 'center',

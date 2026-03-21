@@ -99,13 +99,15 @@ export default {
   'auth.goToSignIn': 'الذهاب إلى تسجيل الدخول',
 
   // Intent Selection
-  'auth.intentTitle': 'ما الذي يجلبك إلى',
+  'auth.intentTitle': 'هل لديك مهارة وتريد الحصول على المزيد من العملاء عبر',
   'auth.intentTitleAccent': 'ألفا ماتش؟',
-  'auth.intentSubtitle': 'اختر كيف تريد استخدام التطبيق.',
-  'auth.findWork': 'البحث عن عمل',
-  'auth.findWorkDesc': 'تصفح الوظائف وقدم خدماتك',
-  'auth.postJob': 'نشر وظيفة',
+  'auth.intentSubtitle': 'اختر كيف تريد البدء.',
+  'auth.findWork': 'نعم، أريد البحث عن عمل',
+  'auth.findWorkDesc': 'اجعل العملاء يكتشفونك',
+  'auth.postJob': 'لا، أريد نشر وظائف',
   'auth.postJobDesc': 'وظّف محترفين لمشاريعك',
+  'auth.both': 'كلاهما',
+  'auth.bothDesc': 'البحث عن عمل ونشر وظائف',
 
   // Alerts & Errors
   'auth.codeSent': 'تم إرسال الرمز',

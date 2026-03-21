@@ -3,13 +3,13 @@
  * Client view of a single job: description, bids received, hire actions, deposit.
  */
 import React from 'react';
-import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import {useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
-import {ArrowLeft, DollarSign, MapPin, Users} from 'lucide-react-native';
+import {DollarSign, MapPin, Users} from 'lucide-react-native';
 import {StatusBadge} from '@src/components/shared/StatusBadge';
 import {ProposalCard} from '@src/components/shared/ProposalCard';
 import type {MyJobsStackParamList, MyJobsStackNavigationProp} from '@src/routes/MyJobsStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type RouteProps = RouteProp<MyJobsStackParamList, 'JobDetailClient'>;
 
@@ -23,15 +23,7 @@ const JobDetailClientScreen: React.FC = () => {
   const route = useRoute<RouteProps>();
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Job Detail</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout title="Job Detail" showDecorations={false} headerStyle="solid" scrollEnabled={false}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={styles.jobTitle}>Fix leaking kitchen tap</Text>
@@ -61,17 +53,13 @@ const JobDetailClientScreen: React.FC = () => {
         </View>
         <View style={styles.bottomPad} />
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default JobDetailClientScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safeTop: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   content: {padding: 20, gap: 16},
   section: {gap: 10},
   sectionHeader: {flexDirection: 'row', alignItems: 'center', gap: 6},

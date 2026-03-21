@@ -15,6 +15,7 @@ export const URLs = {
     verifyResetCode: '/auth/verify-reset-code',
     socialLogin: '/auth/social-login',
     phoneLogin: '/auth/phone-login',
+    resetViaPhone: '/auth/reset-via-phone',
     validatePhone: '/auth/validate-phone',
     verifyOtp: '/auth/verify-otp',
     welcomeSeen: '/auth/welcome-seen',

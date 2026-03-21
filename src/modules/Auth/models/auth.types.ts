@@ -24,6 +24,8 @@ export interface IUser {
   modifiedAt: string;
 }
 
+export type WelcomeIntent = 'findWork' | 'postJob' | 'both' | null;
+
 export interface IAuthState {
   user: IUser | null;
   token: string | null;
@@ -32,6 +34,7 @@ export interface IAuthState {
   error: string | null;
   pendingVerification: IPendingVerification | null;
   resetContact: string | null;
+  welcomeIntent: WelcomeIntent;
 }
 
 export interface IPendingVerification {
@@ -40,7 +43,8 @@ export interface IPendingVerification {
 }
 
 export interface ILoginPayload {
-  contactEmail: string;
+  contactEmail?: string;
+  contactPhone?: string;
   secret: string;
 }
 

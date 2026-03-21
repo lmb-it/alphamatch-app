@@ -62,6 +62,11 @@ export default {
     return res.data;
   },
 
+  resetViaPhone: async (data: {contactPhone: string; firebaseToken: string; newSecret: string; newSecret_confirmation: string}) => {
+    const res = await api.post(URLs.auth.resetViaPhone, data);
+    return res.data;
+  },
+
   socialLogin: async (data: ISocialLoginPayload) => {
     const res = await api.post(URLs.auth.socialLogin, data);
     return res.data;

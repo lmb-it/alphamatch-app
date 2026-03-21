@@ -3,10 +3,10 @@ import {View, ScrollView, TextInput, TouchableOpacity, StyleSheet, Alert, Activi
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
-import {ArrowLeft} from 'lucide-react-native';
 import {Text, useLanguage} from '@lmb-it/kitsconcerto';
 import {selectProfileData, profileActions} from '@src/modules/Profile';
 import {updateProfileApi} from '../api/profile.service';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const EditProfileScreen: React.FC = () => {
   const {t} = useLanguage();
@@ -39,18 +39,7 @@ const EditProfileScreen: React.FC = () => {
   }, [firstName, lastName, phone, bio, dispatch, navigation, t]);
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text fontSize={16} fontWeight="700" color="text-primary">
-          {t('profile.editProfile')}
-        </Text>
-        <View style={{width: 22}} />
-      </View>
-
+    <AlphaLayout title={t('profile.editProfile')} headerStyle="solid" scrollEnabled={false}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text fontSize={13} fontWeight="600" color="text-primary" style={styles.label}>
           {t('profile.firstName')}
@@ -125,24 +114,13 @@ const EditProfileScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </SafeAreaView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default EditProfileScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#F3F4F6',
-  },
   content: {padding: 20, paddingBottom: 40},
   label: {marginBottom: 6, marginTop: 16},
   input: {

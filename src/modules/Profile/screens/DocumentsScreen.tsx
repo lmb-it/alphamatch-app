@@ -6,11 +6,10 @@
  */
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {View, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {Text} from '@lmb-it/kitsconcerto';
-import {ArrowLeft, RefreshCw, Shield} from 'lucide-react-native';
+import {RefreshCw, Shield} from 'lucide-react-native';
 import {selectActiveWorkspaceId, selectIsTradeMode} from '@src/modules/Workspace';
 import {fetchRequiredDocumentsWithTierApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount/models/tradingAccount.types';
@@ -19,6 +18,7 @@ import {DocumentVerificationList} from '@src/components/shared/DocumentVerificat
 import {TierBadge} from '@src/modules/TradingAccount/components/TierBadge';
 import {ExpiryWarningBanner} from '@src/modules/TradingAccount/components/ExpiryWarningBanner';
 import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const DocumentsScreen: React.FC = () => {
   const navigation = useNavigation<ProfileStackNavigationProp>();
@@ -101,26 +101,24 @@ const DocumentsScreen: React.FC = () => {
     }
   };
 
-  return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text fontSize={16} fontWeight="700" color="text-primary">
-          Documents
-        </Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={handleTierStatus} style={styles.headerBtn}>
-            <Shield size={18} color="#00A8B1" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={fetchDocs} style={styles.headerBtn}>
-            <RefreshCw size={18} color="#00A8B1" />
-          </TouchableOpacity>
-        </View>
-      </View>
+  const rightActions = (
+    <>
+      <TouchableOpacity onPress={handleTierStatus} style={styles.headerBtn}>
+        <Shield size={18} color="#00A8B1" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={fetchDocs} style={styles.headerBtn}>
+        <RefreshCw size={18} color="#00A8B1" />
+      </TouchableOpacity>
+    </>
+  );
 
+  return (
+    <AlphaLayout
+      title="Documents"
+      rightActions={rightActions}
+      showDecorations={false}
+      headerStyle="solid"
+      scrollEnabled={false}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}>
@@ -178,28 +176,13 @@ const DocumentsScreen: React.FC = () => {
           </>
         )}
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default DocumentsScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#F3F4F6',
-  },
-  headerRight: {
-    flexDirection: 'row',
-    gap: 12,
-  },
   headerBtn: {
     padding: 4,
   },

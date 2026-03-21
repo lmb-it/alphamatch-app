@@ -29,6 +29,7 @@ export const getRegisterFormElements = (
     label: t('auth.password'),
     placeholder: t('auth.passwordPlaceholder'),
     colSpan: 12,
+    toggleEye:true,
     schema: Yup.string()
       .required(t('auth.passwordRequired'))
       .min(8, t('auth.passwordMin8')),
@@ -39,6 +40,7 @@ export const getRegisterFormElements = (
     label: t('auth.confirmPassword'),
     placeholder: t('auth.confirmPasswordPlaceholder'),
     colSpan: 12,
+    toggleEye:true,
     schema: Yup.string()
       .required(t('auth.confirmPasswordRequired'))
       .oneOf([Yup.ref('password')], t('auth.passwordsMustMatch')),

@@ -10,3 +10,4 @@ export const selectAuthLoading = (state: RootState) => state.auth.loading;
 export const selectAuthError = (state: RootState) => state.auth.error;
 export const selectPendingVerification = (state: RootState) => state.auth.pendingVerification;
 export const selectResetContact = (state: RootState) => state.auth.resetContact;
+export const selectWelcomeIntent = (state: RootState) => state.auth.welcomeIntent;

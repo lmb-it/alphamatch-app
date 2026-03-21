@@ -17,7 +17,7 @@ let _confirmation: FirebaseAuthTypes.ConfirmationResult | null = null;
  * Ensure phone number is in E.164 format (e.g. +61412345678).
  * Firebase requires E.164 — calls will fail with [auth/internal-error] without it.
  */
-function toE164(phone: string): string {
+export function toE164(phone: string): string {
   // Remove everything except digits and +
   let cleaned = phone.replace(/[^\d+]/g, '');
 

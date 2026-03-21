@@ -2126,7 +2126,7 @@ export interface IGlobalEvents {
     onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void; // Used mostly on ScrollView/FlatList
 }
 
-export interface IKitsInputTextBase extends  Omit<IFormSingleElement, 'onFocus'>, IGlobalEvents {
+export interface IKitsInputTextBase extends Omit<IFormSingleElement, 'onFocus'>, IGlobalEvents {
     value?: string;
 
     placeholder?: string;
@@ -2169,7 +2169,7 @@ export interface IKitsInputText extends IKitsInputTextBase {
     keyboardNavId?: string;
 }
 
-export interface IKitsInputTextareaBase extends  Omit<IFormSingleElement, 'onFocus'>,IGlobalEvents {
+export interface IKitsInputTextareaBase extends Omit<IFormSingleElement, 'onFocus'>,IGlobalEvents {
     value?: string;
 
     rows?: number;
@@ -2194,6 +2194,7 @@ export interface IKitsInputTextarea extends IKitsInputTextareaBase {
         multiline?: boolean;
         numberOfLines?: number;
     };
+    keyboardNavId?: string;
 }
 
 export interface IKitsInputSwitch extends Omit<IFormSingleElement, 'onChange'> {
@@ -5884,6 +5885,7 @@ export interface KeyboardNavContextValue {
         blurOnSubmit: boolean;
         onSubmitEditing: () => void;
     };
+    focusNext: (currentId: string) => void;
 }
 declare const KeyboardNavContext: React$1.Context<KeyboardNavContextValue>;
 declare const useKeyboardNav: () => KeyboardNavContextValue;
@@ -5902,6 +5904,7 @@ declare function useKeyboardNavProvider(): KeyboardNavContextValue;
 declare function useFormFieldKeyboardNav(id: string | undefined): {
     inputRef: React$1.RefObject<TextInput>;
     navProps: {};
+    focusNext: () => void;
 };
 
 declare const isValidURL: (url: string) => boolean;

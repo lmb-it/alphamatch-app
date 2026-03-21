@@ -2,14 +2,10 @@
  * WalletScreen — stub
  */
 import React from 'react';
-import {View, Text, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft} from 'lucide-react-native';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import {WalletHeader} from '@src/components/shared/WalletHeader';
 import {StatusBadge} from '@src/components/shared/StatusBadge';
-
-const TITLE = 'Wallet';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const FIXTURE_TXN = [
   {id: 't1', label: 'Top Up', amount: '+$500.00', date: 'Mar 10', type: 'credit'},
@@ -19,17 +15,8 @@ const FIXTURE_TXN = [
 ];
 
 const WalletScreen: React.FC = () => {
-  const navigation = useNavigation();
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{TITLE}</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout title="Wallet" showDecorations={false} headerStyle="solid" scrollEnabled={false}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <WalletHeader balance={400} currency="USD" />
         <Text style={styles.sectionTitle}>Recent Transactions</Text>
@@ -46,17 +33,13 @@ const WalletScreen: React.FC = () => {
         ))}
         <View style={styles.bottomPad} />
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default WalletScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   sectionTitle: {fontSize: 17, fontWeight: '700', color: '#111827', marginHorizontal: 20, marginTop: 8, marginBottom: 8},
   txnRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 13, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F9FAFC'},
   txnInfo: {gap: 2},

@@ -7,16 +7,14 @@
  */
 import React, {useState} from 'react';
 import {View, Text, ScrollView, StyleSheet, Alert} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft, Shield, CreditCard, MapPin, Globe, Mail, Lock, Bell, Smartphone, CheckCircle, Monitor, UserX, Trash2} from 'lucide-react-native';
+import {Shield, CreditCard, MapPin, Globe, Mail, Lock, Bell, Smartphone, CheckCircle, Monitor, UserX, Trash2} from 'lucide-react-native';
 import {SectionMenuRow} from '@src/components/shared/SectionMenuRow';
 import {ToggleRow} from '@src/components/shared/ToggleRow';
 import {ConfirmSheet} from '@src/components/shared/ConfirmSheet';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const TITLE = 'Settings';
 const SECTION_ACCOUNT = 'Account';
 const SECTION_NOTIFICATIONS = 'Notifications';
 const SECTION_APPEARANCE = 'Appearance';
@@ -25,7 +23,6 @@ const SECTION_DANGER = 'Danger Zone';
 // ── Component ────────────────────────────────────────────────────────────────
 
 const SettingsScreen: React.FC = () => {
-  const navigation = useNavigation();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
@@ -35,20 +32,7 @@ const SettingsScreen: React.FC = () => {
   const stub = () => Alert.alert('Coming Soon', 'This settings screen is under construction.');
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <View style={styles.backBtn}>
-          <ArrowLeft
-            size={22}
-            color="#111827"
-            onTouchEnd={() => navigation.goBack()}
-          />
-        </View>
-        <Text style={styles.headerTitle}>{TITLE}</Text>
-        <View style={{width: 22}} />
-      </View>
-
+    <AlphaLayout title="Settings" headerStyle="solid" scrollEnabled={false}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Account */}
         <Text style={styles.section}>{SECTION_ACCOUNT}</Text>
@@ -96,18 +80,13 @@ const SettingsScreen: React.FC = () => {
         onCancel={() => setConfirmSheet(null)}
         isHighRisk
       />
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default SettingsScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  backBtn: {width: 22, justifyContent: 'center'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   section: {fontSize: 12, fontWeight: '700', color: '#6B7280', letterSpacing: 0.8, textTransform: 'uppercase', marginTop: 24, marginBottom: 4, marginHorizontal: 20},
   dangerSection: {color: '#EF4444'},
   bottomPad: {height: 40},

@@ -18,7 +18,6 @@ import {
   Image,
   RefreshControl,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {Sparkles, ImagePlus, X} from 'lucide-react-native';
@@ -36,11 +35,13 @@ import {
 } from '@src/modules/Workspace';
 import {tradingAccountActions} from '@src/modules/TradingAccount';
 import {profileActions} from '@src/modules/Profile';
+import {authActions, selectWelcomeIntent} from '@src/modules/Auth';
 import {JobCard} from '@src/components/shared/JobCard';
 import {WorkspaceBadge} from '@src/components/shared/WorkspaceBadge';
 import {WorkspaceSwitcherSheet} from '@src/components/shared/WorkspaceSwitcherSheet';
 import {WalletHeader} from '@src/components/shared/WalletHeader';
 import type {HomeStackNavigationProp} from '@src/routes/HomeStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 // ── Components ───────────────────────────────────────────────────────────────
 
@@ -152,9 +153,22 @@ const HomeScreen: React.FC = () => {
   const activeType = useSelector(selectActiveWorkspaceType);
   const activeItem = useSelector(selectActiveWorkspaceItem);
   const isTradeMode = activeType === 'trading_account';
+  const welcomeIntent = useSelector(selectWelcomeIntent);
   const {t} = useLanguage();
   const {resolveToken} = useKitsTheme();
   const primaryColor = resolveToken('primary');
+
+  // Auto-navigate to TA creation if user chose "findWork" or "both" on welcome
+  useEffect(() => {
+    if (welcomeIntent === 'findWork' || welcomeIntent === 'both') {
+      dispatch(authActions.clearWelcomeIntent());
+      (navigation as any).navigate('ProfileTab', {
+        screen: 'TradingAccountCreation',
+      });
+    } else if (welcomeIntent === 'postJob') {
+      dispatch(authActions.clearWelcomeIntent());
+    }
+  }, [welcomeIntent, dispatch, navigation]);
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -276,8 +290,7 @@ const HomeScreen: React.FC = () => {
   ], [textareaTemplate, imageUploaderTemplate]);
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
+    <AlphaLayout showDecorations={false} scrollEnabled={false} showBackButton={false}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -375,7 +388,7 @@ const HomeScreen: React.FC = () => {
         onClose={() => setShowSwitcher(false)}
         onCreateTradingAccount={() => navigation.navigate('JobPosting')}
       />
-    </View>
+    </AlphaLayout>
   );
 };
 
@@ -384,8 +397,6 @@ const HomeScreen: React.FC = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safeTop: {backgroundColor: '#F9FAFC'},
   scroll: {paddingTop: 8, paddingBottom: 16},
   header: {
     flexDirection: 'row',

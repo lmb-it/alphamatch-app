@@ -78,7 +78,7 @@ export const alphaMatchTheme = extendTheme({
           borderRadius: 28,
           fontWeight: '600',
           // paddingHorizontal: 24,
-          height: 52,
+          // height: 52,
           // minHeight: 52,
         },
       }
@@ -97,7 +97,6 @@ export const alphaMatchTheme = extendTheme({
           minHeight: 52,
           backgroundColor: '#F9FAFC',
           fontSize: 14,
-          color: '#263238',
         },
       }
     },
@@ -115,7 +114,6 @@ export const alphaMatchTheme = extendTheme({
           minHeight: 52,
           backgroundColor: '#F9FAFC',
           fontSize: 14,
-          color: '#263238',
         },
       }
     },

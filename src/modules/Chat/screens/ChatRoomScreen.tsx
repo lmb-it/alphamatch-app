@@ -16,11 +16,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
-import {ArrowLeft, Paperclip, Send} from 'lucide-react-native';
+import {useRoute, type RouteProp} from '@react-navigation/native';
+import {Paperclip, Send} from 'lucide-react-native';
 import {LockOverlay} from '@src/components/shared/LockOverlay';
 import type {MessagesStackParamList} from '@src/routes/MessagesStackNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,7 +52,6 @@ const FIXTURE_MESSAGES: IMessage[] = [
 // ── Component ────────────────────────────────────────────────────────────────
 
 const ChatRoomScreen: React.FC = () => {
-  const navigation = useNavigation();
   const route = useRoute<ChatRoomRouteProp>();
   const {isLocked} = route.params;
   const [message, setMessage] = useState('');
@@ -69,22 +68,7 @@ const ChatRoomScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safeTop} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerName}>Sam</Text>
-          <Text style={styles.headerJob} numberOfLines={1}>
-            {route.params.jobRef}
-          </Text>
-        </View>
-      </View>
-
+    <AlphaLayout title="Sam" showDecorations={false} headerStyle="solid" scrollEnabled={false}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -127,29 +111,14 @@ const ChatRoomScreen: React.FC = () => {
           onAction={() => {}}
         />
       )}
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default ChatRoomScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safeTop: {backgroundColor: '#FFFFFF'},
   flex: {flex: 1},
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#F3F4F6',
-    gap: 12,
-  },
-  headerInfo: {flex: 1, gap: 2},
-  headerName: {fontSize: 16, fontWeight: '700', color: '#111827'},
-  headerJob: {fontSize: 12, color: '#6B7280'},
   messagesList: {padding: 16, gap: 8},
   bubble: {
     maxWidth: '75%',

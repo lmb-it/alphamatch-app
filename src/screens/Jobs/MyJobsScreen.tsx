@@ -7,22 +7,20 @@ import {
   ScrollView,
   TextInput,
   FlatList,
-  SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import {ArrowLeft, Search} from 'lucide-react-native';
-import {useNavigation} from '@react-navigation/native';
+import {Search} from 'lucide-react-native';
 import {useDispatch} from 'react-redux';
 import {MyJobCard} from '../../components/MyJobCard';
 import {useKitsTheme, useLanguage} from '@lmb-it/kitsconcerto';
 import {tradingAccountActions} from '@src/modules/TradingAccount';
 import {profileActions} from '@src/modules/Profile';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type TabKey = 'all' | 'pending' | 'active' | 'completed' | 'cancelled';
 
 export default function MyJobsScreen() {
   const {t} = useLanguage();
-  const navigation = useNavigation();
   const {resolveToken} = useKitsTheme();
   const primaryColor = resolveToken('primary');
 
@@ -44,7 +42,7 @@ export default function MyJobsScreen() {
     {key: 'pending', label: t('jobs.tabs.pending')},
     {key: 'active', label: t('jobs.tabs.active')},
     {key: 'completed', label: t('jobs.tabs.completed')},
-    {key: 'cancelled', label: t('jobs.tabs.cancelled')}, // Sometimes hidden in mocks but available
+    {key: 'cancelled', label: t('jobs.tabs.cancelled')},
   ];
 
   // Dummy data representing projects
@@ -76,9 +74,7 @@ export default function MyJobsScreen() {
   ];
 
   const filteredJobs = dummyJobs.filter(job => {
-    // Basic filter by tab
     if (activeTab !== 'all' && job.status !== activeTab) return false;
-    // Basic search
     if (
       searchQuery &&
       !job.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -89,122 +85,85 @@ export default function MyJobsScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Go back">
-            <ArrowLeft color="#263238" size={24} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('jobs.myJob')}</Text>
-        </View>
+    <AlphaLayout title={t('jobs.myJob')} showDecorations={false} headerStyle="solid" scrollEnabled={false}>
+      {/* Tabs */}
+      <View style={styles.tabsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsScrollContent}>
+          {tabs.map(tab => {
+            const isActive = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tabItem, isActive && styles.tabItemActive]}
+                onPress={() => setActiveTab(tab.key)}
+                accessible
+                accessibilityRole="tab"
+                accessibilityLabel={tab.label}
+                accessibilityState={{selected: isActive}}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    isActive && {color: primaryColor, fontWeight: '600'},
+                  ]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
-        {/* Tabs */}
-        <View style={styles.tabsContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.tabsScrollContent}>
-            {tabs.map(tab => {
-              const isActive = activeTab === tab.key;
-              return (
-                <TouchableOpacity
-                  key={tab.key}
-                  style={[styles.tabItem, isActive && styles.tabItemActive]}
-                  onPress={() => setActiveTab(tab.key)}
-                  accessible
-                  accessibilityRole="tab"
-                  accessibilityLabel={tab.label}
-                  accessibilityState={{selected: isActive}}>
-                  <Text
-                    style={[
-                      styles.tabText,
-                      isActive && {color: primaryColor, fontWeight: '600'},
-                    ]}>
-                    {tab.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <Search color="#9CA3AF" size={20} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder={t('searchPlaceholder')}
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            accessible
-            accessibilityLabel="Search jobs"
-            accessibilityHint="Filter jobs by title"
-          />
-        </View>
-
-        {/* List */}
-        <FlatList
-          data={filteredJobs}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          renderItem={({item}) => (
-            <MyJobCard
-              style={styles.cardMargin}
-              dateRange={item.dateRange}
-              title={item.title}
-              subtitle={item.subtitle}
-              price={item.price}
-              primaryAction={{
-                label: t('jobs.viewDetails'),
-                onPress: () => {},
-              }}
-              secondaryAction={
-                item.status === 'pending'
-                  ? undefined
-                  : {label: t('chat.rooms'), onPress: () => {}}
-              }
-            />
-          )}
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <Search color="#9CA3AF" size={20} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder={t('searchPlaceholder')}
+          placeholderTextColor="#9CA3AF"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          accessible
+          accessibilityLabel="Search jobs"
+          accessibilityHint="Filter jobs by title"
         />
       </View>
-    </SafeAreaView>
+
+      {/* List */}
+      <FlatList
+        data={filteredJobs}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        renderItem={({item}) => (
+          <MyJobCard
+            style={styles.cardMargin}
+            dateRange={item.dateRange}
+            title={item.title}
+            subtitle={item.subtitle}
+            price={item.price}
+            primaryAction={{
+              label: t('jobs.viewDetails'),
+              onPress: () => {},
+            }}
+            secondaryAction={
+              item.status === 'pending'
+                ? undefined
+                : {label: t('chat.rooms'), onPress: () => {}}
+            }
+          />
+        )}
+      />
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  headerTitle: {
-    fontFamily: 'Roboto',
-    fontWeight: '700',
-    fontSize: 18,
-    color: '#263238',
-  },
   tabsContainer: {
     borderBottomWidth: 1,
     borderBottomColor: '#EEEEEE',
@@ -230,7 +189,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFC', // light grey input bg
+    backgroundColor: '#F9FAFC',
     borderWidth: 1,
     borderColor: '#EEEEEE',
     borderRadius: 50,
@@ -249,7 +208,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 100, // accommodate bottom tab bar
+    paddingBottom: 100,
   },
   cardMargin: {
     marginBottom: 16,

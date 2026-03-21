@@ -3,26 +3,20 @@
  */
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft, CreditCard} from 'lucide-react-native';
+import {CreditCard} from 'lucide-react-native';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const LABEL_PAY = 'Pay Deposit';
 const LABEL_AMOUNT = '$120.00';
 const LABEL_DESC = 'Paying the deposit unlocks the chat and reveals the provider\'s full identity.';
 
 const PayDepositScreen: React.FC = () => {
-  const navigation = useNavigation();
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Pay Deposit</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout
+      title="Pay Deposit"
+      showDecorations={false}
+      headerStyle="solid"
+      scrollEnabled={false}>
       <View style={styles.content}>
         <View style={styles.amountCard}>
           <Text style={styles.amountLabel}>Deposit Amount</Text>
@@ -37,17 +31,13 @@ const PayDepositScreen: React.FC = () => {
           <Text style={styles.payBtnText}>{LABEL_PAY}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default PayDepositScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   content: {flex: 1, padding: 24, gap: 20},
   amountCard: {backgroundColor: '#00A8B1', borderRadius: 20, padding: 24, alignItems: 'center', gap: 6},
   amountLabel: {fontSize: 13, color: 'rgba(255,255,255,0.8)'},

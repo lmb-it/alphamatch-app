@@ -3,36 +3,24 @@
  */
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft, Check} from 'lucide-react-native';
-
-const TITLE = 'App Language';
+import {Check} from 'lucide-react-native';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const LANGUAGES = [
   {code: 'en', label: 'English', nativeLabel: 'English'},
-  {code: 'ar', label: 'Arabic', nativeLabel: 'العربية'},
-  {code: 'es', label: 'Spanish', nativeLabel: 'Español'},
+  {code: 'ar', label: 'Arabic', nativeLabel: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629'},
+  {code: 'es', label: 'Spanish', nativeLabel: 'Espa\u00F1ol'},
   {code: 'de', label: 'German', nativeLabel: 'Deutsch'},
-  {code: 'fr', label: 'French', nativeLabel: 'Français'},
-  {code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা'},
-  {code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी'},
+  {code: 'fr', label: 'French', nativeLabel: 'Fran\u00E7ais'},
+  {code: 'bn', label: 'Bengali', nativeLabel: '\u09AC\u09BE\u0982\u09B2\u09BE'},
+  {code: 'hi', label: 'Hindi', nativeLabel: '\u0939\u093F\u0928\u094D\u0926\u0940'},
 ] as const;
 
 const LanguageSettingsScreen: React.FC = () => {
-  const navigation = useNavigation();
   const [selected, setSelected] = useState<string>('en');
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{TITLE}</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout title="App Language" headerStyle="solid" scrollEnabled={false}>
       <ScrollView>
         {LANGUAGES.map(lang => (
           <TouchableOpacity
@@ -48,17 +36,13 @@ const LanguageSettingsScreen: React.FC = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default LanguageSettingsScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   row: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
   rowSelected: {backgroundColor: '#F0FDFA'},
   rowContent: {gap: 2},

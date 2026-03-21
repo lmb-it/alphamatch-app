@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useSelector, useDispatch} from 'react-redux';
@@ -15,6 +14,7 @@ import {
   tradingAccountActions,
 } from '@src/modules/TradingAccount';
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 
@@ -98,7 +98,7 @@ export default function CareerConfirmationScreen() {
   if (!careerToConfirm) return null;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AlphaLayout showDecorations={false} scrollEnabled={false}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg">
         <ScrollView contentContainerStyle={styles.container}>
 
@@ -189,15 +189,11 @@ export default function CareerConfirmationScreen() {
 
         </ScrollView>
       </Flex>
-    </SafeAreaView>
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
   container: {
     paddingHorizontal: 24,
     paddingTop: 32,

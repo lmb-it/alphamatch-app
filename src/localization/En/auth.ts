@@ -101,13 +101,15 @@ export default {
   'auth.goToSignIn': 'Go to Sign In',
 
   // Intent Selection
-  'auth.intentTitle': 'What brings you to',
+  'auth.intentTitle': 'Do you have a skill and want to get more clients through',
   'auth.intentTitleAccent': 'AlphaMatch?',
-  'auth.intentSubtitle': 'Choose how you want to use the app.',
-  'auth.findWork': 'Find Work',
-  'auth.findWorkDesc': 'Browse jobs and offer your services',
-  'auth.postJob': 'Post a Job',
+  'auth.intentSubtitle': 'Choose how you want to start.',
+  'auth.findWork': 'Yes, I want to find work',
+  'auth.findWorkDesc': 'Get discovered by clients',
+  'auth.postJob': 'No, I want to post jobs',
   'auth.postJobDesc': 'Hire professionals for your projects',
+  'auth.both': 'Both',
+  'auth.bothDesc': 'Find work & post jobs',
 
   // Alerts & Errors
   'auth.codeSent': 'Code Sent',

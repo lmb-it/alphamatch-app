@@ -4,27 +4,20 @@
  */
 import React, {useState} from 'react';
 import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft} from 'lucide-react-native';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 const TABS = ['Overview', 'Files', 'Milestones', 'Feedback'] as const;
 type Tab = typeof TABS[number];
 
 const ProjectDetailScreen: React.FC = () => {
-  const navigation = useNavigation();
   const [tab, setTab] = useState<Tab>('Overview');
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Project Detail</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout
+      title="Project Detail"
+      showDecorations={false}
+      headerStyle="solid"
+      scrollEnabled={false}>
       <View style={styles.tabsRow}>
         {TABS.map(t => (
           <TouchableOpacity
@@ -41,17 +34,13 @@ const ProjectDetailScreen: React.FC = () => {
           <Text style={styles.placeholderSub}>Project {tab} will be implemented here.</Text>
         </View>
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
 export default ProjectDetailScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   tabsRow: {flexDirection: 'row', backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
   tabItem: {flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent'},
   tabItemActive: {borderBottomColor: '#00A8B1'},

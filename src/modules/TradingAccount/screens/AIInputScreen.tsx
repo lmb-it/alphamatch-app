@@ -4,7 +4,6 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
@@ -15,6 +14,7 @@ import {tradingAccountActions, selectAnalyzing, selectAIResult, selectTAError, s
 import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCreationNavigator';
 import {Sparkles} from 'lucide-react-native';
 import {FORM_TYPE_REFS} from '@src/config/api.config';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type Nav = NativeStackNavigationProp<TradingAccountCreationParamList>;
 const MAX_CHARS = 2000;
@@ -65,7 +65,7 @@ export default function AIInputScreen() {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AlphaLayout showDecorations={false} scrollEnabled={false}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg">
         <ScrollView contentContainerStyle={styles.container}>
           <Heading as="h2" bold color="text-primary" style={styles.heading}>
@@ -141,15 +141,11 @@ export default function AIInputScreen() {
           </View>
         </ScrollView>
       </Flex>
-    </SafeAreaView>
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
   container: {
     paddingHorizontal: 24,
     paddingTop: 32,

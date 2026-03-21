@@ -8,7 +8,7 @@ import authService from '../api/auth.service';
 import {signInWithGoogle} from '../services/googleAuth';
 import {signInWithApple} from '../services/appleAuth';
 import {parseApiError} from '@src/services/apiError';
-import {sendFirebaseOtp, confirmFirebaseOtp} from '../services/firebasePhoneAuth';
+import {sendFirebaseOtp, confirmFirebaseOtp, toE164} from '../services/firebasePhoneAuth';
 import {tradingAccountActions} from '@src/modules/TradingAccount';
 
 function* loginSaga(action: ReturnType<typeof authActions.login>): Generator {
@@ -117,14 +117,15 @@ function* logoutSaga(): Generator {
 function* sendOtpSaga(action: ReturnType<typeof authActions.sendOtp>): Generator {
   try {
     const {phone, context} = action.payload;
+    const formattedPhone = toE164(phone);
 
     // Step 1: Validate phone with backend (exists for login, doesn't for register)
-    yield call(authService.validatePhone, {phone, context});
+    yield call(authService.validatePhone, {phone: formattedPhone, context});
 
     // Step 2: Initiate Firebase Phone Auth — sends SMS
-    yield call(sendFirebaseOtp, phone);
+    yield call(sendFirebaseOtp, formattedPhone);
 
-    yield put(authActions.sendOtpSuccess({phone, context}));
+    yield put(authActions.sendOtpSuccess({phone: formattedPhone, context}));
   } catch (e: any) {
     console.log(e)
     yield put(authActions.sendOtpFailure(parseApiError(e).message));
@@ -139,7 +140,8 @@ function* verifyOtpSaga(action: ReturnType<typeof authActions.verifyOtp>): Gener
     const firebaseToken: string = (yield call(confirmFirebaseOtp, code)) as string;
 
     // Step 2: Send Firebase token to backend for verification + login/register
-    const res: any = yield call(authService.verifyOtp, {phone, firebaseToken, context});
+    // Format phone to E.164 to match what Firebase stored
+    const res: any = yield call(authService.verifyOtp, {phone: toE164(phone), firebaseToken, context});
     const token = res.data.token;
 
     yield call(AsyncStorage.setItem, 'auth_token', token);

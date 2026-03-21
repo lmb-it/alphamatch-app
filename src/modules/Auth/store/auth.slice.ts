@@ -15,6 +15,7 @@ import type {
   IForgotPasswordPayload,
   IVerifyResetCodePayload,
   IResetPasswordPayload,
+  WelcomeIntent,
 } from '../models/auth.types';
 
 const initialState: IAuthState = {
@@ -25,6 +26,7 @@ const initialState: IAuthState = {
   error: null,
   pendingVerification: null,
   resetContact: null,
+  welcomeIntent: null,
 };
 
 const authSlice = createSlice({
@@ -247,6 +249,14 @@ const authSlice = createSlice({
     markWelcomeSeenFailure(state, action: PayloadAction<string>) {
       state.loading = false;
       state.error = action.payload;
+    },
+
+    // ── Welcome Intent ──
+    setWelcomeIntent(state, action: PayloadAction<WelcomeIntent>) {
+      state.welcomeIntent = action.payload;
+    },
+    clearWelcomeIntent(state) {
+      state.welcomeIntent = null;
     },
 
     // ── Utility ──

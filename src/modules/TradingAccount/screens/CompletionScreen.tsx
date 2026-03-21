@@ -1,6 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Flex, Text, Heading, Button, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
@@ -10,6 +9,7 @@ import {
   selectCreatedAccount,
 } from '@src/modules/TradingAccount';
 import {profileActions} from '@src/modules/Profile';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 
 type CompletionStatus = 'active' | 'pending_verification' | 'pending_subscription';
 
@@ -80,7 +80,7 @@ export default function CompletionScreen() {
   }, [status, t, navigateHome]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AlphaLayout showDecorations={false} scrollEnabled={false} showBackButton={false}>
       <Flex flex={1} flexDirection="column" backgroundColor="bg" px={24} py={40} justifyContent="center" alignItems="center">
 
         <View style={[styles.iconCircle, {backgroundColor: statusConfig.iconBg}]} accessible accessibilityLabel={`Status: ${statusConfig.badge}`}>
@@ -131,15 +131,11 @@ export default function CompletionScreen() {
           />
         </View>
       </Flex>
-    </SafeAreaView>
+    </AlphaLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
   iconCircle: {
     width: 96,
     height: 96,

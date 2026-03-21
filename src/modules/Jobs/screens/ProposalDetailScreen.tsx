@@ -2,24 +2,17 @@
  * ProposalDetailScreen — stub
  */
 import React from 'react';
-import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {ArrowLeft} from 'lucide-react-native';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import AlphaLayout from '@src/layouts/AlphaLayout';
 import {StatusBadge} from '@src/components/shared/StatusBadge';
 
 const ProposalDetailScreen: React.FC = () => {
-  const navigation = useNavigation();
   return (
-    <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.safe} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Bid Detail</Text>
-        <View style={{width: 22}} />
-      </View>
+    <AlphaLayout
+      title="Bid Detail"
+      showDecorations={false}
+      headerStyle="solid"
+      scrollEnabled={false}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.jobTitle}>Mobile app UI design</Text>
         <StatusBadge status="awarded" size="md" />
@@ -33,10 +26,10 @@ const ProposalDetailScreen: React.FC = () => {
           I have extensive experience in mobile UI design using Figma and React Native. I can deliver pixel-perfect screens based on your requirements within 2 weeks.
         </Text>
         <View style={styles.statusBox}>
-          <Text style={styles.statusBoxText}>⏳ Waiting for client to pay deposit</Text>
+          <Text style={styles.statusBoxText}>Waiting for client to pay deposit</Text>
         </View>
       </ScrollView>
-    </View>
+    </AlphaLayout>
   );
 };
 
@@ -50,10 +43,6 @@ const Row: React.FC<{label: string; value: string}> = ({label, value}) => (
 export default ProposalDetailScreen;
 
 const styles = StyleSheet.create({
-  root: {flex: 1, backgroundColor: '#F9FAFC'},
-  safe: {backgroundColor: '#FFFFFF'},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6'},
-  headerTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
   content: {padding: 20, gap: 14},
   jobTitle: {fontSize: 20, fontWeight: '700', color: '#111827'},
   infoCard: {backgroundColor: '#FFFFFF', borderRadius: 14, padding: 16, gap: 10},
