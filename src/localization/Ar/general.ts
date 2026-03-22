@@ -19,4 +19,11 @@ export default {
   send: 'إرسال',
   close: 'إغلاق',
   search: 'بحث',
+
+  // Options — Address Types
+  'options.addressType.home': 'المنزل',
+  'options.addressType.office': 'المكتب',
+  'options.addressType.warehouse': 'المستودع',
+  'options.addressType.site': 'الموقع',
+  'options.addressType.other': 'أخرى',
 };

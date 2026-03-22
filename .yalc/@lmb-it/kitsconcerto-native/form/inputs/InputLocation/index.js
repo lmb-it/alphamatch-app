@@ -78,16 +78,15 @@ const KitsInputLocation = ({
       });
       if (!onAddressClick || !placeId) return;
       if (provider === "google") {
-        const { data } = await axios.get(
-          `${GOOGLE_DETAILS}?place_id=${placeId}&key=${api_key}`
-        );
+        const url = `${GOOGLE_DETAILS}?place_id=${placeId}&key=${api_key}`;
+        const { data } = await axios.get(url);
         const address = {
           formatted_address: data.result.formatted_address
         };
         data.result.address_components.forEach((c) => {
-          const type = c?.types?.[0];
-          if (type && type in address) {
-            address[type] = c.long_name;
+          const placeType = c?.types?.[0];
+          if (placeType && !(placeType in address)) {
+            address[placeType] = c.long_name;
           }
         });
         onAddressClick(address);

@@ -119,14 +119,6 @@ const Grid = React.forwardRef((props, ref) => {
       }
     });
   });
-  console.log({
-    ...rest,
-    gap: gapValue != null ? style.toNativeValue(gapValue) : void 0,
-    columnGap: columnGapValue != null ? style.toNativeValue(columnGapValue) : void 0,
-    rowGap: rowGapValue != null ? style.toNativeValue(rowGapValue) : void 0,
-    padding: paddingValue != null ? style.toNativeValue(paddingValue) : void 0,
-    _extra: { ...typeof _extra === "object" ? _extra : {}, className: gridColsClass }
-  });
   return /* @__PURE__ */ jsxRuntime.jsx(
     ResponsiveElement.default,
     {

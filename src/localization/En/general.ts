@@ -32,4 +32,11 @@ export default {
   comingSoon: 'Coming Soon',
   verified: 'Verified',
   declined: 'Declined',
+
+  // Options — Address Types
+  'options.addressType.home': 'Home',
+  'options.addressType.office': 'Office',
+  'options.addressType.warehouse': 'Warehouse',
+  'options.addressType.site': 'Site',
+  'options.addressType.other': 'Other',
 };

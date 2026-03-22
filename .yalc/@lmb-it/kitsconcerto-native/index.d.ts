@@ -328,7 +328,7 @@ export interface ILocation<T extends FieldValues = any> extends ITextFieldProps<
     countryISO?: string;
     apiKey: string;
     provider?: 'google' | 'experian';
-    onAddressClick?: (address: IAddressFormat) => void;
+    onAddressClick?: (address: IAddressFormat, group?: GroupFieldConfigs<T>['groupField']) => void;
 }
 
 export interface IPhone<T extends FieldValues = any> extends IElementBase<T> {

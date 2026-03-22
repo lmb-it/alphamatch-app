@@ -5,7 +5,8 @@ const Location = ({
   element,
   control,
   getValues,
-  fieldLogic
+  fieldLogic,
+  groupField
 }) => {
   const {
     field,
@@ -46,7 +47,7 @@ const Location = ({
       provider,
       countryISO,
       forceSelection,
-      onAddressClick,
+      onAddressClick: (address) => onAddressClick(address, groupField),
       hideError,
       withFilter: true,
       style: elementStyle?.input,

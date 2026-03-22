@@ -117,7 +117,7 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
   useSeparator.default(props);
   const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
   resolveToken("primary");
-  const borderColor = resolveToken("border");
+  resolveToken("border");
   const {
     inputValue,
     setInputValue,
@@ -149,10 +149,8 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
       showEmptyMessage: showEmptyMessage ?? true,
       optionGroupChildren: childrenKey ?? void 0,
       optionGroupLabel: childrenKey ? labelKey : void 0,
-      inputStyle: {
-        borderColor
-      },
-      style: { flexDirection: "row", borderRadius: 0, ...resolvedRootStyle && Object.keys(resolvedRootStyle).length > 0 ? resolvedRootStyle : resolvedThemeStyle },
+      style: { width: "100%", borderRadius: 0, border: "none", backgroundColor: "transparent" },
+      inputStyle: { flexDirection: "row", borderRadius: 0, border: "none", width: "100%", backgroundColor: "transparent", ...resolvedRootStyle || resolvedThemeStyle },
       onChange: (event) => {
         setInputValue(event.value);
         handleOnChange(event);
@@ -178,7 +176,8 @@ const KitsAutoComplete = ({ ref, ...rawProps }) => {
       invalid,
       label,
       containerStyle,
-      elementStyles
+      elementStyles,
+      children: Element
     }
   );
 };

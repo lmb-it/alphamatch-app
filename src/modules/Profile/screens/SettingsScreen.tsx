@@ -1,41 +1,46 @@
 /**
  * SettingsScreen
- * Full settings menu with all items from the spec.
- * Each item navigates to its own stack screen or toggles inline.
+ * Full settings with absorbed items: Support, Invite Friends, App Language,
+ * Terms & Conditions, Logout.
  *
- * NOTE: Most sub-screens are stubs — inline navigation will be wired when screens are built.
+ * Order: Account → Notifications → More → Danger (Logout in red)
  */
-import React, {useState} from 'react';
-import {View, Text, ScrollView, StyleSheet, Alert} from 'react-native';
-import {Shield, CreditCard, MapPin, Globe, Mail, Lock, Bell, Smartphone, CheckCircle, Monitor, UserX, Trash2} from 'lucide-react-native';
+import React, {useState, useCallback} from 'react';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import {
+  Shield, CreditCard, MapPin, Globe, Mail, Lock, Bell, Smartphone,
+  CheckCircle, HeadphonesIcon, UserPlus, Languages, FileText, LogOut,
+  UserX, Trash2,
+} from 'lucide-react-native';
+import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
 import {SectionMenuRow} from '@src/components/shared/SectionMenuRow';
 import {ToggleRow} from '@src/components/shared/ToggleRow';
 import {ConfirmSheet} from '@src/components/shared/ConfirmSheet';
+import {authActions} from '@src/modules/Auth';
+import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const SECTION_ACCOUNT = 'Account';
-const SECTION_NOTIFICATIONS = 'Notifications';
-const SECTION_APPEARANCE = 'Appearance';
-const SECTION_DANGER = 'Danger Zone';
-
-// ── Component ────────────────────────────────────────────────────────────────
+const stub = () => {};
 
 const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation<ProfileStackNavigationProp>();
+  const dispatch = useDispatch();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
   const [twoFa, setTwoFa] = useState(false);
-  const [confirmSheet, setConfirmSheet] = useState<'deactivate' | 'delete' | null>(null);
+  const [confirmSheet, setConfirmSheet] = useState<'deactivate' | 'delete' | 'logout' | null>(null);
 
-  const stub = () => Alert.alert('Coming Soon', 'This settings screen is under construction.');
+  const handleLogout = useCallback(() => {
+    dispatch(authActions.logout());
+  }, [dispatch]);
 
   return (
     <AlphaLayout title="Settings" headerStyle="solid" scrollEnabled={false}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Account */}
-        <Text style={styles.section}>{SECTION_ACCOUNT}</Text>
+        <Text style={styles.section}>Account</Text>
         <SectionMenuRow icon={Shield} label="Privacy" sublabel="Who can see your details" onPress={stub} />
         <SectionMenuRow icon={CreditCard} label="Payment Methods" onPress={stub} />
         <SectionMenuRow icon={MapPin} label="Address" onPress={stub} />
@@ -46,23 +51,55 @@ const SettingsScreen: React.FC = () => {
         <ToggleRow icon={Smartphone} label="Two-Factor Authentication" value={twoFa} onToggle={setTwoFa} />
 
         {/* Notifications */}
-        <Text style={styles.section}>{SECTION_NOTIFICATIONS}</Text>
+        <Text style={styles.section}>Notifications</Text>
         <ToggleRow icon={Mail} label="Email Notifications" value={emailNotifications} onToggle={setEmailNotifications} />
         <ToggleRow icon={Bell} label="Push Notifications" value={pushNotifications} onToggle={setPushNotifications} />
         <ToggleRow icon={Mail} label="Marketing Emails" value={marketingEmails} onToggle={setMarketingEmails} />
 
-        {/* Appearance */}
-        <Text style={styles.section}>{SECTION_APPEARANCE}</Text>
-        <SectionMenuRow icon={Monitor} label="App Theme" sublabel="Dark / Light / Auto" onPress={stub} />
+        {/* More — absorbed from profile menu */}
+        <Text style={styles.section}>More</Text>
+        <SectionMenuRow
+          icon={HeadphonesIcon}
+          label="Support"
+          sublabel="Get help from our team"
+          onPress={() => navigation.navigate('Support')}
+        />
+        <SectionMenuRow
+          icon={UserPlus}
+          label="Invite Friends"
+          onPress={() => navigation.navigate('InviteFriends')}
+        />
+        <SectionMenuRow
+          icon={Languages}
+          label="App Language"
+          onPress={() => navigation.navigate('LanguageSettings')}
+        />
+        <SectionMenuRow
+          icon={FileText}
+          label="Terms & Conditions"
+          onPress={() => navigation.navigate('TermsAndConditions')}
+        />
 
-        {/* Danger zone */}
-        <Text style={[styles.section, styles.dangerSection]}>{SECTION_DANGER}</Text>
+        {/* Danger Zone */}
+        <Text style={[styles.section, styles.dangerSection]}>Danger Zone</Text>
+        <SectionMenuRow icon={LogOut} label="Log Out" destructive onPress={() => setConfirmSheet('logout')} />
         <SectionMenuRow icon={UserX} label="Deactivate Account" destructive onPress={() => setConfirmSheet('deactivate')} />
         <SectionMenuRow icon={Trash2} label="Delete Account" destructive onPress={() => setConfirmSheet('delete')} />
 
         <View style={styles.bottomPad} />
       </ScrollView>
 
+      <ConfirmSheet
+        visible={confirmSheet === 'logout'}
+        title="Log Out"
+        message="Are you sure you want to log out?"
+        confirmLabel="Log Out"
+        onConfirm={() => {
+          setConfirmSheet(null);
+          handleLogout();
+        }}
+        onCancel={() => setConfirmSheet(null)}
+      />
       <ConfirmSheet
         visible={confirmSheet === 'deactivate'}
         title="Deactivate Account"

@@ -49,6 +49,8 @@ export const URLs = {
     view: '/profile/:ref',
     portfolio: '/profile/portfolio',
     switchWorkspace: '/profile/switch-workspace',
+    addresses: '/profile/addresses',
+    addressItem: '/profile/addresses/:ref',
   },
   tradingAccounts: {
     index: '/trading-accounts',
@@ -63,6 +65,17 @@ export const URLs = {
     documentFormSubmit: '/trading-accounts/:ref/documents/:docRef/submit',
     requiredDocuments: '/trading-accounts/:ref/required-documents',
     tierStatus: '/trading-accounts/:ref/tier-status',
+    // Portfolio sections
+    experience: '/trading-accounts/:ref/experience',
+    experienceItem: '/trading-accounts/:ref/experience/:itemRef',
+    education: '/trading-accounts/:ref/education',
+    educationItem: '/trading-accounts/:ref/education/:itemRef',
+    qualifications: '/trading-accounts/:ref/qualifications',
+    qualificationItem: '/trading-accounts/:ref/qualifications/:itemRef',
+    references: '/trading-accounts/:ref/references',
+    referenceItem: '/trading-accounts/:ref/references/:itemRef',
+    portfolio: '/trading-accounts/:ref/portfolio',
+    portfolioItem: '/trading-accounts/:ref/portfolio/:itemRef',
   },
   payments: {
     methods: '/payments/methods',

@@ -1,13 +1,28 @@
+/**
+ * MyAccountScreen — Profile tab root
+ *
+ * Context-aware:
+ * - Personal workspace: no tabs, profile card + account items + optional "Create Trading Account"
+ * - Trading account workspace: profile card + 2 tabs (Account + Portfolio)
+ */
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View, StyleSheet, Image, TouchableOpacity, TextInput, StatusBar, Alert} from 'react-native';
+import {View, StyleSheet, Image, TouchableOpacity, StatusBar} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
-import {Text, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
-import {Wallet, Clock, Plus, Camera, Pen, Settings, Share2} from 'lucide-react-native';
+import {Text, Flex, useLanguage, useKitsTheme} from '@lmb-it/kitsconcerto';
+import {
+  Wallet, Clock, Plus, Camera, Pen, Settings, Share2,
+  Briefcase, GraduationCap, FolderOpen, Award, Users, Star,
+  FileCheck, ShieldCheck, CreditCard,
+} from 'lucide-react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
-import {selectProfileData, selectActiveWorkspace, selectTradingAccounts, profileActions} from '@src/modules/Profile';
-import {uploadAvatarApi, uploadCoverApi} from '../api/profile.service';
+import {
+  selectProfileData, selectActiveWorkspace, selectTradingAccounts, profileActions,
+  selectExperiences, selectEducation, selectQualifications, selectReferences, selectPortfolioItems,
+} from '@src/modules/Profile';
+import {selectIsTradeMode} from '@src/modules/Workspace';
+// Photo uploads now go through sagas (profileActions.uploadAvatar / uploadCover)
 import {fetchRequiredDocumentsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount';
 import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
@@ -18,7 +33,37 @@ import AlphaLayout from '@src/layouts/AlphaLayout';
 const COVER_HEIGHT = 180;
 const AVATAR_SIZE = 100;
 
-type TabKey = 'account' | 'portfolio' | 'documents';
+type TabKey = 'account' | 'portfolio';
+
+// ── Portfolio Summary Card ──────────────────────────────────────────────────
+
+interface SummaryCardProps {
+  icon: React.ComponentType<any>;
+  label: string;
+  count: number;
+  subtitle?: string;
+  onPress: () => void;
+}
+
+const SummaryCard: React.FC<SummaryCardProps> = ({icon: IconComp, label, count, subtitle, onPress}) => {
+  const {resolveToken} = useKitsTheme();
+  return (
+    <TouchableOpacity style={styles.summaryCard} onPress={onPress} activeOpacity={0.7}>
+      <View style={[styles.summaryIcon, {backgroundColor: resolveToken('primary') + '15'}]}>
+        <IconComp color={resolveToken('primary')} size={20} />
+      </View>
+      <View style={styles.summaryContent}>
+        <Text fontSize={15} fontWeight="600" color="text-primary">{label}</Text>
+        <Text fontSize={13} color="text-subtle">
+          {count > 0 ? `${count} item${count !== 1 ? 's' : ''}` : subtitle || 'None yet'}
+        </Text>
+      </View>
+      <Text fontSize={18} color="text-subtle">›</Text>
+    </TouchableOpacity>
+  );
+};
+
+// ── Main Screen ─────────────────────────────────────────────────────────────
 
 const MyAccountScreen: React.FC = () => {
   const {t} = useLanguage();
@@ -29,20 +74,37 @@ const MyAccountScreen: React.FC = () => {
   const profileData = useSelector(selectProfileData);
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const tradingAccounts = useSelector(selectTradingAccounts);
+  const isTradeMode = useSelector(selectIsTradeMode);
+  const experiences = useSelector(selectExperiences);
+  const education = useSelector(selectEducation);
+  const qualifications = useSelector(selectQualifications);
+  const references = useSelector(selectReferences);
+  const portfolioItems = useSelector(selectPortfolioItems);
 
   const [activeTab, setActiveTab] = useState<TabKey>('account');
   const [requiredDocs, setRequiredDocs] = useState<IDocumentRequirement[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
-  const [showPortfolioForm, setShowPortfolioForm] = useState(false);
-  const [projectName, setProjectName] = useState('');
 
-  // Resolve careerRef from the active trading account
-  const careerRef = useMemo(() => {
+  // Resolve active trading account details
+  const activeTradingAccount = useMemo(() => {
     if (!activeWorkspace) return null;
-    const account = tradingAccounts.find(a => a.identifier === activeWorkspace);
-    return account?.careerRef ?? null;
+    return tradingAccounts.find(a => a.identifier === activeWorkspace) ?? null;
   }, [activeWorkspace, tradingAccounts]);
 
+  const careerRef = activeTradingAccount?.careerRef ?? null;
+
+  // Load all portfolio sections when in trading account context
+  useEffect(() => {
+    if (isTradeMode && activeWorkspace) {
+      dispatch(profileActions.loadExperiences(activeWorkspace));
+      dispatch(profileActions.loadEducation(activeWorkspace));
+      dispatch(profileActions.loadQualifications(activeWorkspace));
+      dispatch(profileActions.loadReferences(activeWorkspace));
+      dispatch(profileActions.loadPortfolioItems(activeWorkspace));
+    }
+  }, [isTradeMode, activeWorkspace, dispatch]);
+
+  // Fetch required documents when in trading account context
   useEffect(() => {
     if (careerRef) {
       setDocsLoading(true);
@@ -58,26 +120,16 @@ const MyAccountScreen: React.FC = () => {
   const handlePickAvatar = useCallback(async () => {
     const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
     if (result.assets?.[0]?.uri) {
-      try {
-        await uploadAvatarApi(result.assets[0].uri);
-        dispatch(profileActions.fetchProfile());
-      } catch {
-        Alert.alert(t('error'), t('profile.uploadFailed'));
-      }
+      dispatch(profileActions.uploadAvatar(result.assets[0].uri));
     }
-  }, [dispatch, t]);
+  }, [dispatch]);
 
   const handlePickCover = useCallback(async () => {
     const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
     if (result.assets?.[0]?.uri) {
-      try {
-        await uploadCoverApi(result.assets[0].uri);
-        dispatch(profileActions.fetchProfile());
-      } catch {
-        Alert.alert(t('error'), t('profile.uploadFailed'));
-      }
+      dispatch(profileActions.uploadCover(result.assets[0].uri));
     }
-  }, [dispatch, t]);
+  }, [dispatch]);
 
   const handleUploadDocument = useCallback(
     (doc: IDocumentRequirement) => {
@@ -89,47 +141,41 @@ const MyAccountScreen: React.FC = () => {
     [navigation],
   );
 
-  const displayName = profileData
-    ? `${profileData.displayName || ''} ${profileData.familyName || ''}`.trim()
-    : '';
-
-  const availableTabs = useMemo(() => {
-    const tabs: TabKey[] = ['account', 'portfolio'];
-    if (careerRef) {
-      tabs.push('documents');
+  const displayName = useMemo(() => {
+    if (isTradeMode && activeTradingAccount) {
+      return activeTradingAccount.accountName || activeTradingAccount.careerName || '';
     }
-    return tabs;
-  }, [careerRef]);
+    return profileData?.user
+      ? `${profileData.user.displayName || ''} ${profileData.user.familyName || ''}`.trim()
+      : '';
+  }, [isTradeMode, activeTradingAccount, profileData]);
 
-  const tabLabelKey = (tab: TabKey) => {
-    switch (tab) {
-      case 'account':
-        return 'profile.accountTab';
-      case 'portfolio':
-        return 'profile.portfolioTab';
-      case 'documents':
-        return 'profile.documentsTab';
+  const subtitle = useMemo(() => {
+    if (isTradeMode && activeTradingAccount) {
+      return activeTradingAccount.careerName || '';
     }
-  };
+    return profileData?.user?.shortBio || '';
+  }, [isTradeMode, activeTradingAccount, profileData]);
+
+  const hasNoTradingAccounts = tradingAccounts.length === 0;
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <AlphaLayout>
+    <AlphaLayout showBackButton={false} fullScreen>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
       {/* Cover Image */}
       <View style={styles.coverContainer}>
-        {profileData?.coverImage ? (
-          <Image source={{uri: profileData.coverImage}} style={styles.coverImage} />
+        {profileData?.user?.coverImage ? (
+          <Image source={{uri: profileData.user.coverImage}} style={styles.coverImage} />
         ) : (
           <View style={[styles.coverImage, {backgroundColor: primaryColor}]} />
         )}
-
-        {/* Bottom fade */}
         <LinearGradient
           colors={['transparent', 'rgba(249,250,252,0.6)']}
           style={styles.coverGradientBottom}
         />
-        {/* Change cover button */}
         <TouchableOpacity
           style={styles.changeCoverBtn}
           onPress={handlePickCover}
@@ -138,11 +184,11 @@ const MyAccountScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Avatar with camera badge */}
+      {/* Avatar */}
       <View style={styles.avatarWrapper}>
         <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8}>
-          {profileData?.avatar ? (
-            <Image source={{uri: profileData.avatar}} style={styles.avatar} />
+          {profileData?.user?.avatar ? (
+            <Image source={{uri: profileData.user.avatar}} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder]}>
               <Text fontSize={32} fontWeight="700" color="text-subtle">
@@ -160,13 +206,13 @@ const MyAccountScreen: React.FC = () => {
       <Text fontSize={20} fontWeight="700" color="text-primary" textAlign="center" mt={8}>
         {displayName || t('user')}
       </Text>
-      {profileData?.bio ? (
+      {subtitle ? (
         <Text fontSize={13} color="text-subtle" textAlign="center" mt={4} mx={32} numberOfLines={2}>
-          {profileData.bio}
+          {subtitle}
         </Text>
       ) : null}
 
-      {/* Action buttons row */}
+      {/* Action buttons */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={[styles.editProfileBtn, {borderColor: primaryColor}]}
@@ -188,94 +234,170 @@ const MyAccountScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Tab Bar */}
-      <View style={styles.tabBar}>
-        {availableTabs.map(tab => {
-          const isActive = activeTab === tab;
-          return (
+      {/* ═══ PERSONAL WORKSPACE — No tabs ═══ */}
+      {!isTradeMode && (
+        <View style={styles.personalContent}>
+          {/* Create Trading Account card — only if user has ZERO accounts */}
+          {hasNoTradingAccounts && (
             <TouchableOpacity
-              key={tab}
-              style={[styles.tabItem, isActive && {borderBottomColor: primaryColor}]}
-              onPress={() => setActiveTab(tab)}
+              style={[styles.createAccountCard, {borderColor: primaryColor}]}
+              onPress={() => navigation.navigate('TradingAccountCreation')}
               activeOpacity={0.7}>
-              <Text
-                fontSize={14}
-                fontWeight={isActive ? '600' : '400'}
-                color={isActive ? 'primary' : 'text-subtle'}>
-                {t(tabLabelKey(tab))}
-              </Text>
+              <View style={[styles.createAccountIcon, {backgroundColor: primaryColor + '15'}]}>
+                <Plus color={primaryColor} size={24} />
+              </View>
+              <View style={styles.createAccountText}>
+                <Text fontSize={16} fontWeight="700" color="primary">
+                  Create Trading Account
+                </Text>
+                <Text fontSize={13} color="text-subtle" mt={4}>
+                  Start offering your services and earning money
+                </Text>
+              </View>
             </TouchableOpacity>
-          );
-        })}
-      </View>
+          )}
 
-      {/* === Account Tab === */}
-      {activeTab === 'account' && (
-        <View style={styles.menuList}>
-          <MenuItem icon={Wallet} label={t('profile.myWallet')} />
-          <MenuItem icon={Clock} label={t('profile.transactionHistory')} />
+          {/* Account items */}
+          <View style={styles.menuList}>
+            <MenuItem
+              icon={Wallet}
+              label={t('profile.myWallet')}
+              onPress={() => navigation.navigate('Wallet')}
+            />
+            <MenuItem
+              icon={Clock}
+              label={t('profile.transactionHistory')}
+              onPress={() => navigation.navigate('TransactionHistory')}
+            />
+            <MenuItem
+              icon={FileCheck}
+              label={t('profile.documents')}
+              onPress={() => navigation.navigate('Documents')}
+            />
+          </View>
         </View>
       )}
 
-      {/* === Portfolio Tab === */}
-      {activeTab === 'portfolio' && (
-        <View style={styles.portfolioContainer}>
-          {!showPortfolioForm ? (
-            <View style={styles.portfolioEmpty}>
-              <Text fontSize={14} color="text-subtle" textAlign="center" mb={16}>
-                {t('profile.noPortfolio')}
-              </Text>
-              <TouchableOpacity
-                style={[styles.addProjectBtn, {borderColor: primaryColor}]}
-                onPress={() => setShowPortfolioForm(true)}
-                activeOpacity={0.7}>
-                <Plus color={primaryColor} size={16} />
-                <Text fontSize={14} fontWeight="600" color="primary" ml={6}>
-                  {t('profile.addPortfolio')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.portfolioForm}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={8}>
-                {t('profile.projectName')}
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder={t('profile.projectNamePlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                value={projectName}
-                onChangeText={setProjectName}
-              />
-              <TouchableOpacity style={styles.uploadArea} activeOpacity={0.7}>
-                <View style={[styles.uploadIcon, {borderColor: primaryColor}]}>
-                  <Plus color={primaryColor} size={20} />
-                </View>
-                <Text fontSize={14} color="text-subtle">
-                  {t('ta.chooseFile')}{' '}
-                  <Text fontSize={14} color="primary" fontWeight="600">
-                    {t('ta.upload')}
+      {/* ═══ TRADING ACCOUNT WORKSPACE — 2 tabs ═══ */}
+      {isTradeMode && (
+        <>
+          {/* Tab Bar */}
+          <View style={styles.tabBar}>
+            {(['account', 'portfolio'] as TabKey[]).map(tab => {
+              const isActive = activeTab === tab;
+              return (
+                <TouchableOpacity
+                  key={tab}
+                  style={[styles.tabItem, isActive && {borderBottomColor: primaryColor}]}
+                  onPress={() => setActiveTab(tab)}
+                  activeOpacity={0.7}>
+                  <Text
+                    fontSize={14}
+                    fontWeight={isActive ? '600' : '400'}
+                    color={isActive ? 'primary' : 'text-subtle'}>
+                    {tab === 'account' ? t('profile.accountTab') : t('profile.portfolioTab')}
                   </Text>
-                </Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* ── Account Tab ── */}
+          {activeTab === 'account' && (
+            <View style={styles.menuList}>
+              <MenuItem
+                icon={Wallet}
+                label={t('profile.myWallet')}
+                onPress={() => navigation.navigate('Wallet')}
+              />
+              <MenuItem
+                icon={Clock}
+                label={t('profile.transactionHistory')}
+                onPress={() => navigation.navigate('TransactionHistory')}
+              />
+              <MenuItem
+                icon={FileCheck}
+                label={t('profile.documents')}
+                onPress={() => navigation.navigate('Documents')}
+              />
+
+              {/* Subscription status (Flex) or Verification status (Pro) */}
+              {activeTradingAccount?.careerModel === 'flex' && (
+                <MenuItem
+                  icon={CreditCard}
+                  label="Subscription Status"
+                />
+              )}
+              {activeTradingAccount?.careerModel === 'pro' && (
+                <MenuItem
+                  icon={ShieldCheck}
+                  label="Verification Status"
+                  onPress={() => {
+                    if (activeTradingAccount?.identifier) {
+                      navigation.navigate('TierStatus', {accountRef: activeTradingAccount.identifier});
+                    }
+                  }}
+                />
+              )}
             </View>
           )}
-        </View>
-      )}
 
-      {/* === Documents Tab === */}
-      {activeTab === 'documents' && (
-        <View style={styles.docsContainer}>
-          <DocumentVerificationList
-            documents={requiredDocs}
-            loading={docsLoading}
-            onUpload={handleUploadDocument}
-          />
-        </View>
+          {/* ── Portfolio Tab — Summary Cards with real counts ── */}
+          {activeTab === 'portfolio' && (
+            <View style={styles.portfolioCards}>
+              <SummaryCard
+                icon={Briefcase}
+                label="Experience"
+                count={experiences.items.length}
+                subtitle="Add your work history"
+                onPress={() => navigation.navigate('Experience' as any)}
+              />
+              <SummaryCard
+                icon={GraduationCap}
+                label="Education"
+                count={education.items.length}
+                subtitle="Add your education"
+                onPress={() => navigation.navigate('Education' as any)}
+              />
+              <SummaryCard
+                icon={FolderOpen}
+                label="Portfolio"
+                count={portfolioItems.items.length}
+                subtitle="Showcase your projects"
+                onPress={() => navigation.navigate('Portfolio' as any)}
+              />
+              <SummaryCard
+                icon={Award}
+                label="Qualifications"
+                count={qualifications.items.length}
+                subtitle="Add certificates & awards"
+                onPress={() => navigation.navigate('Qualifications' as any)}
+              />
+              <SummaryCard
+                icon={Users}
+                label="References"
+                count={references.items.length}
+                subtitle="Add professional references"
+                onPress={() => navigation.navigate('References' as any)}
+              />
+              <SummaryCard
+                icon={Star}
+                label="Reviews"
+                count={0}
+                subtitle="No reviews yet"
+                onPress={() => navigation.navigate('Reviews' as any)}
+              />
+            </View>
+          )}
+        </>
       )}
     </AlphaLayout>
   );
 };
+
+export default MyAccountScreen;
+
+// ── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   coverContainer: {
@@ -286,13 +408,6 @@ const styles = StyleSheet.create({
   coverImage: {
     width: '100%',
     height: '100%',
-  },
-  coverGradientTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 60,
   },
   coverGradientBottom: {
     position: 'absolute',
@@ -365,6 +480,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  personalContent: {
+    marginTop: 20,
+  },
+  createAccountCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    backgroundColor: '#F9FAFB',
+  },
+  createAccountIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  createAccountText: {
+    flex: 1,
+  },
+  menuList: {
+    gap: 8,
+    marginTop: 8,
+  },
   tabBar: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -379,51 +523,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
-  menuList: {
-    gap: 8,
+  portfolioCards: {
+    gap: 10,
     marginTop: 16,
+    marginHorizontal: 20,
+    paddingBottom: 100,
   },
-  portfolioContainer: {marginTop: 16, marginHorizontal: 20},
-  portfolioEmpty: {alignItems: 'center', paddingVertical: 32},
-  addProjectBtn: {
+  summaryCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
-  },
-  portfolioForm: {gap: 4},
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 14,
-    color: '#111827',
     backgroundColor: '#F9FAFB',
-  },
-  uploadArea: {
-    marginTop: 16,
-    borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    borderStyle: 'dashed',
     borderRadius: 14,
-    paddingVertical: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
-  uploadIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    borderWidth: 1.5,
+  summaryIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 14,
   },
-  docsContainer: {marginTop: 16, marginHorizontal: 20},
+  summaryContent: {
+    flex: 1,
+  },
 });
-
-export default MyAccountScreen;

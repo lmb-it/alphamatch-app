@@ -27,6 +27,7 @@ interface AlphaLayoutProps {
   closeIcon?: boolean;
   showDecorations?: boolean;
   headerStyle?: 'transparent' | 'solid';
+  fullScreen?: boolean;
   contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -41,6 +42,7 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
   closeIcon = false,
   showDecorations = true,
   headerStyle = 'transparent',
+  fullScreen = false,
   contentContainerStyle,
 }) => {
   const insets = useSafeAreaInsets();
@@ -66,8 +68,8 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
   };
 
   const renderSolidHeader = () => (
-    <View style={[styles.solidHeader, {backgroundColor: surfaceColor, borderBottomColor: borderColor, paddingTop: insets.top}]}>
-      <View style={styles.solidHeaderContent}>
+    <View style={[styles.solidHeader, fullScreen && styles.floatingHeader, {backgroundColor: fullScreen ? 'transparent' : surfaceColor, borderBottomColor: fullScreen ? 'transparent' : borderColor, paddingTop: insets.top}]} pointerEvents={fullScreen ? 'box-none' : 'auto'}>
+      <View style={styles.solidHeaderContent} pointerEvents={fullScreen ? 'box-none' : 'auto'}>
         {shouldShowBack ? (
           <TouchableOpacity onPress={handleBack} activeOpacity={0.6} style={styles.headerIcon}>
             <Icon name={closeIcon ? 'x' : 'arrow-left'} size={22} color={textColor} />
@@ -88,7 +90,7 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
   );
 
   const renderTransparentBack = () => {
-    if (!shouldShowBack || hasSolidHeader) return null;
+    if (!shouldShowBack || hasSolidHeader || fullScreen) return null;
     return (
       <TouchableOpacity
         onPress={handleBack}
@@ -100,13 +102,14 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
   };
 
   const renderContent = () => {
+    const needsTopPadding = !hasSolidHeader && !fullScreen;
     if (scrollEnabled) {
       return (
         <ScrollView
           style={styles.flex}
           contentContainerStyle={[
             styles.scrollContent,
-            !hasSolidHeader && {paddingTop: insets.top},
+            needsTopPadding && {paddingTop: insets.top},
             contentContainerStyle,
           ]}
           showsVerticalScrollIndicator={false}
@@ -117,7 +120,7 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
       );
     }
     return (
-      <View style={[styles.flex, !hasSolidHeader && {paddingTop: insets.top}]}>
+      <View style={[styles.flex, needsTopPadding && {paddingTop: insets.top}]}>
         {renderTransparentBack()}
         {children}
       </View>
@@ -163,13 +166,22 @@ const AlphaLayout: React.FC<AlphaLayoutProps> = ({
         </View>
       )}
 
-      {hasSolidHeader && renderSolidHeader()}
+      {hasSolidHeader && !fullScreen && renderSolidHeader()}
 
       <KeyboardAvoidingView
-        style={styles.flex}
+        style={[styles.flex, fullScreen && StyleSheet.absoluteFillObject]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {renderContent()}
       </KeyboardAvoidingView>
+
+      {fullScreen && hasSolidHeader && renderSolidHeader()}
+      {fullScreen && !hasSolidHeader && shouldShowBack && (
+        <View style={[styles.floatingBackRow, {paddingTop: insets.top}]} pointerEvents="box-none">
+          <TouchableOpacity onPress={handleBack} activeOpacity={0.6} style={styles.backButton}>
+            <Icon name="arrow-left" size="lg" color={textColor} />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -219,6 +231,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  floatingHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  floatingBackRow: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
 });
 

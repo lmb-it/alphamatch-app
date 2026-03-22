@@ -3,12 +3,12 @@
 var nativewindUtils = require('@gluestack-ui/utils/nativewind-utils');
 
 const gridBaseStyle = nativewindUtils.isWeb ? "grid grid-cols-12" : "box-border flex-row flex-wrap justify-start";
-const gridItemBaseStyle = nativewindUtils.isWeb ? "w-auto col-span-1" : "";
+const gridItemBaseStyle = nativewindUtils.isWeb ? "w-auto col-span-1" : "w-auto";
 const gridStyle = nativewindUtils.tva({
   base: `w-full ${gridBaseStyle}`
 });
 const gridItemStyle = nativewindUtils.tva({
-  base: `w-full ${gridItemBaseStyle}`
+  base: `${gridItemBaseStyle}`
 });
 
 exports.gridItemStyle = gridItemStyle;
