@@ -1,5 +1,5 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
-import { useMemo, useEffect, useImperativeHandle, useCallback } from 'react';
+import { useState, useMemo, useEffect, useImperativeHandle, useCallback } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import '../../../../apps/mobile/src/ui/accordion/index.js';
 import '../../../../apps/mobile/src/ui/actionsheet/index.js';
@@ -89,6 +89,7 @@ const Group = ({
   fieldLogic
 }) => {
   const { isShown, label, elements } = fieldLogic;
+  const [_focusedField, _setFocusedField] = useState("");
   const groupElement = element;
   const { groupsSettings, helperText } = groupElement;
   const fieldArray = useFieldArray({
@@ -179,8 +180,8 @@ const Group = ({
               groupField: { index, name: element.id, values: getValues()[element.id][index] },
               getValues,
               parentPath: `${element.id}.${index}.`,
-              focusedField,
-              setFocusedField,
+              focusedField: _focusedField,
+              setFocusedField: _setFocusedField,
               grid: groupsSettings?.grid
             }
           ),

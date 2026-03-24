@@ -61,7 +61,8 @@ const RegisterScreen: React.FC = () => {
   const handleSubmit = useCallback(
     (data: IRegisterForm, setIsSubmitting: (v: boolean) => void) => {
       Keyboard.dismiss();
-      const isPhone = /^\d/.test(data.email);
+      const cleaned = data.email.replace(/[\s\-()]/g, '');
+      const isPhone = /^\+?[0-9]{8,15}$/.test(cleaned);
       if (isPhone) {
         dispatch(authActions.sendOtp({phone: data.email, context: 'register'}));
       } else {

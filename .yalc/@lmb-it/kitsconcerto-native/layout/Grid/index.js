@@ -115,6 +115,14 @@ const Grid = forwardRef((props, ref) => {
       }
     });
   });
+  console.log({
+    ...rest,
+    gap: gapValue != null ? toNativeValue(gapValue) : void 0,
+    columnGap: columnGapValue != null ? toNativeValue(columnGapValue) : void 0,
+    rowGap: rowGapValue != null ? toNativeValue(rowGapValue) : void 0,
+    padding: paddingValue != null ? toNativeValue(paddingValue) : void 0,
+    _extra: { ...typeof _extra === "object" ? _extra : {}, className: gridColsClass }
+  });
   return /* @__PURE__ */ jsx(
     ResponsiveElement,
     {

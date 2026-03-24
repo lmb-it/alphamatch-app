@@ -11,53 +11,28 @@
  * Address CRUD is separate from profile update — each address is saved independently.
  */
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Image, Pressable, StyleSheet} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {
-  Text, Flex, Form, Box, Button,
-  useKitsTheme, useDialog, Icon, useLanguage,
-  type IFormElement, type IUseFormReturn,
+  Text, Form, Box,
+  useKitsTheme, useDialog, useLanguage,
+  type IUseFormReturn,
 } from '@lmb-it/kitsconcerto';
+import Config from 'react-native-config';
 import {Camera} from 'lucide-react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
-import * as Yup from 'yup';
 import {selectProfileUser, selectProfileLoading, selectProfileError, profileActions} from '@src/modules/Profile';
 import {useProfileErrorToast} from '@src/hooks/useErrorToast';
 import {uploadAvatarApi, uploadCoverApi, createAddressApi, updateAddressApi, deleteAddressApi} from '../api/profile.service';
 import AlphaLayout from '@src/layouts/AlphaLayout';
-import {ADDRESS_TYPE_OPTIONS} from '@src/config/options';
 import type {IAddress} from '../models/profile.types';
+import type {IAddressEntry, IEditProfileForm} from '../models/profile.component.types';
+import {getEditProfileElements} from './editProfile.elements';
 
-const COVER_HEIGHT = 250;
-const AVATAR_SIZE = 90;
-
-interface IAddressEntry {
-  identifier: string;
-  addressType: string;
-  fullAddress: string;
-  line1: string;
-  line2: string;
-  stateName: string;
-  cityName: string;
-  zipCode: string;
-  country: string;
-  lat: number | null;
-  lng: number | null;
-  googlePlaceId: string | null;
-  entryMode: string;
-  manualEntry: boolean;
-}
-
-interface IEditProfileForm {
-  displayName: string;
-  middleName: string;
-  familyName: string;
-  contactPhone: string;
-  shortBio: string;
-  addresses: IAddressEntry[];
-}
+const COVER_HEIGHT = 180;
+const AVATAR_SIZE = 100;
 
 const EditProfileScreen: React.FC = () => {
   const {resolveToken} = useKitsTheme();
@@ -73,6 +48,7 @@ const EditProfileScreen: React.FC = () => {
   useProfileErrorToast();
 
   const formRef = useRef<IUseFormReturn<IEditProfileForm>>(null);
+  const addAddressRef = useRef<()=>void>(null)
   const isSaving = useRef(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -186,22 +162,7 @@ const EditProfileScreen: React.FC = () => {
   const initialAddresses: IAddressEntry[] = useMemo(() => {
     const existing = user?.addresses ?? [];
     if (existing.length === 0) {
-      return [{
-        identifier: '',
-        addressType: 'home',
-        fullAddress: '',
-        line1: '',
-        line2: '',
-        stateName: '',
-        cityName: '',
-        zipCode: '',
-        country: '',
-        lat: null,
-        lng: null,
-        googlePlaceId: null,
-        entryMode: 'autocomplete',
-        manualEntry: false,
-      }];
+      return [];
     }
     return existing.map((a: IAddress) => ({
       identifier: a.identifier,
@@ -221,175 +182,36 @@ const EditProfileScreen: React.FC = () => {
     }));
   }, [user?.addresses]);
 
+
+  useEffect(() => {
+    if(initialAddresses.length > 0){
+      initialAddresses.forEach((item, index)=>{
+        const prefix = `addresses.${index}` as `addresses.${number}`;
+
+
+        formRef.current?.setValue(`${prefix}.addressType`, item.addressType);
+        formRef.current?.setValue(`${prefix}.fullAddress`, item.fullAddress);
+        formRef.current?.setValue(`${prefix}.line1`, item.line1);
+        formRef.current?.setValue(`${prefix}.cityName`, item.cityName);
+        formRef.current?.setValue(`${prefix}.stateName`, item.stateName);
+        formRef.current?.setValue(`${prefix}.zipCode`, item.zipCode);
+        formRef.current?.setValue(`${prefix}.country`, item.country);
+        formRef.current?.setValue(`${prefix}.googlePlaceId`, item.googlePlaceId);
+        formRef.current?.setValue(`${prefix}.lat`, item.lat);
+        formRef.current?.setValue(`${prefix}.lng`, item.lng);
+      })
+    }
+  }, [initialAddresses]);
   // ── Form elements ─────────────────────────────────────────────────────────
   const formElements = useMemo(
-    (): IFormElement<IEditProfileForm>[] => [
-      {
-        id: 'displayName',
-        type: 'Text',
-        label: 'First Name',
-        placeholder: 'Enter first name',
-        colSpan: 12,
-        initialValue: user?.displayName ?? '',
-        schema: Yup.string().required('First name is required'),
-      },
-      {
-        id: 'middleName',
-        type: 'Text',
-        label: 'Middle Name (optional)',
-        placeholder: 'Enter middle name',
-        colSpan: 12,
-        initialValue: user?.middleName ?? '',
-      },
-      {
-        id: 'familyName',
-        type: 'Text',
-        label: 'Last Name',
-        placeholder: 'Enter last name',
-        colSpan: 12,
-        initialValue: user?.familyName ?? '',
-        schema: Yup.string().required('Last name is required'),
-      },
-      {
-        id: 'contactPhone',
-        type: 'Text',
-        label: 'Phone Number',
-        placeholder: 'Enter phone number',
-        colSpan: 12,
-        initialValue: user?.contactPhone ?? '',
-        keyboardType: 'phone-pad',
-      },
-      {
-        id: 'shortBio',
-        type: 'Textarea',
-        label: 'Bio',
-        placeholder: 'Tell us about yourself',
-        colSpan: 12,
-        initialValue: user?.shortBio ?? '',
-        rows: 4,
-      },
-      // ── Addresses — repeatable Group ──
-      {
-        type: 'Group',
-        id: 'addresses',
-        label: 'Addresses',
-        colSpan: 12,
-        initialValue: initialAddresses,
-        groupsSettings: {
-          repeatable: {
-            plusButton: (total: number, addOne: () => void) => (
-              <Button
-                label={`Add Address (${total})`}
-                severity="brand"
-                onClick={addOne}
-                icon={<Icon name="plus" color={'white'} />}
-              />
-            ),
-            minusButton: (_total: number, removeOne: () => void) => (
-              <Button
-                label="Remove"
-                severity="danger"
-                onClick={() => removeOne()}
-                icon={<Icon name="trash" />}
-              />
-            ),
-            maxRepeats: 5,
-            minRepeats: 0,
-          },
-          grid: {columns: 12},
-        },
-        elements: [
-          {
-            type: 'Select',
-            id: 'addressType',
-            label: 'Type',
-            initialValue: 'home',
-            list: ADDRESS_TYPE_OPTIONS.map(o => ({...o, label: t(o.label)})),
-            schema: Yup.string().required('Type is required'),
-            colSpan: 12,
-          },
-          {
-            type: 'Location',
-            id: 'fullAddress',
-            label: 'Address',
-            placeholder: 'Search for address',
-            initialValue: '',
-            provider: 'google',
-            apiKey: 'AIzaSyBENsjk_sS3EhtqENIgDmySwxFjpH_8KlU',
-            deps: ['manualEntry'],
-            isDisabled: ([manualEntry]: any[]) => manualEntry === true,
-            onAddressClick: (address: any, group: {index: number}) => {
-              const prefix = `addresses.${group.index}` as any;
-              const street = [address.street_number, address.route].filter(Boolean).join(' ');
-              formRef.current?.setValue(`${prefix}.line1`, street);
-              formRef.current?.setValue(`${prefix}.cityName`, address.locality || address.administrative_area_level_2 || '');
-              formRef.current?.setValue(`${prefix}.stateName`, address.administrative_area_level_1 || '');
-              formRef.current?.setValue(`${prefix}.zipCode`, address.postal_code || '');
-              formRef.current?.setValue(`${prefix}.country`, address.country || '');
-              formRef.current?.setValue(`${prefix}.googlePlaceId`, address.place_id || null);
-              formRef.current?.setValue(`${prefix}.lat`, address.lat ?? null);
-              formRef.current?.setValue(`${prefix}.lng`, address.lng ?? null);
-            },
-            colSpan: 12,
-          },
-          {
-            type: 'Switch',
-            id: 'manualEntry',
-            label: "Enter address manually",
-            initialValue: false,
-            colSpan: 12,
-          },
-          {
-            type: 'Text',
-            id: 'line1',
-            label: 'Street Address',
-            placeholder: 'Enter street address',
-            initialValue: '',
-            deps: ['manualEntry'],
-            show: ([manualEntry]: any[]) => manualEntry === true,
-            schema: Yup.string().when('manualEntry', {
-              is: true,
-              then: (s) => s.required('Street is required'),
-            }),
-            colSpan: 12,
-          },
-          {
-            type: 'Text',
-            id: 'cityName',
-            label: 'City',
-            placeholder: 'Enter city',
-            initialValue: '',
-            deps: ['manualEntry'],
-            show: ([manualEntry]: any[]) => manualEntry === true,
-            schema: Yup.string().when('manualEntry', {
-              is: true,
-              then: (s) => s.required('City is required'),
-            }),
-            colSpan: 6,
-          },
-          {
-            type: 'Text',
-            id: 'stateName',
-            label: 'State / Region',
-            placeholder: 'Enter state',
-            initialValue: '',
-            deps: ['manualEntry'],
-            show: ([manualEntry]: any[]) => manualEntry === true,
-            colSpan: 6,
-          },
-          {
-            type: 'Text',
-            id: 'zipCode',
-            label: 'Postcode',
-            placeholder: 'Postcode',
-            initialValue: '',
-            deps: ['manualEntry'],
-            show: ([manualEntry]: any[]) => manualEntry === true,
-            colSpan: 6,
-          },
-        ],
-      } as any,
-    ],
+    () => getEditProfileElements({
+      user,
+      initialAddresses,
+      t,
+      formRef,
+      addAddressRef,
+      googleMapsApiKey: Config.GOOGLE_MAPS_API_KEY || '',
+    }),
     [user, initialAddresses, t],
   );
 
@@ -400,73 +222,41 @@ const EditProfileScreen: React.FC = () => {
   return (
     <AlphaLayout fullScreen>
       {/* Cover Photo */}
-      <Pressable style={styles.coverContainer} onPress={handlePickCover}>
+      <View style={styles.coverContainer}>
         {coverUri ? (
-          <>
             <Image source={{uri: coverUri}} style={styles.coverImage} />
-            <LinearGradient
-                colors={['rgba(255,255,255,0)', 'rgb(255,255,255)']}
-                locations={[0, 0.95]}
-                start={{x: 0, y: 0}}
-                end={{x: 0, y: 1}}
-                style={styles.coverGradientTop}
-            />
-          </>
         ) : (
-          <LinearGradient
-            colors={['transparent', primaryColor]}
-            style={styles.coverImage}
-          />
+            <View style={[styles.coverImage, {backgroundColor: primaryColor}]} />
         )}
-        <Flex
-          style={styles.coverCameraIcon}
-          flexDirection="row"
-          alignItems="center"
-          bgColor="rgba(0,0,0,0.5)"
-          px={14}
-          py={8}
-          borderRadius={20}>
-          <Camera color="#FFFFFF" size={20} />
-          <Text fontSize={12} fontWeight="600" color="#FFFFFF" ml={6}>
-            Change Cover
-          </Text>
-        </Flex>
-      </Pressable>
+        <LinearGradient
+            colors={['transparent', 'rgba(249,250,252,0.6)']}
+            style={styles.coverGradientBottom}
+        />
+        <TouchableOpacity
+            style={styles.changeCoverBtn}
+            onPress={handlePickCover}
+            activeOpacity={0.7}>
+          <Camera color="#FFFFFF" size={16} />
+        </TouchableOpacity>
+      </View>
 
       {/* Avatar */}
-      <Flex alignItems="center" style={styles.avatarSection}>
-        <Pressable onPress={handlePickAvatar}>
+      <View style={styles.avatarWrapper}>
+        <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8}>
           {avatarUri ? (
-            <Image source={{uri: avatarUri}} style={styles.avatar} />
+              <Image source={{uri: avatarUri}} style={styles.avatar} />
           ) : (
-            <Flex
-              w={AVATAR_SIZE}
-              h={AVATAR_SIZE}
-              borderRadius={AVATAR_SIZE / 2}
-              bgColor="gray.200"
-              justifyContent="center"
-              alignItems="center"
-              style={styles.avatarBorder}>
-              <Text fontSize={28} fontWeight="700" color="text-subtle">
-                {(user?.displayName || '?').charAt(0).toUpperCase()}
-              </Text>
-            </Flex>
+              <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                <Text fontSize={32} fontWeight="700" color="text-subtle">
+                  {user?.displayName?.charAt(0).toUpperCase() || '?'}
+                </Text>
+              </View>
           )}
-          <Flex
-            style={styles.cameraBadge}
-            bgColor="primary"
-            w={28}
-            h={28}
-            borderRadius={14}
-            justifyContent="center"
-            alignItems="center">
+          <View style={[styles.cameraBadge, {backgroundColor: primaryColor}]}>
             <Camera color="#FFFFFF" size={14} />
-          </Flex>
-        </Pressable>
-        <Text fontSize={13} color="text-subtle" mt={8}>
-          Tap to change photo
-        </Text>
-      </Flex>
+          </View>
+        </TouchableOpacity>
+      </View>
 
       {/* Form */}
       <Box px={20} mt={16} pb={40}>
@@ -491,26 +281,33 @@ export default EditProfileScreen;
 const styles = StyleSheet.create({
   coverContainer: {
     height: COVER_HEIGHT,
-    // marginHorizontal: -24,
-    overflow: 'hidden',
+    marginHorizontal: -24,
+    marginTop: -20,
   },
   coverImage: {
     width: '100%',
     height: '100%',
   },
-  coverGradientTop: {
+  coverGradientBottom: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
-    height: '100%',
+    height: 40,
   },
-  coverCameraIcon: {
+  changeCoverBtn: {
     position: 'absolute',
+    right: 16,
     bottom: 12,
-    alignSelf: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  avatarSection: {
+  avatarWrapper: {
+    alignItems: 'center',
     marginTop: -(AVATAR_SIZE / 2),
   },
   avatar: {
@@ -520,14 +317,20 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#FFFFFF',
   },
-  avatarBorder: {
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
+  avatarPlaceholder: {
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cameraBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: 2,
+    right: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },

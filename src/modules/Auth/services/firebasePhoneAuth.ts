@@ -87,3 +87,16 @@ export async function confirmFirebaseOtp(code: string): Promise<string> {
 export function clearConfirmation(): void {
   _confirmation = null;
 }
+
+/**
+ * Sign out of Firebase Auth — must be called on app logout
+ * to clear any cached Firebase session (phone, Google, Apple).
+ */
+export async function signOutFirebase(): Promise<void> {
+  try {
+    await auth().signOut();
+  } catch (_e) {
+    // Ignore — user may not have a Firebase session
+  }
+  _confirmation = null;
+}

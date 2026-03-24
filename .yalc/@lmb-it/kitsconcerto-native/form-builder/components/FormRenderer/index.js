@@ -19,8 +19,8 @@ import { ColorPicker } from '../fields/ColorPicker/index.js';
 import { Group } from '../fields/Group/index.js';
 import { ObjectElement } from '../fields/Object/index.js';
 import 'react-hook-form';
-import Grid from '../../../layout/Grid/index.js';
-import GridItem from '../../../layout/GridItem/index.js';
+import KitsGrid from '../../../layout/Grid/native/KitsGrid.js';
+import KitsGridItem from '../../../layout/GridItem/native/KitsGridItem.js';
 
 const FormRenderer = ({
   elements,
@@ -32,14 +32,7 @@ const FormRenderer = ({
   focusedField,
   setFocusedField
 }) => {
-  const [gridItemProps, setGridItemProps] = useState(
-    () => Object.fromEntries(
-      elements.map((el) => [
-        `${parentPath}${el.id}`,
-        String(el.colSpan ?? 12)
-      ])
-    )
-  );
+  const [gridItemProps, setGridItemProps] = useState({});
   const TEXT_TYPES = ["Text", "Email", "Number", "Password", "Phone", "Textarea"];
   const textFieldIds = useMemo(() => {
     return elements.filter((el) => TEXT_TYPES.includes(el.type)).map((el) => `${parentPath}${el.id}`);
@@ -95,16 +88,11 @@ const FormRenderer = ({
     }
   }, []);
   return /* @__PURE__ */ jsx(KeyboardNavContext.Provider, { value: keyboardNavCtx, children: /* @__PURE__ */ jsx(
-    Grid,
+    KitsGrid,
     {
       columns: 12,
       rowGap: 10,
-      colSpan: 12,
       columnGap: 10,
-      w: "full",
-      m: 0,
-      position: "relative",
-      ...grid,
       children: elements.map((element) => {
         const FieldComponent = getElement(element.type);
         const elementId = `${parentPath}${element.id}`;
@@ -113,10 +101,8 @@ const FormRenderer = ({
           console.warn(`No component found for element type: "${resolvedElement.type}"`);
           return null;
         }
-        const className = "col-span-" + (gridItemProps[elementId] ?? "12");
-        return /* @__PURE__ */ jsx(GridItem, { _extra: {
-          className
-        }, children: /* @__PURE__ */ jsx(
+        const colSpan = parseInt(gridItemProps[elementId] ?? "12", 10);
+        return /* @__PURE__ */ jsx(KitsGridItem, { id: elementId, colSpan, children: /* @__PURE__ */ jsx(
           FieldWrapper,
           {
             element: resolvedElement,

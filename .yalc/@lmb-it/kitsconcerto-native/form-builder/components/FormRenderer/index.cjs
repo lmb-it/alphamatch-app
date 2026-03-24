@@ -21,8 +21,8 @@ var index$8 = require('../fields/ColorPicker/index.cjs');
 var index_native = require('../fields/Group/index.cjs');
 var index$1 = require('../fields/Object/index.cjs');
 require('react-hook-form');
-var index_native$1 = require('../../../layout/Grid/index.cjs');
-var index_native$2 = require('../../../layout/GridItem/index.cjs');
+var KitsGrid = require('../../../layout/Grid/native/KitsGrid.cjs');
+var KitsGridItem = require('../../../layout/GridItem/native/KitsGridItem.cjs');
 
 const FormRenderer = ({
   elements,
@@ -34,14 +34,7 @@ const FormRenderer = ({
   focusedField,
   setFocusedField
 }) => {
-  const [gridItemProps, setGridItemProps] = React.useState(
-    () => Object.fromEntries(
-      elements.map((el) => [
-        `${parentPath}${el.id}`,
-        String(el.colSpan ?? 12)
-      ])
-    )
-  );
+  const [gridItemProps, setGridItemProps] = React.useState({});
   const TEXT_TYPES = ["Text", "Email", "Number", "Password", "Phone", "Textarea"];
   const textFieldIds = React.useMemo(() => {
     return elements.filter((el) => TEXT_TYPES.includes(el.type)).map((el) => `${parentPath}${el.id}`);
@@ -97,16 +90,11 @@ const FormRenderer = ({
     }
   }, []);
   return /* @__PURE__ */ jsxRuntime.jsx(useKeyboardNavigation_native.KeyboardNavContext.Provider, { value: keyboardNavCtx, children: /* @__PURE__ */ jsxRuntime.jsx(
-    index_native$1.default,
+    KitsGrid.default,
     {
       columns: 12,
       rowGap: 10,
-      colSpan: 12,
       columnGap: 10,
-      w: "full",
-      m: 0,
-      position: "relative",
-      ...grid,
       children: elements.map((element) => {
         const FieldComponent = getElement(element.type);
         const elementId = `${parentPath}${element.id}`;
@@ -115,10 +103,8 @@ const FormRenderer = ({
           console.warn(`No component found for element type: "${resolvedElement.type}"`);
           return null;
         }
-        const className = "col-span-" + (gridItemProps[elementId] ?? "12");
-        return /* @__PURE__ */ jsxRuntime.jsx(index_native$2.default, { _extra: {
-          className
-        }, children: /* @__PURE__ */ jsxRuntime.jsx(
+        const colSpan = parseInt(gridItemProps[elementId] ?? "12", 10);
+        return /* @__PURE__ */ jsxRuntime.jsx(KitsGridItem.default, { id: elementId, colSpan, children: /* @__PURE__ */ jsxRuntime.jsx(
           FieldWrapper_native.FieldWrapper,
           {
             element: resolvedElement,

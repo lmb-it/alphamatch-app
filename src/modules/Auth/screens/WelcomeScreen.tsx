@@ -7,7 +7,7 @@ import {
   Heading,
   Icon,
   useLanguage,
-  useKitsTheme,
+  useKitsTheme, IIconProps,
 } from '@lmb-it/kitsconcerto';
 import {useDispatch, useSelector} from 'react-redux';
 import {authActions, selectAuthLoading} from '@src/modules/Auth';
@@ -19,15 +19,15 @@ type IntentChoice = 'findWork' | 'postJob' | 'both' | null;
 
 interface IntentOption {
   key: IntentChoice;
-  icon: string;
+  icon: IIconProps['name'];
   labelKey: string;
   descKey: string;
 }
 
 const OPTIONS: IntentOption[] = [
-  {key: 'findWork', icon: 'pi-briefcase', labelKey: 'auth.findWork', descKey: 'auth.findWorkDesc'},
-  {key: 'postJob', icon: 'pi-plus-circle', labelKey: 'auth.postJob', descKey: 'auth.postJobDesc'},
-  {key: 'both', icon: 'pi-th-large', labelKey: 'auth.both', descKey: 'auth.bothDesc'},
+  {key: 'findWork', icon: 'briefcase', labelKey: 'auth.findWork', descKey: 'auth.findWorkDesc'},
+  {key: 'postJob', icon: 'forward', labelKey: 'auth.postJob', descKey: 'auth.postJobDesc'},
+  {key: 'both', icon: 'th-large', labelKey: 'auth.both', descKey: 'auth.bothDesc'},
 ];
 
 const WelcomeScreen: React.FC = () => {
@@ -98,15 +98,18 @@ const WelcomeScreen: React.FC = () => {
                     w={48}
                     h={48}
                     borderRadius={24}
+                    borderWidth={1}
+                    borderColor={'brand.500'}
+                    borderStyle={'solid'}
                     justifyContent="center"
                     alignItems="center"
                     backgroundColor={
-                      isSelected ? 'primary' : 'surface-secondary'
+                      isSelected ? 'brand.500' : 'trasnparent'
                     }>
                     <Icon
                       name={option.icon}
-                      size={22}
-                      color={isSelected ? 'white' : 'text-primary'}
+                      size={'xl'}
+                      color={isSelected ? 'white' : 'brand.500'}
                     />
                   </Flex>
                   <Flex flex={1} flexDirection="column" gap={4}>

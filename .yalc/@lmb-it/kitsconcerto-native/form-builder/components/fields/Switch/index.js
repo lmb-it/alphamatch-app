@@ -19,6 +19,7 @@ const Switch = ({
     attached,
     style: elementStyle
   } = fieldLogic;
+  const switchElement = element;
   return /* @__PURE__ */ jsx(
     KitsInputSwitch,
     {
@@ -31,6 +32,7 @@ const Switch = ({
       errors: fieldState.error?.message,
       helperText,
       attached,
+      displayAs: switchElement.displayAs,
       style: elementStyle?.input,
       containerStyle: elementStyle?.container,
       checked: !!field.value

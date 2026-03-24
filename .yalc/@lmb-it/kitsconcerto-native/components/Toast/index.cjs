@@ -22,6 +22,15 @@ const KitsToast = ({ ref }) => {
   const timersRef = React.useRef(/* @__PURE__ */ new Map());
   const { resolveToken } = KitsThemeProvider_native.useKitsTheme();
   const insets = reactNativeSafeAreaContext.useSafeAreaInsets();
+  const [keyboardVisible, setKeyboardVisible] = React.useState(false);
+  React.useEffect(() => {
+    const showSub = reactNative.Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = reactNative.Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
   const severityColors = {
     success: resolveToken("green.500"),
     info: resolveToken("blue.500"),
@@ -82,7 +91,7 @@ const KitsToast = ({ ref }) => {
   };
   const isTop = (position) => position.startsWith("top");
   return /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: reactNative.StyleSheet.absoluteFill, pointerEvents: "box-none", children: toasts.map((item) => {
-    const top = isTop(item.position);
+    const top = keyboardVisible ? true : isTop(item.position);
     const align = getAlignment(item.position);
     const entering = top ? Animated.SlideInUp.duration(300) : Animated.SlideInDown.duration(300);
     const exiting = top ? Animated.SlideOutUp.duration(200) : Animated.SlideOutDown.duration(200);

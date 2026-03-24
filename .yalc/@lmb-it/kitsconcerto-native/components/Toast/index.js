@@ -1,6 +1,6 @@
 import { jsx, jsxs } from 'react/jsx-runtime';
-import { useState, useRef, useCallback, useImperativeHandle, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { useState, useRef, useEffect, useCallback, useImperativeHandle } from 'react';
+import { Keyboard, View, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import Animated, { SlideInUp, SlideInDown, SlideOutUp, SlideOutDown, FadeOut, FadeIn, Layout } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKitsTheme } from '../../contexts/Theme/KitsThemeProvider.js';
@@ -18,6 +18,15 @@ const KitsToast = ({ ref }) => {
   const timersRef = useRef(/* @__PURE__ */ new Map());
   const { resolveToken } = useKitsTheme();
   const insets = useSafeAreaInsets();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
   const severityColors = {
     success: resolveToken("green.500"),
     info: resolveToken("blue.500"),
@@ -78,7 +87,7 @@ const KitsToast = ({ ref }) => {
   };
   const isTop = (position) => position.startsWith("top");
   return /* @__PURE__ */ jsx(View, { style: StyleSheet.absoluteFill, pointerEvents: "box-none", children: toasts.map((item) => {
-    const top = isTop(item.position);
+    const top = keyboardVisible ? true : isTop(item.position);
     const align = getAlignment(item.position);
     const entering = top ? SlideInUp.duration(300) : SlideInDown.duration(300);
     const exiting = top ? SlideOutUp.duration(200) : SlideOutDown.duration(200);

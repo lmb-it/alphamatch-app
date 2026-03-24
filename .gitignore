@@ -66,6 +66,13 @@ yarn-error.log
 # testing
 /coverage
 
+# Environment files — contain API keys and secrets
+.env
+.env.local
+.env.uat
+.env.stage
+.env.production
+
 # Yarn
 .yarn/*
 !.yarn/patches

@@ -308,6 +308,7 @@ export interface IDate<T extends FieldValues = any> extends ITextFieldProps<T> {
 
 export interface ISwitch<T extends FieldValues = any> extends IElementBase<T> {
     type: 'Switch';
+    displayAs?: 'switch' | 'checkbox';
 }
 
 export interface IFile<T extends FieldValues = any> extends IElementBase<T> {
@@ -1777,28 +1778,6 @@ export interface ICollapseProps {
     duration?: number;
 }
 
-export interface IGridComponent extends ElementProps<ViewProps> {
-    ref?: Ref<any> | undefined;
-    children?: ReactNode;
-    gap?: number;
-    flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
-    padding?: number;
-    paddingLeft?: number;
-    paddingRight?: number;
-    paddingStart?: number;
-    paddingEnd?: number;
-    borderWidth?: number;
-    _extra?: { className: string };
-}
-
-export interface IGridItemComponent extends ElementProps<ViewProps> {
-    fixedWidth?: number;
-    children?: ReactNode;
-    ref?: Ref<any> | undefined;
-    index?: number;
-    _extra?: { className: string };
-}
-
 export interface ISVGComponent extends ElementProps<React.SVGProps<SVGSVGElement>> {
     ref?: Ref<SVGSVGElement> | undefined;
 }
@@ -2204,6 +2183,8 @@ export interface IKitsInputSwitch extends Omit<IFormSingleElement, 'onChange'> {
     onChange?: (e: { target: { value: boolean }; value?: boolean }) => void;
     /** Pre-checked state for uncontrolled usage */
     checked?: boolean;
+    /** Render as 'switch' (default) or 'checkbox' with inline label */
+    displayAs?: 'switch' | 'checkbox';
     /** For passing any extra props to underlying libs */
     localProps?: any;
     /** Ref forwarding */
@@ -5424,9 +5405,43 @@ export interface BadgeProps {
 
 declare const Card: (rawProps: ICardComponent<Omit<ICardProps, "title">>) => react_jsx_runtime.JSX.Element;
 
-declare const Grid: React__default.ForwardRefExoticComponent<Omit<React__default.PropsWithChildren<IGridComponent>, "ref"> & React__default.RefAttributes<any>>;
+export interface IKitsGridProps {
+    /** Total number of columns in the grid (default 12) */
+    columns?: number;
+    /** Gap between columns in pixels (default 0) */
+    columnGap?: number;
+    /** Gap between rows in pixels (default 0) */
+    rowGap?: number;
+    children: ReactNode;
+}
+/**
+ * Pure React Native grid container.
+ *
+ * Measures its own width via onLayout, then calculates pixel widths
+ * for each registered KitsGridItem based on colSpan / numColumns.
+ *
+ * Children communicate via GridContext — KitsGridItem does NOT need
+ * to be a direct child of KitsGrid.
+ */
+declare const KitsGrid: ({ columns, columnGap, rowGap, children, }: IKitsGridProps) => react_jsx_runtime.JSX.Element;
 
-declare const GridItem: React$1.ForwardRefExoticComponent<Omit<PropsWithChildren<IGridItemComponent>, "ref"> & React$1.RefAttributes<any>>;
+export interface IKitsGridItemProps {
+    /** Unique identifier — used for context registration. Auto-generated if omitted. */
+    id?: string;
+    /** Number of grid columns this item spans */
+    colSpan: number;
+    children?: ReactNode;
+}
+/**
+ * Pure React Native grid item.
+ *
+ * Registers its colSpan with the parent KitsGrid via context.
+ * Reads its calculated pixel width from context and applies it.
+ *
+ * Does NOT need to be a direct child of KitsGrid — context
+ * handles communication regardless of hierarchy depth.
+ */
+declare const KitsGridItem: ({ id: externalId, colSpan, children }: IKitsGridItemProps) => react_jsx_runtime.JSX.Element;
 
 declare const Flex: {
     ({ className, children, ref, ...props }: PropsWithChildren<IFlexComponent>): react_jsx_runtime.JSX.Element;
@@ -11409,5 +11424,5 @@ declare const localeFiles: {
     };
 };
 
-export { CustomAccordion as Accordion, Alert, AlertDescription, AlertIcon, AlertTitle, KitsAnimatePresence as AnimatePresence, AnyFile, Badge, Box, BreadCrumb, Button, Card, Center, CircularProgress, Collapse, Container, CustomPopover, DataView, DataViewContext, DetailList as DetailsList, Divider, Editable, Flex, Form, FormSelect, Form as GoForm, Datatable as GoTable, Grid, GridItem, HStack, Heading, Icon, IconMap, Image, KitsInputSwitch as InputSwitch, KeyboardNavContext, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsConfirmPopup, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, ListItem, Loader, LocaleContext, LocaleContextProvider, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, KitsScrollView as ScrollView, FormSelect as Select, SelectButton, Skeleton$1 as Skeleton, SkeletonRows, Skeleton as SkeletonText, Svg, TableContext, Text, ThemeContextProvider, Tooltip, Translate, KitsTreeSelect as TreeSelect, TreeView, TriStateCheckbox, VStack, capitalizeFirstLetter, checkNameDuplication, dateTimeFormat, deepMerge, downloadCanvas, dynamicList, extendTheme, fontSizeMapping, formFileValidation, getCombinedChildIds, getCustomDateTime, getDateElements, getDefaultValues, getParams, getPropertyByPath, getURLParams, isNumber, isToday, isValidURL, localeFiles, mergeRefs, resolveStyleRecord, schemaBuilder, sizeMapping, timeAgo, timeSince, useAllSeverityColors, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFocusStyles, useFormFieldKeyboardNav, useFormManager, useKeyboardNav, useKeyboardNavProvider, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedElementStyles, useResolvedStyle, useScrollState, useSelectionController, useSeverityColors, useTable, useTheme };
+export { CustomAccordion as Accordion, Alert, AlertDescription, AlertIcon, AlertTitle, KitsAnimatePresence as AnimatePresence, AnyFile, Badge, Box, BreadCrumb, Button, Card, Center, CircularProgress, Collapse, Container, CustomPopover, DataView, DataViewContext, DetailList as DetailsList, Divider, Editable, Flex, Form, FormSelect, Form as GoForm, Datatable as GoTable, KitsGrid as Grid, KitsGridItem as GridItem, HStack, Heading, Icon, IconMap, Image, KitsInputSwitch as InputSwitch, KeyboardNavContext, KitsAutoComplete, KitsCascadeSelect, KitsCheckbox as KitsCheckboxes, KitsConfirm, KitsConfirmPopup, KitsContainer, KitsInputCalendar as KitsDatepicker, KitsDialogControlled as KitsDialog, KitsDropdown, FilePicker as KitsFilePicker, KitsInputColorPicker, KitsInputLocation, KitsInputMask, KitsInputNumber, KitsInputPassword, KitsInputText, KitsInputTextarea, KitsListBox, KitsMultiSelect, KitsPhoneComponent, KitsRadio as KitsRadios, KitsSliders, KitsThemeProvider, KitsToast, KitsTreeSelect, Label, Link, List, ListItem, Loader, LocaleContext, LocaleContextProvider, MainContext, MainContextProvider, KitsMultiSelect as MultiSelect, KitsScrollView as ScrollView, FormSelect as Select, SelectButton, Skeleton$1 as Skeleton, SkeletonRows, Skeleton as SkeletonText, Svg, TableContext, Text, ThemeContextProvider, Tooltip, Translate, KitsTreeSelect as TreeSelect, TreeView, TriStateCheckbox, VStack, capitalizeFirstLetter, checkNameDuplication, dateTimeFormat, deepMerge, downloadCanvas, dynamicList, extendTheme, fontSizeMapping, formFileValidation, getCombinedChildIds, getCustomDateTime, getDateElements, getDefaultValues, getParams, getPropertyByPath, getURLParams, isNumber, isToday, isValidURL, localeFiles, mergeRefs, resolveStyleRecord, schemaBuilder, sizeMapping, timeAgo, timeSince, useAllSeverityColors, useComponentDefaults, useDataView, useDialog, useDisclosure, useFieldLogic, useFocusStyles, useFormFieldKeyboardNav, useFormManager, useKeyboardNav, useKeyboardNavProvider, useKitsColorScheme, useKitsConcerto, useKitsTheme, useLanguage, useNativeColorMap, usePopup, useResolvedElementStyles, useResolvedStyle, useScrollState, useSelectionController, useSeverityColors, useTable, useTheme };
 export type { UseComponentDefaultsResult, UseFormManagerReturn };

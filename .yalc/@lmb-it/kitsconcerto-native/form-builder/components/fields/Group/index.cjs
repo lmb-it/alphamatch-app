@@ -93,6 +93,7 @@ const Group = ({
   fieldLogic
 }) => {
   const { isShown, label, elements } = fieldLogic;
+  const [_focusedField, _setFocusedField] = React.useState("");
   const groupElement = element;
   const { groupsSettings, helperText } = groupElement;
   const fieldArray = reactHookForm.useFieldArray({
@@ -183,8 +184,8 @@ const Group = ({
               groupField: { index: index$2, name: element.id, values: getValues()[element.id][index$2] },
               getValues,
               parentPath: `${element.id}.${index$2}.`,
-              focusedField,
-              setFocusedField,
+              focusedField: _focusedField,
+              setFocusedField: _setFocusedField,
               grid: groupsSettings?.grid
             }
           ),

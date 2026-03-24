@@ -8,8 +8,10 @@ import authService from '../api/auth.service';
 import {signInWithGoogle} from '../services/googleAuth';
 import {signInWithApple} from '../services/appleAuth';
 import {parseApiError} from '@src/services/apiError';
-import {sendFirebaseOtp, confirmFirebaseOtp, toE164} from '../services/firebasePhoneAuth';
+import {sendFirebaseOtp, confirmFirebaseOtp, toE164, signOutFirebase} from '../services/firebasePhoneAuth';
+import {signOutGoogle} from '../services/googleAuth';
 import {tradingAccountActions} from '@src/modules/TradingAccount';
+import * as Sentry from '@sentry/react-native';
 
 function* loginSaga(action: ReturnType<typeof authActions.login>): Generator {
   try {
@@ -21,7 +23,22 @@ function* loginSaga(action: ReturnType<typeof authActions.login>): Generator {
     const meRes: any = yield call(authService.me);
     yield put(authActions.loginSuccess({user: meRes.data, token}));
   } catch (e: any) {
-    yield put(authActions.loginFailure(parseApiError(e).message));
+    const err = parseApiError(e);
+
+    // Unverified email — navigate to verification screen
+    if (err.meta?.pendingVerification && err.meta?.contactEmail) {
+      yield put(
+        authActions.setPendingVerification({
+          contactEmail: err.meta.contactEmail,
+          context: 'emailVerification',
+        }),
+      );
+      yield put(authActions.loginFailure(err.message));
+      return;
+    }
+
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'login'}});
+    yield put(authActions.loginFailure(err.message));
   }
 }
 
@@ -39,6 +56,7 @@ function* registerSaga(action: ReturnType<typeof authActions.register>): Generat
       }),
     );
   } catch (e: any) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'register'}});
     yield put(authActions.registerFailure(parseApiError(e).message));
   }
 }
@@ -50,6 +68,7 @@ function* verifyEmailSaga(action: ReturnType<typeof authActions.verifyEmail>): G
     yield call(AsyncStorage.setItem, 'auth_token', token);
     yield put(authActions.verifyEmailSuccess({user: res.data.account, token}));
   } catch (e: any) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'verify_email'}});
     yield put(authActions.verifyEmailFailure(parseApiError(e).message));
   }
 }
@@ -59,6 +78,7 @@ function* resendCodeSaga(action: ReturnType<typeof authActions.resendCode>): Gen
     yield call(authService.resendCode, action.payload);
     yield put(authActions.resendCodeSuccess());
   } catch (e: any) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'resend_code'}});
     yield put(authActions.resendCodeFailure(parseApiError(e).message));
   }
 }
@@ -68,6 +88,7 @@ function* markWelcomeSeenSaga(): Generator {
     const res: any = yield call(authService.markWelcomeSeen);
     yield put(authActions.markWelcomeSeenSuccess(res.data));
   } catch (e: any) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'mark_welcome_seen'}});
     yield put(authActions.markWelcomeSeenFailure(parseApiError(e).message));
   }
 }
@@ -99,6 +120,7 @@ function* socialLoginSaga(action: ReturnType<typeof authActions.socialLogin>): G
       yield put(authActions.socialLoginFailure(''));
       return;
     }
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'social_login'}});
     yield put(authActions.socialLoginFailure(parseApiError(e).message));
   }
 }
@@ -107,8 +129,18 @@ function* logoutSaga(): Generator {
   try {
     yield call(authService.logout);
   } catch (_e) {
-    // Ignore errors on logout
+    // Ignore errors on logout API call
   } finally {
+    try {
+      yield call(signOutFirebase);
+    } catch (e) {
+      Sentry.captureException(e, {tags: {feature: 'auth', step: 'logout_firebase'}});
+    }
+    try {
+      yield call(signOutGoogle);
+    } catch (e) {
+      Sentry.captureException(e, {tags: {feature: 'auth', step: 'logout_google'}});
+    }
     yield call(AsyncStorage.removeItem, 'auth_token');
     yield put(authActions.logoutSuccess());
   }
@@ -127,7 +159,7 @@ function* sendOtpSaga(action: ReturnType<typeof authActions.sendOtp>): Generator
 
     yield put(authActions.sendOtpSuccess({phone: formattedPhone, context}));
   } catch (e: any) {
-    console.log(e)
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'send_otp'}});
     yield put(authActions.sendOtpFailure(parseApiError(e).message));
   }
 }
@@ -147,6 +179,7 @@ function* verifyOtpSaga(action: ReturnType<typeof authActions.verifyOtp>): Gener
     yield call(AsyncStorage.setItem, 'auth_token', token);
     yield put(authActions.verifyOtpSuccess({user: res.data.account, token}));
   } catch (e: any) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'verify_otp'}});
     yield put(authActions.verifyOtpFailure(parseApiError(e).message));
   }
 }
@@ -155,7 +188,8 @@ function* fetchMeSaga(): Generator {
   try {
     const res: any = yield call(authService.me);
     yield put(authActions.fetchMeSuccess(res.data));
-  } catch (_e) {
+  } catch (e) {
+    Sentry.captureException(e, {tags: {feature: 'auth', step: 'fetch_me'}});
     yield call(AsyncStorage.removeItem, 'auth_token');
     yield put(authActions.fetchMeFailure());
   }

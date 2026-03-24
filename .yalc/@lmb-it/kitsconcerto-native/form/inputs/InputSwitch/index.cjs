@@ -81,6 +81,7 @@ var index_native = require('../../helpers/FormContainer/index.cjs');
 require('../../../contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../../hooks/useComponentDefaults.cjs');
 var useResolvedStyle = require('../../../hooks/useResolvedStyle.cjs');
+var checkbox_native = require('../../controls/Checkbox/checkbox.cjs');
 
 const KitsInputSwitch = ({ ref, ...rawProps }) => {
   const { mergedProps: props, themeStyle, elementStyles } = useComponentDefaults.default("Switch", rawProps);
@@ -97,10 +98,12 @@ const KitsInputSwitch = ({ ref, ...rawProps }) => {
     value,
     checked,
     onChange,
+    displayAs,
     containerStyle,
     localProps,
     ...rest
   } = props;
+  const isCheckbox = displayAs === "checkbox";
   const incoming = typeof checked === "boolean" ? checked : value;
   const isControlled = typeof incoming !== "undefined" && typeof onChange === "function";
   const [internal, setInternal] = React.useState(incoming ?? false);
@@ -116,6 +119,33 @@ const KitsInputSwitch = ({ ref, ...rawProps }) => {
     onChange?.({ target: { value: newVal }, value: newVal });
   };
   const { nativeProps, cssProps } = useSeparator.default({ ...rest, ...localProps });
+  const labelText = typeof label === "string" ? label : typeof label === "object" && label !== null && "text" in label ? label.text : void 0;
+  const Element = isCheckbox ? /* @__PURE__ */ jsxRuntime.jsx(
+    checkbox_native.default,
+    {
+      item: {
+        value: true,
+        label: labelText ?? "",
+        withBulbs: true,
+        labelPosition: "right"
+      },
+      selected: !!internal,
+      disabled,
+      isInvalid: invalid,
+      onToggle: () => handleToggle(!internal)
+    }
+  ) : /* @__PURE__ */ jsxRuntime.jsx(
+    index.Switch,
+    {
+      ...nativeProps,
+      ref,
+      style: { ...resolvedRootStyle && Object.keys(resolvedRootStyle).length > 0 ? resolvedRootStyle : resolvedThemeStyle, ...cssProps },
+      value: internal,
+      isDisabled: !!disabled,
+      isInvalid: !!invalid,
+      onToggle: handleToggle
+    }
+  );
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -124,22 +154,11 @@ const KitsInputSwitch = ({ ref, ...rawProps }) => {
       helperText,
       errors,
       invalid,
-      label,
+      label: isCheckbox ? void 0 : label,
       disabled,
       containerStyle: { borderRadius: 0, overflow: "visible", ...containerStyle, borderWidth: 0 },
       elementStyles,
-      children: /* @__PURE__ */ jsxRuntime.jsx(
-        index.Switch,
-        {
-          ...nativeProps,
-          ref,
-          style: { ...resolvedRootStyle && Object.keys(resolvedRootStyle).length > 0 ? resolvedRootStyle : resolvedThemeStyle, ...cssProps },
-          value: internal,
-          isDisabled: !!disabled,
-          isInvalid: !!invalid,
-          onToggle: handleToggle
-        }
-      )
+      children: Element
     }
   );
 };

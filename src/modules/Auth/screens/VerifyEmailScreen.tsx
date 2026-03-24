@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
+import {TextInput, StyleSheet} from 'react-native';
 import {
   Button,
   Flex,
@@ -14,7 +14,6 @@ import {authActions, selectAuthLoading} from '@src/modules/Auth';
 import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import type {AuthStackParamList} from '@src/routes/AuthNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
-import {TouchableOpacity} from 'react-native';
 
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN = 60;
@@ -108,12 +107,6 @@ const VerifyEmailScreen: React.FC = () => {
 
   return (
     <AlphaLayout>
-      <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView
-          contentContainerStyle={{flexGrow: 1}}
-          keyboardShouldPersistTaps="handled">
           <Flex flex={1} px={22} mt={79} pb={32} flexDirection="column" gap={24}>
             <Flex flexDirection="column" gap={8}>
               <Heading
@@ -181,16 +174,12 @@ const VerifyEmailScreen: React.FC = () => {
                   {t('auth.seconds')}
                 </Text>
               ) : (
-                <TouchableOpacity onPress={handleResend} activeOpacity={0.6}>
-                  <Text fontSize={14} color="primary" fontWeight="600">
+                <Text fontSize={14} color="primary" fontWeight="600" onPress={handleResend}>
                     {t('auth.resendCode')}
-                  </Text>
-                </TouchableOpacity>
+                </Text>
               )}
             </Flex>
           </Flex>
-        </ScrollView>
-      </KeyboardAvoidingView>
     </AlphaLayout>
   );
 };

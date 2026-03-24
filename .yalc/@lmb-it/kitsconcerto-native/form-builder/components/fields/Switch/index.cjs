@@ -23,6 +23,7 @@ const Switch = ({
     attached,
     style: elementStyle
   } = fieldLogic;
+  const switchElement = element;
   return /* @__PURE__ */ jsxRuntime.jsx(
     index_native.default,
     {
@@ -35,6 +36,7 @@ const Switch = ({
       errors: fieldState.error?.message,
       helperText,
       attached,
+      displayAs: switchElement.displayAs,
       style: elementStyle?.input,
       containerStyle: elementStyle?.container,
       checked: !!field.value

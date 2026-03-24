@@ -1,5 +1,5 @@
 import React, {useRef, useCallback, useMemo, useState, useEffect} from 'react';
-import {TouchableOpacity, TextInput, StyleSheet} from 'react-native';
+import {TextInput, StyleSheet} from 'react-native';
 import {
   Button,
   Flex,
@@ -32,7 +32,7 @@ interface INewPasswordForm {
 
 type Step = 'request' | 'verifyCode' | 'newPassword';
 
-const EMAIL_CODE_LENGTH = 4;
+const EMAIL_CODE_LENGTH = 6;
 const PHONE_CODE_LENGTH = 6;
 const RESEND_COOLDOWN = 60;
 
@@ -160,7 +160,8 @@ const ForgotPasswordScreen: React.FC = () => {
     async (data: IForgotPasswordForm, setIsSubmitting: (v: boolean) => void) => {
       setLoading(true);
       const identifier = data.identifier.trim();
-      const phoneDetected = /^\d/.test(identifier) || identifier.startsWith('+');
+      const cleaned = identifier.replace(/[\s\-()]/g, '');
+      const phoneDetected = /^\+?[0-9]{8,15}$/.test(cleaned);
       setIsPhone(phoneDetected);
       setContactInfo(identifier);
 
@@ -380,11 +381,9 @@ const ForgotPasswordScreen: React.FC = () => {
                   {t('auth.resendIn')} {countdown}{t('auth.seconds')}
                 </Text>
               ) : (
-                <TouchableOpacity onPress={handleResend} activeOpacity={0.6}>
-                  <Text fontSize={14} color="primary" fontWeight="600">
+                <Text fontSize={14} color="primary" fontWeight="600" onPress={handleResend}>
                     {t('auth.resendCode')}
-                  </Text>
-                </TouchableOpacity>
+                </Text>
               )}
             </Flex>
           </>
@@ -415,13 +414,9 @@ const ForgotPasswordScreen: React.FC = () => {
           <Text fontSize={14} color="text-subtle">
             {t('auth.goBackTo')}{' '}
           </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Login')}
-            activeOpacity={0.6}>
-            <Text fontSize={14} color="primary" fontWeight="600" textDecoration="underline">
+          <Text fontSize={14} color="primary" fontWeight="600" textDecoration="underline" onPress={() => navigation.navigate('Login')}>
               {t('auth.signIn')}
-            </Text>
-          </TouchableOpacity>
+          </Text>
         </Flex>
       </Flex>
     </AlphaLayout>

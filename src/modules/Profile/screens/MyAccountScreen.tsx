@@ -15,8 +15,6 @@ import {
   Briefcase, GraduationCap, FolderOpen, Award, Users, Star,
   FileCheck, ShieldCheck, CreditCard,
 } from 'lucide-react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import LinearGradient from 'react-native-linear-gradient';
 import {
   selectProfileData, selectActiveWorkspace, selectTradingAccounts, profileActions,
   selectExperiences, selectEducation, selectQualifications, selectReferences, selectPortfolioItems,
@@ -26,9 +24,9 @@ import {selectIsTradeMode} from '@src/modules/Workspace';
 import {fetchRequiredDocumentsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount';
 import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
-import {DocumentVerificationList} from '@src/components/shared/DocumentVerificationList';
 import MenuItem from '../components/MenuItem';
 import AlphaLayout from '@src/layouts/AlphaLayout';
+import {Grid, GridItem} from "@lmb-it/kitsconcerto-native";
 
 const COVER_HEIGHT = 180;
 const AVATAR_SIZE = 100;
@@ -117,29 +115,6 @@ const MyAccountScreen: React.FC = () => {
     }
   }, [careerRef]);
 
-  const handlePickAvatar = useCallback(async () => {
-    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
-    if (result.assets?.[0]?.uri) {
-      dispatch(profileActions.uploadAvatar(result.assets[0].uri));
-    }
-  }, [dispatch]);
-
-  const handlePickCover = useCallback(async () => {
-    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
-    if (result.assets?.[0]?.uri) {
-      dispatch(profileActions.uploadCover(result.assets[0].uri));
-    }
-  }, [dispatch]);
-
-  const handleUploadDocument = useCallback(
-    (doc: IDocumentRequirement) => {
-      navigation.navigate('TradingAccountCreation', {
-        screen: 'TADocumentForm',
-        params: {documentRef: doc.identifier, documentName: doc.name},
-      } as any);
-    },
-    [navigation],
-  );
 
   const displayName = useMemo(() => {
     if (isTradeMode && activeTradingAccount) {
@@ -172,35 +147,29 @@ const MyAccountScreen: React.FC = () => {
         ) : (
           <View style={[styles.coverImage, {backgroundColor: primaryColor}]} />
         )}
-        <LinearGradient
-          colors={['transparent', 'rgba(249,250,252,0.6)']}
-          style={styles.coverGradientBottom}
-        />
-        <TouchableOpacity
-          style={styles.changeCoverBtn}
-          onPress={handlePickCover}
-          activeOpacity={0.7}>
-          <Camera color="#FFFFFF" size={16} />
-        </TouchableOpacity>
+
       </View>
 
       {/* Avatar */}
       <View style={styles.avatarWrapper}>
-        <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8}>
-          {profileData?.user?.avatar ? (
+        {profileData?.user?.avatar ? (
             <Image source={{uri: profileData.user.avatar}} style={styles.avatar} />
-          ) : (
+        ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder]}>
               <Text fontSize={32} fontWeight="700" color="text-subtle">
                 {displayName.charAt(0).toUpperCase() || '?'}
               </Text>
             </View>
-          )}
-          <View style={[styles.cameraBadge, {backgroundColor: primaryColor}]}>
-            <Camera color="#FFFFFF" size={14} />
-          </View>
-        </TouchableOpacity>
+        )}
       </View>
+
+
+{/*      <Grid columns={12} gap={15} p={10} backgroundColor={'red'}>
+        <GridItem colSpan={3} backgroundColor="red" className="p-6 border-round"><Text>Grid</Text></GridItem>
+        <GridItem colSpan={3} backgroundColor="green" className="p-6 border-round"><Text>Grid</Text></GridItem>
+        <GridItem colSpan={3} backgroundColor="blue" className="p-6 border-round"><Text>Grid</Text></GridItem>
+        <GridItem colSpan={3} backgroundColor="black" className="p-6 border-round"><Text>Grid</Text></GridItem>
+      </Grid>*/}
 
       {/* Name + subtitle */}
       <Text fontSize={20} fontWeight="700" color="text-primary" textAlign="center" mt={8}>
@@ -391,6 +360,7 @@ const MyAccountScreen: React.FC = () => {
           )}
         </>
       )}
+
     </AlphaLayout>
   );
 };
