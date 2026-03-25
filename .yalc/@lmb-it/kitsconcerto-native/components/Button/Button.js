@@ -101,12 +101,11 @@ function resolveIcon(icon) {
 }
 function Button(rawProps) {
   const { mergedProps: props, themeStyle, elementStyles } = useComponentDefaults("Button", rawProps);
-  const { children, label, isLoadingText, severity = "primary", size = "md", loading, outlined, icon, iconPos = "left" } = props;
+  const { children, label, isLoadingText, severity = "brand", size = "md", loading, outlined, icon, iconPos = "left" } = props;
   const { handlers, isDisabled, _nativeProps } = useButton(props);
   const { cssProps, nativeProps } = useSeparator(_nativeProps);
   const { t } = useLanguage();
-  const brandColors = useSeverityColors(severity ?? "secondary");
-  const isBrand = severity === "brand";
+  const sevColors = useSeverityColors(severity ?? "secondary");
   const gluestackVariant = outlined ? "outline" : "solid";
   const SEVERITY_TO_ACTION = {
     primary: "primary",
@@ -144,25 +143,20 @@ function Button(rawProps) {
   const borderRadiusStyles = Object.fromEntries(
     Object.entries(computedStyles).filter(([k]) => BORDER_RADIUS_KEYS.has(k))
   );
-  const brandButtonStyle = {};
-  if (isBrand) {
-    if (outlined) {
-      brandButtonStyle.borderColor = brandColors.solid;
-      brandButtonStyle.backgroundColor = "transparent";
-      textStyles.color = brandColors.solid;
-    } else {
-      brandButtonStyle.backgroundColor = brandColors.solid;
-      brandButtonStyle.borderColor = brandColors.solid;
-      textStyles.color = "#FFFFFF";
-    }
+  const severityButtonStyle = { ...borderRadiusStyles };
+  if (outlined) {
+    severityButtonStyle.borderColor = sevColors.solid;
+    severityButtonStyle.backgroundColor = "transparent";
+    textStyles.color = sevColors.solid;
+  } else {
+    severityButtonStyle.backgroundColor = sevColors.solid;
+    severityButtonStyle.borderColor = sevColors.border || sevColors.solid;
+    textStyles.color = sevColors.solidText;
   }
-  const gluestackStyle = {
-    ...borderRadiusStyles,
-    ...brandButtonStyle,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row"
-  };
+  severityButtonStyle.justifyContent = "center";
+  severityButtonStyle.alignItems = "center";
+  severityButtonStyle.flexDirection = "row";
+  const spinnerColor = outlined ? sevColors.solid : sevColors.solidText;
   return /* @__PURE__ */ jsx(
     ResponsiveElement,
     {
@@ -182,11 +176,11 @@ function Button(rawProps) {
           onPressOut: handlers.onPressOut,
           testID: props.testID,
           ...nativeProps,
-          style: Object.keys(gluestackStyle).length ? gluestackStyle : void 0,
+          style: Object.keys(severityButtonStyle).length ? severityButtonStyle : void 0,
           children: [
             isValidElement(resolvedIcon) && iconPos === "left" && resolvedIcon,
             resolvedIcon && !isValidElement(resolvedIcon) && iconPos === "left" && /* @__PURE__ */ jsx(ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] }),
-            loading && /* @__PURE__ */ jsx(ButtonSpinner, { color: isBrand ? "#FFFFFF" : "gray" }),
+            loading && /* @__PURE__ */ jsx(ButtonSpinner, { color: spinnerColor }),
             (children || label) && /* @__PURE__ */ jsx(ButtonText, { style: Object.keys(textStyles).length ? textStyles : void 0, children: resolvedLabel }),
             isValidElement(resolvedIcon) && iconPos === "right" && resolvedIcon,
             resolvedIcon && !isValidElement(resolvedIcon) && iconPos === "right" && /* @__PURE__ */ jsx(ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] })

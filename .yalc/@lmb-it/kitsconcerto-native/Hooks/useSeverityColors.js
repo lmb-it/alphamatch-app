@@ -1,20 +1,23 @@
 import { useMemo } from 'react';
 import { useKitsTheme } from '../contexts/Theme/KitsThemeProvider.js';
 
+const WHITE = "#ffffff";
 function useSeverityColors(severity) {
   const { theme, resolveToken, colorMode } = useKitsTheme();
   return useMemo(() => {
     const slots = theme.severity?.[severity] ?? theme.severity?.secondary;
     if (!slots) {
       const fallback = resolveToken("gray.500");
-      return { solid: fallback, bgTint: fallback, iconFg: fallback, iconBg: fallback, text: fallback, border: fallback };
+      return { solid: fallback, solidText: WHITE, bgTint: fallback, iconFg: fallback, iconBg: fallback, text: fallback, border: fallback };
     }
+    const resolveSolidText = () => slots.solidText ? resolveToken(slots.solidText) : WHITE;
     if (severity === "brand") {
       const primary = resolveToken("primary");
       if (colorMode === "dark") {
         const swapShade = (token, target) => resolveToken(token.replace(/\.\d+$/, `.${target}`));
         return {
           solid: primary,
+          solidText: resolveSolidText(),
           bgTint: swapShade(slots.solid, "900"),
           iconFg: primary,
           iconBg: swapShade(slots.solid, "800"),
@@ -24,6 +27,7 @@ function useSeverityColors(severity) {
       }
       return {
         solid: primary,
+        solidText: resolveSolidText(),
         bgTint: resolveToken(slots.bgTint),
         iconFg: primary,
         iconBg: resolveToken(slots.iconBg),
@@ -37,6 +41,7 @@ function useSeverityColors(severity) {
       };
       return {
         solid: resolveToken(slots.solid),
+        solidText: resolveSolidText(),
         bgTint: swapShade(slots.solid, "900"),
         iconFg: swapShade(slots.solid, "300"),
         iconBg: swapShade(slots.solid, "800"),
@@ -46,6 +51,7 @@ function useSeverityColors(severity) {
     }
     return {
       solid: resolveToken(slots.solid),
+      solidText: resolveSolidText(),
       bgTint: resolveToken(slots.bgTint),
       iconFg: resolveToken(slots.iconFg),
       iconBg: resolveToken(slots.iconBg),
@@ -64,12 +70,14 @@ function useAllSeverityColors() {
       const slots = theme.severity?.[key];
       if (!slots) continue;
       const isBrand = key === "brand";
+      const solidText = slots.solidText ? resolveToken(slots.solidText) : WHITE;
       if (colorMode === "dark") {
         const swapShade = (token, target) => {
           return resolveToken(token.replace(/\.\d+$/, `.${target}`));
         };
         result[key] = {
           solid: isBrand ? primary : resolveToken(slots.solid),
+          solidText,
           bgTint: swapShade(slots.solid, "900"),
           iconFg: isBrand ? primary : swapShade(slots.solid, "300"),
           iconBg: swapShade(slots.solid, "800"),
@@ -79,6 +87,7 @@ function useAllSeverityColors() {
       } else {
         result[key] = {
           solid: isBrand ? primary : resolveToken(slots.solid),
+          solidText,
           bgTint: resolveToken(slots.bgTint),
           iconFg: isBrand ? primary : resolveToken(slots.iconFg),
           iconBg: resolveToken(slots.iconBg),

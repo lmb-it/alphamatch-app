@@ -13,8 +13,18 @@ const ELEMENT_SLOT_KEYS = /* @__PURE__ */ new Set([
   "icon",
   "header",
   "title",
+  "subTitle",
   "content",
-  "footer"
+  "footer",
+  // Table slots
+  "headerRow",
+  "headerCell",
+  "body",
+  "bodyRow",
+  "bodyCell",
+  "footerCell",
+  "paginator",
+  "emptyMessage"
 ]);
 function useComponentDefaults(componentName, props, baseGroup) {
   const { theme } = useKitsTheme();

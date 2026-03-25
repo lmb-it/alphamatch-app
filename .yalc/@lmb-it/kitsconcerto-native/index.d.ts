@@ -1657,6 +1657,15 @@ export type ICssStyling = ISpacing &
 export type IStyleClasses = ICssStyling & {
     _hover?: ICssStyling;
     _focus?: ICssStyling;
+    _focusVisible?: ICssStyling;
+    _active?: ICssStyling;
+    _disabled?: ICssStyling;
+    _visited?: ICssStyling;
+    _checked?: ICssStyling;
+    _placeholder?: ICssStyling;
+    _selection?: ICssStyling;
+    _firstChild?: ICssStyling;
+    _lastChild?: ICssStyling;
 };
 
 export type IRadioCheckboxListItem<T = any> = {
@@ -4085,15 +4094,17 @@ export type Severity =
  * Resolution happens at render time via resolveToken().
  */
 export interface ISeverityColorSlots {
-    /** Solid accent color — icon bubble fill, solid buttons */
+    /** Solid accent color — icon bubble fill, solid button background */
     solid: string;
-    /** Light background tint — panel background */
+    /** Text color on solid background — used by filled buttons. Accepts any theme token. */
+    solidText?: string;
+    /** Light background tint — panel/toast background */
     bgTint: string;
     /** Icon foreground color on soft circle */
     iconFg: string;
     /** Icon circle background (soft circle fill, ~20% feel) */
     iconBg: string;
-    /** Text color for severity-tinted surfaces */
+    /** Text color for severity-tinted surfaces (e.g. dark green on green-50 panel) */
     text: string;
     /** Border accent */
     border: string;
@@ -4989,16 +5000,44 @@ export interface IButtonElementSlots {
 
 /** Element slots for Card */
 export interface ICardElementSlots {
-    /** The card root element */
+    /** The card root element (outer container) */
     root?: IElementSlotConfig;
     /** Card header area */
     header?: IElementSlotConfig;
     /** Card title text */
     title?: IElementSlotConfig;
-    /** Card body content area */
+    /** Card subtitle text */
+    subTitle?: IElementSlotConfig;
+    /** Card body content area (children wrapper) */
     content?: IElementSlotConfig;
     /** Card footer area */
     footer?: IElementSlotConfig;
+}
+
+/** Element slots for Table (PrimeReact DataTable styling) */
+export interface ITableElementSlots {
+    /** Outer table wrapper */
+    root?: IElementSlotConfig;
+    /** thead area */
+    header?: IElementSlotConfig;
+    /** tr in thead */
+    headerRow?: IElementSlotConfig;
+    /** th element — font size, weight, color, padding, border, bg */
+    headerCell?: IElementSlotConfig;
+    /** tbody area */
+    body?: IElementSlotConfig;
+    /** tr in tbody — hover, striped, selected states */
+    bodyRow?: IElementSlotConfig;
+    /** td element — padding, font size, color, border */
+    bodyCell?: IElementSlotConfig;
+    /** tfoot area */
+    footer?: IElementSlotConfig;
+    /** td in tfoot */
+    footerCell?: IElementSlotConfig;
+    /** Paginator wrapper */
+    paginator?: IElementSlotConfig;
+    /** Empty state row content */
+    emptyMessage?: IElementSlotConfig;
 }
 
 /**
@@ -5041,6 +5080,7 @@ export interface IKitsComponentDefaults {
 
     // Standalone
     Card?: IComponentThemeConfig<ICardElementSlots>;
+    Table?: IComponentThemeConfig<ITableElementSlots>;
     Switch?: IComponentThemeConfig<IFormElementSlots>;
     Checkbox?: IComponentThemeConfig<IFormElementSlots>;
     Radio?: IComponentThemeConfig<IFormElementSlots>;
@@ -5865,6 +5905,7 @@ declare function useKitsColorScheme(colorScheme: string | undefined, variant?: '
 
 export interface ResolvedSeverityColors {
     solid: string;
+    solidText: string;
     bgTint: string;
     iconFg: string;
     iconBg: string;
@@ -5873,14 +5914,17 @@ export interface ResolvedSeverityColors {
 }
 /**
  * Resolves all severity color slots for a given severity using the current theme.
- * Returns platform-appropriate values (CSS vars on web, hex on native).
- * Handles dark mode by swapping shade levels for subtle tints.
+ * All slot values go through resolveToken() — so they support:
+ *   - Raw values: '#ff0000', 'black', 'rgb(..)'
+ *   - Semantic tokens: 'primary', 'danger'
+ *   - Dot-notation: 'red.700', 'blue.500'
+ *   - Prefixed tokens: '$spacing.4'
+ *
+ * solidText defaults to white if not explicitly set by the consumer.
  */
 declare function useSeverityColors(severity: Severity): ResolvedSeverityColors;
 /**
  * Returns the full resolved map for all severities.
- * Useful when a component needs to look up colors dynamically
- * (e.g., per-button severity in a buttons array).
  */
 declare function useAllSeverityColors(): Record<Severity, ResolvedSeverityColors>;
 
