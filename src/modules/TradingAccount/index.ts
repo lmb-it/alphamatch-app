@@ -14,4 +14,4 @@ export {ExpiryWarningBanner} from './components/ExpiryWarningBanner';
 export type {ExpiryWarningBannerProps} from './components/ExpiryWarningBanner';
 
 // Screens
-export {default as TierStatusScreen} from './screens/TierStatusScreen';
+export {default as TierStatusScreen} from './screens/TierStatus';

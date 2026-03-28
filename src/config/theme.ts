@@ -78,10 +78,10 @@ export const alphaMatchTheme = extendTheme({
           borderRadius: 28,
           fontWeight: '600',
           // paddingHorizontal: 24,
-          // height: 52,
+          height: 52,
           // minHeight: 52,
         },
-      }
+      },
     },
     Select: {
       root: {
@@ -115,10 +115,48 @@ export const alphaMatchTheme = extendTheme({
           backgroundColor: '#F9FAFC',
           fontSize: 14,
         },
+      },
+      leftAddon: {
+        style: {
+          backgroundColor: 'transparent'
+        }
+      },
+
+      rightAddon: {
+        style: {
+          backgroundColor: 'transparent'
+        }
+      }
+    },
+    Textarea: {
+      root: {
+        props: {
+          inputSize: 'lg',
+        },
+        style: {
+          borderRadius: 20,
+          borderWidth: 1,
+          borderColor: '#EEEEEE',
+          paddingHorizontal: 16,
+          height: 52,
+          minHeight: 52,
+          backgroundColor: '#F9FAFC',
+          fontSize: 14,
+        },
+      },
+      leftAddon: {
+        style: {
+          backgroundColor: 'transparent'
+        }
+      },
+
+      rightAddon: {
+        style: {
+          backgroundColor: 'transparent'
+        }
       }
     },
     FormContainer: {
-
       root: {
         style: {
           gap: 8,

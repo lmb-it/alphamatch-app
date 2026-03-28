@@ -8,7 +8,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import HomeScreen from '@src/modules/Home/screens/HomeScreen';
+import HomeScreen from '@src/modules/Home/screens/Home';
 import JobDetailWorkerScreen from '@src/modules/Jobs/screens/JobDetailWorkerScreen';
 import SubmitProposalScreen from '@src/modules/Jobs/screens/SubmitProposalScreen';
 import {CustomerJobPostingNavigator} from './CustomerJobPostingNavigator';

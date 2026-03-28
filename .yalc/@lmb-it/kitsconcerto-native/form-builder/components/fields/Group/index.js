@@ -137,7 +137,6 @@ const Group = ({
       const min = settings.repeatable.minRepeats || 0;
       if (fields.length < min) {
         const itemsToAppend = min - fields.length;
-        console.log({ itemsToAppend, current: fields.length });
         handleAppend(itemsToAppend);
       }
     };
@@ -158,9 +157,9 @@ const Group = ({
   if (!isShown) {
     return null;
   }
-  return /* @__PURE__ */ jsxs(Flex, { id: element.id, w: "full", flexDirection: "column", gap: 10, mb: 6, children: [
+  return /* @__PURE__ */ jsxs(Flex, { id: element.id.toString(), w: "full", flexDirection: "column", gap: 10, mb: 6, children: [
     label && /* @__PURE__ */ jsxs(Box, { mt: 15, mb: 15, w: "100%", children: [
-      /* @__PURE__ */ jsx(Label, { as: "h2", label, elementId: element.id }),
+      /* @__PURE__ */ jsx(Label, { as: "h2", label, elementId: element.id.toString() }),
       /* @__PURE__ */ jsx(Divider, { style: { width: "100%" }, className: "my-2" })
     ] }),
     fields.map((field, index) => /* @__PURE__ */ jsxs(
@@ -177,9 +176,15 @@ const Group = ({
             {
               elements: reBuildElements(field, index),
               control,
-              groupField: { index, name: element.id, values: getValues()[element.id][index] },
+              groupField: {
+                index,
+                name: element.id.toString(),
+                values: getValues()[element.id][index],
+                append: handleAppend,
+                remove: () => handleRemove(index)
+              },
               getValues,
-              parentPath: `${element.id}.${index}.`,
+              parentPath: `${element.id.toString()}.${index}.`,
               focusedField: _focusedField,
               setFocusedField: _setFocusedField,
               grid: groupsSettings?.grid

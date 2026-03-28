@@ -7,7 +7,7 @@ var React = require('react');
 var reactNative = require('react-native');
 var _ = require('lodash');
 var errormessage_native = require('../ErrorMessage/errormessage.cjs');
-var index$1 = require('../Addons/index.cjs');
+var index = require('../Addons/index.cjs');
 require('../../../apps/mobile/src/ui/accordion/index.cjs');
 require('../../../apps/mobile/src/ui/actionsheet/index.cjs');
 require('../../../apps/mobile/src/ui/alert/index.cjs');
@@ -23,7 +23,7 @@ require('../../../apps/mobile/src/ui/checkbox/index.cjs');
 require('../../../apps/mobile/src/ui/divider/index.cjs');
 require('../../../apps/mobile/src/ui/drawer/index.cjs');
 require('../../../apps/mobile/src/ui/fab/index.cjs');
-var index = require('../../../apps/mobile/src/ui/form-control/index.cjs');
+var index$1 = require('../../../apps/mobile/src/ui/form-control/index.cjs');
 require('../../../apps/mobile/src/ui/gluestack-ui-provider/config.cjs');
 require('@gluestack-ui/core/overlay/creator');
 require('@gluestack-ui/core/toast/creator');
@@ -129,7 +129,22 @@ const KitsContainer = (rawProps) => {
   const isHorizontal = placement === "RL";
   const isBottom = placement === "B";
   const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { isFormControl: true, label, elementId, required, style: elStyles.label || void 0 }) : null;
-  const contentElement = /* @__PURE__ */ jsxRuntime.jsx(index$1.default, { additionalClassName, leftAddon, rightAddon, invalid, children });
+  const inputGroupStyle = React.useMemo(
+    () => elStyles.inputGroup && Object.keys(elStyles.inputGroup).length ? elStyles.inputGroup : void 0,
+    [elStyles.inputGroup]
+  );
+  const contentElement = /* @__PURE__ */ jsxRuntime.jsx(reactNative.View, { style: inputGroupStyle ? { width: "100%", ...inputGroupStyle } : { width: "100%" }, children: /* @__PURE__ */ jsxRuntime.jsx(
+    index.default,
+    {
+      additionalClassName,
+      leftAddon,
+      rightAddon,
+      invalid,
+      leftAddonStyle: elStyles.leftAddon,
+      rightAddonStyle: elStyles.rightAddon,
+      children
+    }
+  ) });
   const themeRnStyle = React.useMemo(
     () => themeStyle && Object.keys(themeStyle).length ? style.style(themeStyle) : {},
     [themeStyle]
@@ -139,7 +154,7 @@ const KitsContainer = (rawProps) => {
     [containerStyle]
   );
   return /* @__PURE__ */ jsxRuntime.jsxs(
-    index.FormControl,
+    index$1.FormControl,
     {
       isInvalid: invalid,
       size: "md",
@@ -158,7 +173,7 @@ const KitsContainer = (rawProps) => {
           labelElement,
           contentElement
         ] }),
-        helperText && typeof helperText !== "function" && /* @__PURE__ */ jsxRuntime.jsx(index.FormControlHelper, { children: /* @__PURE__ */ jsxRuntime.jsx(index.FormControlHelperText, { style: elStyles.helperText || void 0, children: helperText }) }),
+        helperText && typeof helperText !== "function" && /* @__PURE__ */ jsxRuntime.jsx(index$1.FormControlHelper, { children: /* @__PURE__ */ jsxRuntime.jsx(index$1.FormControlHelperText, { style: elStyles.helperText || void 0, children: helperText }) }),
         !hideError && /* @__PURE__ */ jsxRuntime.jsx(errormessage_native.default, { invalid, errors, style: elStyles.error || void 0 })
       ]
     }

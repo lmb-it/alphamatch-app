@@ -102,8 +102,13 @@ const KitsInputTextarea = forwardRef((rawProps, ref) => {
     containerStyle,
     localProps,
     keyboardNavId,
+    rows,
+    autoResize,
     ...rest
   } = props;
+  const LINE_HEIGHT = 20;
+  const VERTICAL_PADDING = 16;
+  const calculatedHeight = rows ? LINE_HEIGHT * rows + VERTICAL_PADDING : void 0;
   const { inputRef, navProps } = useFormFieldKeyboardNav(keyboardNavId ?? id);
   const isControlled = value !== void 0;
   const { cssProps, nativeProps } = useSeparator({
@@ -159,7 +164,11 @@ const KitsInputTextarea = forwardRef((rawProps, ref) => {
           size: inputSize ?? "md",
           isDisabled: !!disabled,
           isInvalid: !!invalid,
-          style: { ...resolvedRootStyle && Object.keys(resolvedRootStyle).length > 0 ? resolvedRootStyle : resolvedThemeStyle, ...cssProps },
+          style: {
+            ...resolvedRootStyle && Object.keys(resolvedRootStyle).length > 0 ? resolvedRootStyle : resolvedThemeStyle,
+            ...cssProps,
+            ...calculatedHeight ? { height: calculatedHeight, minHeight: calculatedHeight } : {}
+          },
           ...nativeProps,
           children: /* @__PURE__ */ jsx(
             TextareaInput,
@@ -168,6 +177,9 @@ const KitsInputTextarea = forwardRef((rawProps, ref) => {
               value: displayValue,
               onChangeText: handleChangeText,
               editable: !disabled,
+              numberOfLines: rows ?? 4,
+              textAlignVertical: "top",
+              style: calculatedHeight ? { height: calculatedHeight - VERTICAL_PADDING } : void 0,
               ...navProps
             }
           )

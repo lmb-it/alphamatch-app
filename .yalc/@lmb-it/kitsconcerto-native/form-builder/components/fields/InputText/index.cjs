@@ -56,6 +56,7 @@ const InputText = ({
       }
     );
   } else {
+    const keyboardType = "keyboardType" in element ? element.keyboardType : void 0;
     return /* @__PURE__ */ jsxRuntime.jsx(
       index_native$1.default,
       {
@@ -69,6 +70,7 @@ const InputText = ({
         leftAddon,
         rightAddon,
         keyFilter,
+        keyboardType,
         label,
         attached,
         errors: fieldState.error?.message,

@@ -52,6 +52,7 @@ const InputText = ({
       }
     );
   } else {
+    const keyboardType = "keyboardType" in element ? element.keyboardType : void 0;
     return /* @__PURE__ */ jsx(
       KitsInputText,
       {
@@ -65,6 +66,7 @@ const InputText = ({
         leftAddon,
         rightAddon,
         keyFilter,
+        keyboardType,
         label,
         attached,
         errors: fieldState.error?.message,

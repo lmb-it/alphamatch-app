@@ -183,10 +183,12 @@ const useFieldLogic = ({
       onDepsChange(watchedValues, allFormValues, formContext, groupField);
     }
   }, [watchedValues]);
+  const isObjectElement = element.type === "Object";
   const { field, fieldState } = useController({
     name: element.id,
     control,
-    shouldUnregister: !isShown
+    shouldUnregister: !isShown,
+    ...isObjectElement ? { defaultValue: {} } : {}
   });
   useEffect(() => {
     if (!onDepsChange) return;

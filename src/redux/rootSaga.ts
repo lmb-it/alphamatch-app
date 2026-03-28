@@ -6,6 +6,7 @@ import authSaga from '../modules/Auth/store/auth.saga';
 import {profileSaga} from '../modules/Profile';
 import {tradingAccountSaga} from '../modules/TradingAccount';
 import {workspaceSaga} from '../modules/Workspace';
+import {lookupsSaga} from '../modules/Lookups';
 
 export default function* rootSaga(): Generator {
   yield all([
@@ -13,7 +14,6 @@ export default function* rootSaga(): Generator {
     fork(profileSaga),
     fork(tradingAccountSaga),
     fork(workspaceSaga),
-    // Jobs, Bids, Chat, Payments, Notifications, Lookups
-    // sagas will be forked here as modules are implemented
+    fork(lookupsSaga),
   ]);
 }

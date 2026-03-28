@@ -1,6 +1,6 @@
 import { jsx } from 'react/jsx-runtime';
 import { useMemo } from 'react';
-import { TouchableOpacity, ScrollView, View } from 'react-native';
+import { TouchableOpacity, ScrollView, Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import '../ui/accordion/index.js';
 import '../ui/actionsheet/index.js';
@@ -10,7 +10,7 @@ import '../ui/avatar/index.js';
 import '../ui/badge/index.js';
 import '../ui/bottomsheet/index.js';
 import { Box } from '../ui/box/index.js';
-import { ButtonGroup, Button } from '../ui/button/index.js';
+import '../ui/button/index.js';
 import { Card } from '../ui/card/index.js';
 import { Center } from '../ui/center/index.js';
 import '../ui/checkbox/index.js';
@@ -34,7 +34,7 @@ import '../ui/menu/index.js';
 import '../ui/modal/index.js';
 import '../ui/popover/index.js';
 import '../ui/portal/index.js';
-import { Pressable } from '../ui/pressable/index.js';
+import '../ui/pressable/index.js';
 import '../ui/progress/index.js';
 import '../ui/radio/index.js';
 import 'react-native-safe-area-context';
@@ -76,13 +76,11 @@ import '../Core/Checkbox/index.js';
 import '../Core/RadioButton/index.js';
 
 const COMPONENT_MAP = {
-  Button,
-  ButtonGroup,
   Svg: View,
   List: View,
   ListItem: View,
   a: Pressable,
-  Pressable,
+  Pressable: Pressable,
   Box,
   Image,
   Grid,
@@ -135,7 +133,7 @@ const ResponsiveElement = ({
   }, [exiting, animationDuration, animationDelay]);
   const pressHandler = "onClick" in nativeProps ? nativeProps?.onClick : "onPress" in nativeProps ? nativeProps?.onPress : null;
   const hasPressHandler = typeof pressHandler === "function";
-  const isButton = as === "Button" || as === "ButtonGroup";
+  const isButton = as === "Pressable" || as === "a";
   const isImage = as === "Image";
   const cleanedNativeProps = useMemo(() => {
     if (!hasPressHandler || isButton) return nativeProps;

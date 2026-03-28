@@ -12,14 +12,11 @@ import {
   FlatList,
   Modal,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import {Text, Flex, Button, useKitsTheme} from '@lmb-it/kitsconcerto';
+import {Text, Flex, Box, HStack, Button, KitsInputText, useLanguage} from '@lmb-it/kitsconcerto';
 import {Users, Plus, X, Edit2, Trash2, Check} from 'lucide-react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import AlphaLayout from '@src/layouts/AlphaLayout';
@@ -27,18 +24,9 @@ import {profileActions} from '../store/profile.slice';
 import {selectReferences} from '../store/profile.selectors';
 import {selectActiveWorkspaceId} from '@src/modules/Workspace/store/workspace.selectors';
 import type {IReference, ICreateReference} from '../models/profile.types';
+import {getRelationshipOptions, WORK_RELATIONSHIPS} from '../constants/relationships';
 
 type Relationship = ICreateReference['relationship'];
-
-const RELATIONSHIP_OPTIONS: {value: Relationship; label: string}[] = [
-  {value: 'manager', label: 'Manager'},
-  {value: 'colleague', label: 'Colleague'},
-  {value: 'client', label: 'Client'},
-  {value: 'friend', label: 'Friend'},
-  {value: 'other', label: 'Other'},
-];
-
-const WORK_RELATIONSHIPS: Relationship[] = ['manager', 'colleague', 'client'];
 
 const EMPTY_FORM: ICreateReference = {
   fullName: '',
@@ -50,9 +38,12 @@ const EMPTY_FORM: ICreateReference = {
   knownSince: null,
 };
 
+/** Extract string value from KitsConcerto onChange event */
+const extractValue = (e: any): string => e?.target?.value ?? e ?? '';
+
 const ReferencesScreen: React.FC = () => {
   const dispatch = useDispatch();
-  const {resolveToken} = useKitsTheme();
+  const {t} = useLanguage();
   const accountRef = useSelector(selectActiveWorkspaceId);
   const {items, loading} = useSelector(selectReferences);
 
@@ -60,6 +51,8 @@ const ReferencesScreen: React.FC = () => {
   const [editingItem, setEditingItem] = useState<IReference | null>(null);
   const [form, setForm] = useState<ICreateReference>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const relationshipOptions = useMemo(() => getRelationshipOptions(t), [t]);
 
   useEffect(() => {
     if (accountRef) {
@@ -101,19 +94,19 @@ const ReferencesScreen: React.FC = () => {
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
-    if (!form.fullName.trim()) next.fullName = 'Full name is required';
-    if (!form.relationship) next.relationship = 'Relationship is required';
+    if (!form.fullName.trim()) next.fullName = t('profile.references.validation.fullNameRequired');
+    if (!form.relationship) next.relationship = t('profile.references.validation.relationshipRequired');
 
     const hasEmail = !!form.email?.trim();
     const hasPhone = !!form.phone?.trim();
     if (!hasEmail && !hasPhone) {
-      next.email = 'Email or phone is required';
-      next.phone = 'Email or phone is required';
+      next.email = t('profile.references.validation.contactRequired');
+      next.phone = t('profile.references.validation.contactRequired');
     }
 
     if (isWorkRelationship) {
-      if (!form.company?.trim()) next.company = 'Company is required for this relationship';
-      if (!form.jobTitle?.trim()) next.jobTitle = 'Job title is required for this relationship';
+      if (!form.company?.trim()) next.company = t('profile.references.validation.companyRequired');
+      if (!form.jobTitle?.trim()) next.jobTitle = t('profile.references.validation.jobTitleRequired');
     }
 
     setErrors(next);
@@ -141,12 +134,12 @@ const ReferencesScreen: React.FC = () => {
 
   const handleDelete = (item: IReference) => {
     Alert.alert(
-      'Delete Reference',
-      `Are you sure you want to delete "${item.fullName}"?`,
+      t('profile.references.deleteConfirmTitle'),
+      t('profile.references.deleteConfirmMessage'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('profile.references.cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('profile.references.delete'),
           style: 'destructive',
           onPress: () => {
             if (accountRef) {
@@ -158,58 +151,64 @@ const ReferencesScreen: React.FC = () => {
     );
   };
 
-  const primaryColor = resolveToken('primary');
-  const textColor = resolveToken('text-primary');
-  const subtleColor = resolveToken('text-subtle');
-  const surfaceColor = resolveToken('surface');
-  const borderColor = resolveToken('border');
-  const bgColor = resolveToken('bg');
-  const dangerColor = resolveToken('danger') || '#e74c3c';
-
   const getRelationshipLabel = (value: Relationship) =>
-    RELATIONSHIP_OPTIONS.find(o => o.value === value)?.label ?? value;
+    relationshipOptions.find(o => o.value === value)?.label ?? value;
 
   const renderItem = ({item}: {item: IReference}) => (
-    <View style={[styles.card, {backgroundColor: surfaceColor, borderColor}]}>
-      <View style={styles.cardContent}>
-        <View style={styles.cardTitleRow}>
+    <Box
+      flexDirection="row"
+      alignItems="center"
+      p={16}
+      borderRadius={12}
+      borderWidth={1}
+      bgColor="surface"
+      borderColor="border">
+      <Box flex={1} mr={12}>
+        <HStack alignItems="center" gap={8}>
           <Text fontSize={16} fontWeight="700" color="text-primary" numberOfLines={1} style={styles.cardName}>
             {item.fullName}
           </Text>
-          <View style={[styles.badge, {backgroundColor: primaryColor + '1A'}]}>
+          <Box px={8} py={2} borderRadius={6} bgColor="primary" opacity={0.1}>
             <Text fontSize={11} fontWeight="600" color="primary">
               {getRelationshipLabel(item.relationship)}
             </Text>
-          </View>
-        </View>
+          </Box>
+        </HStack>
         {item.company && (
           <Text fontSize={14} color="text-subtle" mt={2}>
             {item.company}
           </Text>
         )}
-      </View>
-      <View style={styles.cardActions}>
-        <TouchableOpacity onPress={() => openEdit(item)} hitSlop={8} style={styles.actionBtn}>
-          <Edit2 size={18} color={primaryColor} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDelete(item)} hitSlop={8} style={styles.actionBtn}>
-          <Trash2 size={18} color={dangerColor} />
-        </TouchableOpacity>
-      </View>
-    </View>
+      </Box>
+      <HStack gap={12}>
+        <Button
+          size="sm"
+          outlined
+          icon={<Edit2 size={18} />}
+          onPress={() => openEdit(item)}
+        />
+        <Button
+          size="sm"
+          outlined
+          severity="danger"
+          icon={<Trash2 size={18} />}
+          onPress={() => handleDelete(item)}
+        />
+      </HStack>
+    </Box>
   );
 
   const renderEmpty = () => (
     <Flex flex={1} justifyContent="center" alignItems="center" px={20} py={40}>
-      <Users color={subtleColor} size={48} />
+      <Users color="#999" size={48} />
       <Text fontSize={16} fontWeight="600" color="text-primary" mt={16}>
-        No references added yet
+        {t('profile.references.emptyTitle')}
       </Text>
       <Text fontSize={14} color="text-subtle" textAlign="center" mt={8}>
-        Add professional references to build trust with potential clients.
+        {t('profile.references.emptyDescription')}
       </Text>
       <Button
-        label="Add Reference"
+        label={t('profile.references.addButton')}
         icon={<Plus size={18} color="#fff" />}
         mt={24}
         onPress={openAdd}
@@ -218,44 +217,40 @@ const ReferencesScreen: React.FC = () => {
   );
 
   const headerRight = (
-    <TouchableOpacity onPress={openAdd} hitSlop={8}>
-      <Plus size={24} color={primaryColor} />
-    </TouchableOpacity>
+    <Button
+      size="sm"
+      outlined
+      icon={<Plus size={24} />}
+      onPress={openAdd}
+    />
   );
 
   const renderRelationshipPicker = () => (
-    <View style={styles.fieldGroup}>
+    <Box mb={20}>
       <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-        Relationship <Text color="danger">*</Text>
+        {t('profile.references.fields.relationship')} <Text color="danger">*</Text>
       </Text>
-      <View style={styles.relationshipRow}>
-        {RELATIONSHIP_OPTIONS.map(option => {
+      <HStack flexWrap="wrap" gap={8}>
+        {relationshipOptions.map(option => {
           const isSelected = form.relationship === option.value;
           return (
-            <TouchableOpacity
+            <Button
               key={option.value}
+              outlined={!isSelected}
+              size="sm"
+              label={option.label}
+              icon={isSelected ? <Check size={14} /> : undefined}
               onPress={() => setForm(prev => ({...prev, relationship: option.value}))}
-              style={[
-                styles.relationshipChip,
-                {
-                  borderColor: isSelected ? primaryColor : borderColor,
-                  backgroundColor: isSelected ? primaryColor + '1A' : surfaceColor,
-                },
-              ]}>
-              {isSelected && <Check size={14} color={primaryColor} style={{marginRight: 4}} />}
-              <Text fontSize={13} fontWeight={isSelected ? '600' : '400'} color={isSelected ? 'primary' : 'text-primary'}>
-                {option.label}
-              </Text>
-            </TouchableOpacity>
+            />
           );
         })}
-      </View>
+      </HStack>
       {errors.relationship && <Text fontSize={12} color="danger" mt={4}>{errors.relationship}</Text>}
-    </View>
+    </Box>
   );
 
   return (
-    <AlphaLayout title="References" headerStyle="solid" rightActions={items.length > 0 ? headerRight : undefined}>
+    <AlphaLayout title={t('profile.references.title')} headerStyle="solid" rightActions={items.length > 0 ? headerRight : undefined}>
       <FlatList
         data={items}
         keyExtractor={(item) => item.identifier}
@@ -272,124 +267,130 @@ const ReferencesScreen: React.FC = () => {
         presentationStyle="pageSheet"
         onRequestClose={closeModal}>
         <KeyboardAvoidingView
-          style={[styles.modalContainer, {backgroundColor: bgColor}]}
+          style={styles.modalContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {/* Modal Header */}
-          <View style={[styles.modalHeader, {borderBottomColor: borderColor}]}>
-            <TouchableOpacity onPress={closeModal} hitSlop={8}>
-              <X size={24} color={textColor} />
-            </TouchableOpacity>
+          <HStack
+            alignItems="center"
+            justifyContent="space-between"
+            px={16}
+            py={14}
+            borderBottomWidth={1}
+            borderColor="border">
+            <Button
+              size="sm"
+              outlined
+              icon={<X size={24} />}
+              onPress={closeModal}
+            />
             <Text fontSize={17} fontWeight="700" color="text-primary">
-              {editingItem ? 'Edit Reference' : 'Add Reference'}
+              {editingItem ? t('profile.references.editTitle') : t('profile.references.addTitle')}
             </Text>
-            <View style={{width: 24}} />
-          </View>
+            <Box w={24} />
+          </HStack>
 
           <ScrollView style={styles.formScroll} contentContainerStyle={styles.formContent} keyboardShouldPersistTaps="handled">
             {/* Full Name */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Full Name <Text color="danger">*</Text>
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.fullName ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="fullName"
+                label={t('profile.references.fields.fullName')}
+                required
                 value={form.fullName}
-                onChangeText={(v) => setForm(prev => ({...prev, fullName: v}))}
-                placeholder="e.g. John Smith"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => setForm(prev => ({...prev, fullName: extractValue(e)}))}
+                placeholder={t('profile.references.fields.fullNamePlaceholder')}
+                errors={errors.fullName}
               />
-              {errors.fullName && <Text fontSize={12} color="danger" mt={4}>{errors.fullName}</Text>}
-            </View>
+            </Box>
 
             {/* Relationship Picker */}
             {renderRelationshipPicker()}
 
             {/* Email */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Email {!form.phone?.trim() ? <Text color="danger">*</Text> : null}
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.email ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="email"
+                label={`${t('profile.references.fields.email')}${!form.phone?.trim() ? ' *' : ''}`}
                 value={form.email ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, email: v || null}))}
-                placeholder="john@example.com"
-                placeholderTextColor={subtleColor}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, email: v || null}));
+                }}
+                placeholder={t('profile.references.fields.emailPlaceholder')}
+                localProps={{keyboardType: 'email-address', autoCapitalize: 'none'}}
+                errors={errors.email}
               />
-              {errors.email && <Text fontSize={12} color="danger" mt={4}>{errors.email}</Text>}
-            </View>
+            </Box>
 
             {/* Phone */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Phone {!form.email?.trim() ? <Text color="danger">*</Text> : null}
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.phone ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="phone"
+                label={`${t('profile.references.fields.phone')}${!form.email?.trim() ? ' *' : ''}`}
                 value={form.phone ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, phone: v || null}))}
-                placeholder="+61 400 000 000"
-                placeholderTextColor={subtleColor}
-                keyboardType="phone-pad"
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, phone: v || null}));
+                }}
+                placeholder={t('profile.references.fields.phonePlaceholder')}
+                localProps={{keyboardType: 'phone-pad'}}
+                errors={errors.phone}
               />
-              {errors.phone && <Text fontSize={12} color="danger" mt={4}>{errors.phone}</Text>}
-            </View>
+            </Box>
 
             {/* Company */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Company {isWorkRelationship ? <Text color="danger">* Required</Text> : null}
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.company ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="company"
+                label={`${t('profile.references.fields.company')}${isWorkRelationship ? ' *' : ''}`}
                 value={form.company ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, company: v || null}))}
-                placeholder="e.g. Acme Corp"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, company: v || null}));
+                }}
+                placeholder={t('profile.references.fields.companyPlaceholder')}
+                errors={errors.company}
               />
-              {errors.company && <Text fontSize={12} color="danger" mt={4}>{errors.company}</Text>}
-            </View>
+            </Box>
 
             {/* Job Title */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Job Title {isWorkRelationship ? <Text color="danger">* Required</Text> : null}
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.jobTitle ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="jobTitle"
+                label={`${t('profile.references.fields.jobTitle')}${isWorkRelationship ? ' *' : ''}`}
                 value={form.jobTitle ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, jobTitle: v || null}))}
-                placeholder="e.g. Senior Developer"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, jobTitle: v || null}));
+                }}
+                placeholder={t('profile.references.fields.jobTitlePlaceholder')}
+                errors={errors.jobTitle}
               />
-              {errors.jobTitle && <Text fontSize={12} color="danger" mt={4}>{errors.jobTitle}</Text>}
-            </View>
+            </Box>
 
             {/* Known Since */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Known Since
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="knownSince"
+                label={t('profile.references.fields.knownSince')}
                 value={form.knownSince ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, knownSince: v || null}))}
-                placeholder="e.g. Since 2019"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, knownSince: v || null}));
+                }}
+                placeholder={t('profile.references.fields.knownSincePlaceholder')}
               />
-            </View>
+            </Box>
           </ScrollView>
 
           {/* Submit */}
-          <View style={[styles.modalFooter, {borderTopColor: borderColor}]}>
+          <Box p={16} borderTopWidth={1} borderColor="border">
             <Button
-              label={editingItem ? 'Update' : 'Add Reference'}
+              label={editingItem ? t('profile.references.updateButton') : t('profile.references.addButton')}
               onPress={handleSubmit}
-              width="100%"
+              w="100%"
             />
-          </View>
+          </Box>
         </KeyboardAvoidingView>
       </Modal>
     </AlphaLayout>
@@ -399,59 +400,10 @@ const ReferencesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   emptyContainer: {flexGrow: 1},
   listContainer: {padding: 16, gap: 12},
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  cardContent: {flex: 1, marginRight: 12},
-  cardTitleRow: {flexDirection: 'row', alignItems: 'center', gap: 8},
   cardName: {flexShrink: 1},
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  cardActions: {flexDirection: 'row', gap: 12},
-  actionBtn: {padding: 4},
   modalContainer: {flex: 1},
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-  },
   formScroll: {flex: 1},
-  formContent: {padding: 16, gap: 20},
-  fieldGroup: {},
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-  },
-  relationshipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  relationshipChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  modalFooter: {
-    padding: 16,
-    borderTopWidth: 1,
-  },
+  formContent: {padding: 16},
 });
 
 export default ReferencesScreen;

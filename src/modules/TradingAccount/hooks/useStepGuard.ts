@@ -2,13 +2,12 @@
  * Step access guard for the Trading Account creation flow.
  *
  * Determines the furthest step the user can access based on the current
- * Redux state (createdAccount, aiResult, basicInfo, etc.).
+ * Redux state (createdAccount, aiResult, etc.).
  * Screens call `canAccess(routeName)` — if false they should redirect
  * back to the earliest valid screen.
  */
 import {useSelector} from 'react-redux';
 import {
-  selectBasicInfo,
   selectAIResult,
   selectCreatedAccount,
   selectSelectedCareerRef,
@@ -18,7 +17,6 @@ import type {TradingAccountCreationParamList} from '@src/routes/TradingAccountCr
 /** Ordered list of route names in the creation flow. */
 const STEP_ORDER: (keyof TradingAccountCreationParamList)[] = [
   'TAIntro',
-  'TABasicInfo',
   'TAInput',
   'TACareerSelection',
   'TACareerConfirmation',
@@ -36,7 +34,6 @@ const STEP_ORDER: (keyof TradingAccountCreationParamList)[] = [
  * Everything at or below this index is accessible.
  */
 function computeMaxReachable(state: {
-  hasBasicInfo: boolean;
   hasAiResultOrCareer: boolean;
   hasCreatedAccount: boolean;
   setupStatus: string | null;
@@ -45,20 +42,21 @@ function computeMaxReachable(state: {
   // TAIntro is always accessible
   let max = 0; // TAIntro
 
-  if (!state.hasBasicInfo) return max;
-  max = 1; // TABasicInfo done → can reach TAInput
+  // TAIntro done → can reach TAInput (index 1)
+  // TAInput is always reachable after intro (no gate — profile check is before flow)
+  max = 1; // TAInput
 
-  if (!state.hasAiResultOrCareer) return max + 1; // TAInput
-  max = 4; // TACareerConfirmation
+  if (!state.hasAiResultOrCareer) return max;
+  max = 3; // TACareerConfirmation
 
   if (!state.hasCreatedAccount) return max + 1; // TAMissingQuestions
-  max = 6; // TAConfirmation
+  max = 5; // TAConfirmation
 
   // Past TAConfirmation, routing depends on career model
   if (state.careerModel === 'pro') {
-    max = 9; // TADocumentForm
+    max = 8; // TADocumentForm
   } else {
-    max = 10; // TAFlexActivation
+    max = 9; // TAFlexActivation
   }
 
   // TACompletion always accessible once an account exists
@@ -67,13 +65,11 @@ function computeMaxReachable(state: {
 }
 
 export function useStepGuard() {
-  const basicInfo = useSelector(selectBasicInfo);
   const aiResult = useSelector(selectAIResult);
   const selectedCareerRef = useSelector(selectSelectedCareerRef);
   const createdAccount = useSelector(selectCreatedAccount);
 
   const maxReachable = computeMaxReachable({
-    hasBasicInfo: !!basicInfo,
     hasAiResultOrCareer: !!(aiResult || selectedCareerRef),
     hasCreatedAccount: !!createdAccount,
     setupStatus: createdAccount?.setupStatus ?? null,

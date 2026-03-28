@@ -18,7 +18,7 @@ import { Location } from '../fields/Location/index.js';
 import { ColorPicker } from '../fields/ColorPicker/index.js';
 import { Group } from '../fields/Group/index.js';
 import { ObjectElement } from '../fields/Object/index.js';
-import 'react-hook-form';
+import { CombinedElement } from '../fields/Combined/index.js';
 import KitsGrid from '../../../layout/Grid/native/KitsGrid.js';
 import KitsGridItem from '../../../layout/GridItem/native/KitsGridItem.js';
 
@@ -85,6 +85,8 @@ const FormRenderer = ({
         return ObjectElement;
       case "Container":
         return Container;
+      case "Combined":
+        return CombinedElement;
     }
   }, []);
   return /* @__PURE__ */ jsx(KeyboardNavContext.Provider, { value: keyboardNavCtx, children: /* @__PURE__ */ jsx(

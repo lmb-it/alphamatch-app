@@ -1,4 +1,30 @@
 export default {
+  // Profile Setup Gate (modal before creation flow)
+  'trading.profileSetup.title': 'TODO',
+  'trading.profileSetup.subtitle': 'TODO',
+  'trading.profileSetup.save': 'TODO',
+  'trading.profileSetup.firstName': 'TODO',
+  'trading.profileSetup.firstNamePlaceholder': 'TODO',
+  'trading.profileSetup.firstNameRequired': 'TODO',
+  'trading.profileSetup.lastName': 'TODO',
+  'trading.profileSetup.lastNamePlaceholder': 'TODO',
+  'trading.profileSetup.lastNameRequired': 'TODO',
+  'trading.profileSetup.contactEmail': 'TODO',
+  'trading.profileSetup.contactEmailPlaceholder': 'TODO',
+  'trading.profileSetup.contactPhone': 'TODO',
+  'trading.profileSetup.contactPhonePlaceholder': 'TODO',
+  'trading.profileSetup.contactRequired': 'TODO',
+
+  // Intro Screen (Pro/Flex explanation + T&C)
+  'trading.intro.title': 'TODO',
+  'trading.intro.proTitle': 'TODO',
+  'trading.intro.proDescription': 'TODO',
+  'trading.intro.flexTitle': 'TODO',
+  'trading.intro.flexDescription': 'TODO',
+  'trading.intro.howItWorks': 'TODO',
+  'trading.intro.termsCheckbox': 'TODO',
+  'trading.intro.continueButton': 'TODO',
+
   // Tier Display
   'trading.tier.unverified': 'غير موثق',
   'trading.tier.currentTier': 'المستوى الحالي',

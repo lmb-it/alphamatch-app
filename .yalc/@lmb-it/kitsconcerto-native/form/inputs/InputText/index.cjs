@@ -112,6 +112,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
     containerStyle,
     localProps,
     keyboardNavId,
+    keyboardType,
     ...rest
   } = props;
   const { inputRef, navProps } = useFormFieldKeyboardNav_native.useFormFieldKeyboardNav(keyboardNavId ?? id);
@@ -153,6 +154,7 @@ const KitsInputText = ({ ref, ...rawProps }) => {
           value: displayValue,
           placeholder: isFloatedLabel ? void 0 : placeholder,
           editable: !disabled,
+          keyboardType,
           onChangeText: handleChangeText,
           onFocus: (e) => {
             setFocused(true);

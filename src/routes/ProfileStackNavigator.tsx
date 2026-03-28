@@ -11,13 +11,13 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import MyAccountScreen from '@src/modules/Profile/screens/MyAccountScreen';
 import WorkspaceSwitchingScreen from '@src/modules/Profile/screens/WorkspaceSwitchingScreen';
-import EditProfileScreen from '@src/modules/Profile/screens/EditProfileScreen';
+import EditProfileScreen from '@src/modules/Profile/screens/EditProfile';
 import SettingsScreen from '@src/modules/Profile/screens/SettingsScreen';
 import WalletScreen from '@src/modules/Payments/screens/WalletScreen';
 import TransactionHistoryScreen from '@src/modules/Payments/screens/TransactionHistoryScreen';
 import EarningsScreen from '@src/modules/Payments/screens/EarningsScreen';
 import DocumentsScreen from '@src/modules/Profile/screens/DocumentsScreen';
-import TierStatusScreen from '@src/modules/TradingAccount/screens/TierStatusScreen';
+import TierStatusScreen from '@src/modules/TradingAccount/screens/TierStatus';
 // Portfolio section screens
 import ExperienceScreen from '@src/modules/Profile/screens/ExperienceScreen';
 import EducationScreen from '@src/modules/Profile/screens/EducationScreen';

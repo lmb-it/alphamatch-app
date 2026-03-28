@@ -3,6 +3,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var jsxRuntime = require('react/jsx-runtime');
+var React = require('react');
+var reactNative = require('react-native');
 require('../../apps/mobile/src/ui/accordion/index.cjs');
 require('../../apps/mobile/src/ui/actionsheet/index.cjs');
 require('../../apps/mobile/src/ui/alert/index.cjs');
@@ -11,16 +13,14 @@ require('../../apps/mobile/src/ui/avatar/index.cjs');
 require('../../apps/mobile/src/ui/badge/index.cjs');
 require('../../apps/mobile/src/ui/bottomsheet/index.cjs');
 require('../../apps/mobile/src/ui/box/index.cjs');
-var index = require('../../apps/mobile/src/ui/button/index.cjs');
+require('../../apps/mobile/src/ui/button/index.cjs');
 require('../../apps/mobile/src/ui/card/index.cjs');
 require('../../apps/mobile/src/ui/center/index.cjs');
 require('../../apps/mobile/src/ui/checkbox/index.cjs');
 require('../../apps/mobile/src/ui/divider/index.cjs');
 require('../../apps/mobile/src/ui/drawer/index.cjs');
 require('../../apps/mobile/src/ui/fab/index.cjs');
-require('react-native');
 require('../../apps/mobile/src/ui/form-control/index.cjs');
-var React = require('react');
 require('../../apps/mobile/src/ui/gluestack-ui-provider/config.cjs');
 require('@gluestack-ui/core/overlay/creator');
 require('@gluestack-ui/core/toast/creator');
@@ -53,7 +53,11 @@ require('../../apps/mobile/src/ui/toast/index.cjs');
 require('../../apps/mobile/src/ui/tooltip/index.cjs');
 require('../../apps/mobile/src/ui/vstack/index.cjs');
 var ResponsiveElement = require('../../apps/mobile/src/Factory/ResponsiveElement.cjs');
-var style = require('../../apps/mobile/src/Factory/helpers/style.cjs');
+require('react-icons/fa');
+require('react-icons/ai');
+require('react-icons/io');
+require('../../packages/types/src/Components/Molecules/Form/FilePicker/types/filesTypes.cjs');
+require('yup');
 var useSeparator = require('../../apps/mobile/src/Factory/useSeparator.cjs');
 require('../../apps/mobile/src/Factory/DimensionsContext.cjs');
 require('i18next');
@@ -73,124 +77,138 @@ require('../../apps/mobile/src/Core/Badge/index.cjs');
 require('../../apps/mobile/src/Core/ProgressBar/index.cjs');
 require('../../apps/mobile/src/Core/Checkbox/index.cjs');
 require('../../apps/mobile/src/Core/RadioButton/index.cjs');
-var useButton = require('./useButton.cjs');
 var index_native = require('../../assets/Icons/index.cjs');
 var locale = require('../../hooks/locale.cjs');
 require('../../contexts/DialogContext.cjs');
 var useComponentDefaults = require('../../hooks/useComponentDefaults.cjs');
 var useSeverityColors = require('../../hooks/useSeverityColors.cjs');
 
-const TEXT_STYLE_KEYS = /* @__PURE__ */ new Set([
-  "color",
-  "fontSize",
-  "fontFamily",
-  "fontWeight",
-  "letterSpacing",
-  "lineHeight",
-  "textAlign",
-  "textTransform",
-  "fontStyle",
-  "textDecorationLine"
-]);
-function resolveIcon(icon) {
-  if (!icon) return void 0;
-  if (React.isValidElement(icon)) return icon;
-  if (typeof icon === "function") return icon;
-  if (typeof icon === "string") {
-    const piMatches = icon.match(/pi-([a-z-]+)/g);
-    const iconName = piMatches ? piMatches[piMatches.length - 1].replace("pi-", "") : icon;
-    return index_native.IconMap[iconName];
+const SIZE_MAP = {
+  sm: { height: 32, fontSize: 12, px: 10, py: 6, gap: 6, iconSize: 14 },
+  md: { height: 40, fontSize: 14, px: 16, py: 10, gap: 8, iconSize: 16 },
+  lg: { height: 48, fontSize: 16, px: 24, py: 12, gap: 10, iconSize: 18 }
+};
+function resolveIcon(icon, color, iconSize) {
+  if (!icon) return null;
+  if (React.isValidElement(icon)) {
+    return React.cloneElement(icon, { color, size: iconSize });
   }
-  return void 0;
+  if (typeof icon === "function") {
+    const Comp = icon;
+    return /* @__PURE__ */ jsxRuntime.jsx(Comp, { size: iconSize, color });
+  }
+  if (typeof icon !== "string") return null;
+  const piMatches = icon.match(/pi-([a-z-]+)/g);
+  const iconName = piMatches ? piMatches[piMatches.length - 1].replace("pi-", "") : icon;
+  const Component = index_native.IconMap[iconName];
+  if (Component) return /* @__PURE__ */ jsxRuntime.jsx(Component, { size: iconSize, color });
+  return null;
 }
 function Button(rawProps) {
   const { mergedProps: props, themeStyle, elementStyles } = useComponentDefaults.default("Button", rawProps);
-  const { children, label, isLoadingText, severity = "brand", size = "md", loading, outlined, icon, iconPos = "left" } = props;
-  const { handlers, isDisabled, _nativeProps } = useButton.useButton(props);
-  const { cssProps, nativeProps } = useSeparator.default(_nativeProps);
+  const {
+    children,
+    label,
+    isLoadingText,
+    severity = "brand",
+    size = "md",
+    loading,
+    iconPos = "left",
+    icon,
+    disabled,
+    outlined,
+    raised,
+    rounded,
+    testID,
+    style: styleProp,
+    onPress,
+    onClick,
+    ...rest
+  } = props;
   const { t } = locale.useLanguage();
-  const sevColors = useSeverityColors.useSeverityColors(severity ?? "secondary");
-  const gluestackVariant = outlined ? "outline" : "solid";
-  const SEVERITY_TO_ACTION = {
-    primary: "primary",
-    danger: "negative",
-    success: "positive",
-    secondary: "secondary",
-    info: "primary",
-    warning: "negative",
-    help: "secondary",
-    brand: "primary"
-  };
-  const action = SEVERITY_TO_ACTION[severity] ?? "primary";
-  const resolvedIcon = resolveIcon(icon);
-  const resolvedLabel = typeof children === "string" ? children : loading && isLoadingText ? isLoadingText : t(label ?? "");
-  const iconSizesMap = {
-    "2xs": "2xs",
-    "xs": "xs",
-    "sm": "md",
-    "md": "md",
-    "lg": "lg",
-    "xl": "lg"
-  };
-  const mergedCssProps = { ...themeStyle, ...elementStyles.root || {}, ...cssProps };
-  const computedStyles = style.style(mergedCssProps);
-  const textStyles = Object.fromEntries(
-    Object.entries(computedStyles).filter(([k]) => TEXT_STYLE_KEYS.has(k))
-  );
-  const BORDER_RADIUS_KEYS = /* @__PURE__ */ new Set([
-    "borderRadius",
-    "borderTopLeftRadius",
-    "borderTopRightRadius",
-    "borderBottomLeftRadius",
-    "borderBottomRightRadius"
+  const { cssProps, nativeProps } = useSeparator.default(rest);
+  const sevColors = useSeverityColors.useSeverityColors(severity ?? "brand");
+  const sizeConfig = SIZE_MAP[size] ?? SIZE_MAP.md;
+  const isDisabled = disabled || loading;
+  const resolvedLabel = typeof children === "string" ? children : loading && isLoadingText ? isLoadingText : label ? t(label) : "";
+  const hasLabel = !!resolvedLabel;
+  const textColor = outlined ? sevColors.solid : sevColors.solidText;
+  const bgColor = outlined ? "transparent" : sevColors.solid;
+  const borderColor = sevColors.border || sevColors.solid;
+  const computedCss = React.useMemo(() => ({
+    ...themeStyle,
+    ...elementStyles.root || {},
+    ...cssProps,
+    backgroundColor: bgColor,
+    borderColor,
+    borderWidth: 1,
+    height: sizeConfig.height,
+    paddingLeft: hasLabel ? sizeConfig.px : sizeConfig.py,
+    paddingRight: hasLabel ? sizeConfig.px : sizeConfig.py,
+    paddingTop: sizeConfig.py,
+    paddingBottom: sizeConfig.py,
+    borderRadius: rounded ? 9999 : 6,
+    flexDirection: iconPos === "top" || iconPos === "bottom" ? iconPos === "bottom" ? "column-reverse" : "column" : iconPos === "right" ? "row-reverse" : "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: sizeConfig.gap,
+    opacity: isDisabled ? 50 : 100,
+    alignSelf: "flex-start",
+    overflow: "hidden",
+    ...raised ? {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.16,
+      shadowRadius: 6,
+      elevation: 4
+    } : {},
+    ...styleProp
+  }), [
+    themeStyle,
+    elementStyles,
+    cssProps,
+    bgColor,
+    borderColor,
+    sizeConfig,
+    hasLabel,
+    icon,
+    iconPos,
+    rounded,
+    raised,
+    isDisabled,
+    styleProp
   ]);
-  const borderRadiusStyles = Object.fromEntries(
-    Object.entries(computedStyles).filter(([k]) => BORDER_RADIUS_KEYS.has(k))
-  );
-  const severityButtonStyle = { ...borderRadiusStyles };
-  if (outlined) {
-    severityButtonStyle.borderColor = sevColors.solid;
-    severityButtonStyle.backgroundColor = "transparent";
-    textStyles.color = sevColors.solid;
-  } else {
-    severityButtonStyle.backgroundColor = sevColors.solid;
-    severityButtonStyle.borderColor = sevColors.border || sevColors.solid;
-    textStyles.color = sevColors.solidText;
-  }
-  severityButtonStyle.justifyContent = "center";
-  severityButtonStyle.alignItems = "center";
-  severityButtonStyle.flexDirection = "row";
-  const spinnerColor = outlined ? sevColors.solid : sevColors.solidText;
-  return /* @__PURE__ */ jsxRuntime.jsx(
+  const iconElement = loading ? /* @__PURE__ */ jsxRuntime.jsx(reactNative.ActivityIndicator, { size: "small", color: textColor }) : resolveIcon(icon, textColor, sizeConfig.iconSize);
+  const labelStyle = React.useMemo(() => ({
+    color: textColor,
+    fontSize: sizeConfig.fontSize,
+    fontWeight: "600",
+    lineHeight: sizeConfig.fontSize * 1.2
+  }), [textColor, sizeConfig]);
+  const handlePress = React.useCallback((e) => {
+    if (isDisabled) return;
+    if (onPress) onPress(e);
+    if (onClick) onClick(e);
+  }, [isDisabled, onPress, onClick]);
+  return /* @__PURE__ */ jsxRuntime.jsxs(
     ResponsiveElement.default,
     {
-      as: "Box",
-      additionalStyles: { alignSelf: "flex-start", overflow: "hidden" },
-      cssProps: mergedCssProps,
-      nativeProps: {},
-      children: /* @__PURE__ */ jsxRuntime.jsxs(
-        index.Button,
-        {
-          variant: gluestackVariant,
-          action,
-          size,
-          isDisabled: isDisabled || loading,
-          onPress: handlers.onClick,
-          onPressIn: handlers.onPressIn,
-          onPressOut: handlers.onPressOut,
-          testID: props.testID,
-          ...nativeProps,
-          style: Object.keys(severityButtonStyle).length ? severityButtonStyle : void 0,
-          children: [
-            React.isValidElement(resolvedIcon) && iconPos === "left" && resolvedIcon,
-            resolvedIcon && !React.isValidElement(resolvedIcon) && iconPos === "left" && /* @__PURE__ */ jsxRuntime.jsx(index.ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] }),
-            loading && /* @__PURE__ */ jsxRuntime.jsx(index.ButtonSpinner, { color: spinnerColor }),
-            (children || label) && /* @__PURE__ */ jsxRuntime.jsx(index.ButtonText, { style: Object.keys(textStyles).length ? textStyles : void 0, children: resolvedLabel }),
-            React.isValidElement(resolvedIcon) && iconPos === "right" && resolvedIcon,
-            resolvedIcon && !React.isValidElement(resolvedIcon) && iconPos === "right" && /* @__PURE__ */ jsxRuntime.jsx(index.ButtonIcon, { as: resolvedIcon, size: iconSizesMap[size] })
-          ]
-        }
-      )
+      as: "Pressable",
+      cssProps: computedCss,
+      nativeProps: {
+        ...nativeProps,
+        onPress: handlePress,
+        disabled: isDisabled,
+        testID,
+        accessibilityRole: "button",
+        accessibilityState: { disabled: isDisabled, busy: loading },
+        accessibilityLabel: resolvedLabel || void 0
+      },
+      children: [
+        iconElement,
+        !!hasLabel && /* @__PURE__ */ jsxRuntime.jsx(reactNative.Text, { style: labelStyle, numberOfLines: 1, children: resolvedLabel }),
+        typeof children !== "string" ? children : void 0
+      ]
     }
   );
 }

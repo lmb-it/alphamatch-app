@@ -29,7 +29,8 @@ const Phone = ({
     outputFormat,
     customCountriesCodesList,
     excludedCountries,
-    includedCountries
+    includedCountries,
+    withMask
   } = phoneElement;
   return /* @__PURE__ */ jsx(
     KitsPhoneComponent,

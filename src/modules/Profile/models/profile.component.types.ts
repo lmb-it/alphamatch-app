@@ -26,14 +26,33 @@ export interface IAddressEntry {
   manualEntry: boolean;
 }
 
+/** Shape of a language entry for the profile form. */
+export interface ILanguageEntry {
+  ref: string;
+  proficiencyLevel: string;
+  isNative: boolean;
+}
+
 /** Top-level form data shape for the edit profile form. */
 export interface IEditProfileForm {
+  coverImage: string | null;
+  avatarImage: string | null;
   displayName: string;
   middleName: string;
   familyName: string;
-  contactPhone: string;
+  contactPhone: {phoneCountryId: number; phoneNumber: string};
   shortBio: string;
+  gender: string;
+  birthDate: string;
+  nationalityRef: string;
+  languages: ILanguageEntry[];
   addresses: IAddressEntry[];
+}
+
+/** A nationality option for the Select dropdown */
+export interface INationalityOption {
+  label: string;
+  value: string;
 }
 
 /** Options passed to the form elements builder function. */
@@ -43,5 +62,7 @@ export interface IEditProfileElementOptions {
   t: (key: string) => string;
   formRef: MutableRefObject<IUseFormReturn<IEditProfileForm> | null>;
   addAddressRef: MutableRefObject<(() => void) | null>;
-  googleMapsApiKey: string;
+  addLanguageRef: MutableRefObject<(() => void) | null>;
+  nationalities: INationalityOption[];
+  languageOptions: Array<{label: string; value: string}>;
 }

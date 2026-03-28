@@ -14,7 +14,7 @@ require('../ui/avatar/index.cjs');
 require('../ui/badge/index.cjs');
 require('../ui/bottomsheet/index.cjs');
 var index$9 = require('../ui/box/index.cjs');
-var index$b = require('../ui/button/index.cjs');
+require('../ui/button/index.cjs');
 var index$6 = require('../ui/card/index.cjs');
 var index$3 = require('../ui/center/index.cjs');
 require('../ui/checkbox/index.cjs');
@@ -38,7 +38,7 @@ require('../ui/menu/index.cjs');
 require('../ui/modal/index.cjs');
 require('../ui/popover/index.cjs');
 require('../ui/portal/index.cjs');
-var index$a = require('../ui/pressable/index.cjs');
+require('../ui/pressable/index.cjs');
 require('../ui/progress/index.cjs');
 require('../ui/radio/index.cjs');
 require('react-native-safe-area-context');
@@ -80,13 +80,11 @@ require('../Core/Checkbox/index.cjs');
 require('../Core/RadioButton/index.cjs');
 
 const COMPONENT_MAP = {
-  Button: index$b.Button,
-  ButtonGroup: index$b.ButtonGroup,
   Svg: reactNative.View,
   List: reactNative.View,
   ListItem: reactNative.View,
-  a: index$a.Pressable,
-  Pressable: index$a.Pressable,
+  a: reactNative.Pressable,
+  Pressable: reactNative.Pressable,
   Box: index$9.Box,
   Image: index$8.Image,
   Grid: index$7.Grid,
@@ -139,7 +137,7 @@ const ResponsiveElement = ({
   }, [exiting, animationDuration, animationDelay]);
   const pressHandler = "onClick" in nativeProps ? nativeProps?.onClick : "onPress" in nativeProps ? nativeProps?.onPress : null;
   const hasPressHandler = typeof pressHandler === "function";
-  const isButton = as === "Button" || as === "ButtonGroup";
+  const isButton = as === "Pressable" || as === "a";
   const isImage = as === "Image";
   const cleanedNativeProps = React.useMemo(() => {
     if (!hasPressHandler || isButton) return nativeProps;

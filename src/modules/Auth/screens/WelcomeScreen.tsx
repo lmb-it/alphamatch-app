@@ -7,22 +7,14 @@ import {
   Heading,
   Icon,
   useLanguage,
-  useKitsTheme, IIconProps,
+  useKitsTheme,
 } from '@lmb-it/kitsconcerto';
 import {useDispatch, useSelector} from 'react-redux';
 import {authActions, selectAuthLoading} from '@src/modules/Auth';
 import {useAuthErrorToast} from '@src/hooks/useErrorToast';
 import AlphaLayout from '@src/layouts/AlphaLayout';
 import type {WelcomeIntent} from '../models/auth.types';
-
-type IntentChoice = 'findWork' | 'postJob' | 'both' | null;
-
-interface IntentOption {
-  key: IntentChoice;
-  icon: IIconProps['name'];
-  labelKey: string;
-  descKey: string;
-}
+import type {IntentChoice, IntentOption} from '../models/auth.component.types';
 
 const OPTIONS: IntentOption[] = [
   {key: 'findWork', icon: 'briefcase', labelKey: 'auth.findWork', descKey: 'auth.findWorkDesc'},

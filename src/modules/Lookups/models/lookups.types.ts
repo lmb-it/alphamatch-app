@@ -35,12 +35,26 @@ export interface ICareer {
   categoryLabel: string;
 }
 
+/** Nationality option for dropdowns — { label: "🇦🇺 Australian", value: "AU" } */
+export interface INationalityOption {
+  label: string;
+  value: string;
+}
+
+/** Language option for dropdowns — { label: "English", value: "en" } */
+export interface ILanguageOption {
+  label: string;
+  value: string;
+}
+
 export interface ILookupsState {
   countries: ICountry[];
   states: IState[];
   cities: ICity[];
   currencies: ICurrency[];
   careers: ICareer[];
+  nationalities: INationalityOption[];
+  languages: ILanguageOption[];
   loading: Record<string, boolean>;
   errors: Record<string, string | null>;
 }

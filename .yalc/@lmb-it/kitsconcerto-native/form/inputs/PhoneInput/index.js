@@ -77,6 +77,7 @@ import { usePhoneInput } from './usePhoneInput.js';
 import { SvgUri } from 'react-native-svg';
 import '../../../contexts/DialogContext.js';
 import useComponentDefaults from '../../../hooks/useComponentDefaults.js';
+import useResolvedStyle from '../../../hooks/useResolvedStyle.js';
 import { Icon } from '../../../primitives/Icon/index.js';
 import KitsContainer from '../../helpers/FormContainer/index.js';
 import KitsInputText from '../InputText/index.js';
@@ -107,6 +108,8 @@ const KitsPhoneComponent = ({
   ...props
 }) => {
   const { mergedProps: _mergedProps, themeStyle, elementStyles } = useComponentDefaults("PhoneInput", props, "Input");
+  useResolvedStyle(themeStyle);
+  useResolvedStyle(elementStyles?.root || {});
   useSeparator(props);
   const {
     displayValue,
@@ -164,6 +167,7 @@ const KitsPhoneComponent = ({
           onChange: (e) => handleChange(e.target.value),
           invalid,
           disabled,
+          keyboardType: "phone-pad",
           placeholder: placeholder ?? (isWithCountryCode ? "+1 (555) 123-4567" : ""),
           localProps: Object.keys(themeStyle).length ? { style: { width: "100%", ...themeStyle } } : void 0
         }

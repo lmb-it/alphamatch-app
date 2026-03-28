@@ -108,10 +108,11 @@ export const URLs = {
     registerDevice: '/notifications/device',
   },
   lookups: {
-    countries: '/geo/countries',
-    states: '/geo/states/:countryRef',
-    cities: '/geo/cities',
-    currencies: '/geo/currencies',
+    countries: '/countries',
+    languages: '/languages',
+    states: '/states/:countryRef',
+    cities: '/cities',
+    currencies: '/currencies',
     careers: '/options/careers',
   },
 };

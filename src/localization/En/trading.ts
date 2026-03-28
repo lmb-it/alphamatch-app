@@ -1,14 +1,34 @@
 export default {
-  // Intro Screen
-  'trading.intro.title': 'Create Your Professional Profile',
-  'trading.intro.subtitle':
-    'Join AlphaMatch as a service provider to connect with clients and grow your business on your terms.',
-  'trading.intro.benefit1': 'Get matched with jobs in your area',
-  'trading.intro.benefit2': 'Build your professional reputation',
-  'trading.intro.benefit3': 'Manage your earnings',
-  'trading.intro.privacyNote':
-    'Your contact info stays private until clients accept your proposal.',
-  'trading.intro.getStarted': 'Get Started',
+  // Profile Setup Gate (modal before creation flow)
+  'trading.profileSetup.title': 'Setup your profile',
+  'trading.profileSetup.subtitle':
+    'This information is not related to your trading account, but you must provide it before creating your first trading account.',
+  'trading.profileSetup.save': 'Save',
+  'trading.profileSetup.firstName': 'First Name',
+  'trading.profileSetup.firstNamePlaceholder': 'Enter your first name',
+  'trading.profileSetup.firstNameRequired': 'First name is required',
+  'trading.profileSetup.lastName': 'Last Name',
+  'trading.profileSetup.lastNamePlaceholder': 'Enter your last name',
+  'trading.profileSetup.lastNameRequired': 'Last name is required',
+  'trading.profileSetup.contactEmail': 'Email Address',
+  'trading.profileSetup.contactEmailPlaceholder': 'Enter your email address',
+  'trading.profileSetup.contactPhone': 'Phone Number',
+  'trading.profileSetup.contactPhonePlaceholder': 'Enter your phone number',
+  'trading.profileSetup.contactRequired': 'At least an email or phone number is required',
+
+  // Intro Screen (Pro/Flex explanation + T&C)
+  'trading.intro.title': 'Create your professional account',
+  'trading.intro.proTitle': 'Commission-Based Careers',
+  'trading.intro.proDescription':
+    'For regulated trades like electricians, plumbers, and builders. Jobs are secured through a bidding process, payments are held in escrow by the platform, and a commission is taken per completed job. Document verification is required before activation.',
+  'trading.intro.flexTitle': 'Subscription-Based Careers',
+  'trading.intro.flexDescription':
+    'For non-regulated services like photographers, tutors, and designers. A monthly fee gives you access to job listings. Workers apply directly to jobs, and clients pay workers directly — the platform does not handle payments for these jobs.',
+  'trading.intro.howItWorks':
+    'Based on the career you select in the next step, the system will automatically determine which model applies to you.',
+  'trading.intro.termsCheckbox':
+    'I agree to the AlphaMatch Terms and Conditions and Privacy Policy',
+  'trading.intro.continueButton': 'Continue',
 
   // Basic Info Screen
   'trading.basic.title': 'Basic Information',

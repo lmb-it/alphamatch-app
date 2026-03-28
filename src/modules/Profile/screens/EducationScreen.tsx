@@ -4,24 +4,22 @@
  */
 import React, {useEffect, useState, useCallback} from 'react';
 import {
-  View,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   Alert,
   Modal,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
-import {Text, Flex, Button, useKitsTheme} from '@lmb-it/kitsconcerto';
+import {Text, Flex, Box, HStack, Button, KitsInputText, useLanguage} from '@lmb-it/kitsconcerto';
 import {GraduationCap, Plus, Trash2, Edit3, X} from 'lucide-react-native';
 import {profileActions, selectEducation} from '@src/modules/Profile';
 import type {IEducation, ICreateEducation} from '@src/modules/Profile';
 import {selectActiveWorkspaceId} from '@src/modules/Workspace';
 import AlphaLayout from '@src/layouts/AlphaLayout';
+import type {IEducationFormState} from '../models/profile.form.types';
 
 const formatDateRange = (item: IEducation): string => {
   const start = String(item.startYear);
@@ -29,15 +27,7 @@ const formatDateRange = (item: IEducation): string => {
   return `${start} - Present`;
 };
 
-interface FormState {
-  country: string;
-  institution: string;
-  degree: string;
-  startYear: string;
-  endYear: string;
-}
-
-const emptyForm: FormState = {
+const emptyForm: IEducationFormState = {
   country: '',
   institution: '',
   degree: '',
@@ -45,23 +35,18 @@ const emptyForm: FormState = {
   endYear: '',
 };
 
+/** Extract string value from KitsConcerto onChange event */
+const extractValue = (e: any): string => e?.target?.value ?? e ?? '';
+
 const EducationScreen: React.FC = () => {
   const dispatch = useDispatch();
-  const {resolveToken} = useKitsTheme();
+  const {t} = useLanguage();
   const accountRef = useSelector(selectActiveWorkspaceId);
   const {items, loading} = useSelector(selectEducation);
 
   const [formVisible, setFormVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<IEducation | null>(null);
-  const [form, setForm] = useState<FormState>(emptyForm);
-
-  const primaryColor = resolveToken('primary');
-  const textColor = resolveToken('text-primary');
-  const subtleColor = resolveToken('text-subtle');
-  const surfaceColor = resolveToken('surface');
-  const borderColor = resolveToken('border');
-  const bgColor = resolveToken('bg');
-  const dangerColor = resolveToken('danger');
+  const [form, setForm] = useState<IEducationFormState>(emptyForm);
 
   useEffect(() => {
     if (accountRef) {
@@ -97,16 +82,16 @@ const EducationScreen: React.FC = () => {
     if (!accountRef) return;
 
     if (!form.institution.trim()) {
-      Alert.alert('Validation', 'Institution is required.');
+      Alert.alert(t('profile.education.validation.title'), t('profile.education.validation.institutionRequired'));
       return;
     }
     if (!form.degree.trim()) {
-      Alert.alert('Validation', 'Degree is required.');
+      Alert.alert(t('profile.education.validation.title'), t('profile.education.validation.degreeRequired'));
       return;
     }
     const startYear = parseInt(form.startYear, 10);
     if (!startYear || startYear < 1950) {
-      Alert.alert('Validation', 'Start year is required.');
+      Alert.alert(t('profile.education.validation.title'), t('profile.education.validation.startYearRequired'));
       return;
     }
 
@@ -129,17 +114,17 @@ const EducationScreen: React.FC = () => {
     }
 
     closeForm();
-  }, [accountRef, form, editingItem, dispatch, closeForm]);
+  }, [accountRef, form, editingItem, dispatch, closeForm, t]);
 
   const handleDelete = useCallback((item: IEducation) => {
     if (!accountRef) return;
     Alert.alert(
-      'Delete Education',
-      `Are you sure you want to delete "${item.institution}"?`,
+      t('profile.education.deleteConfirmTitle'),
+      t('profile.education.deleteConfirmMessage'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('profile.education.cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('profile.education.delete'),
           style: 'destructive',
           onPress: () => dispatch(profileActions.deleteEducation({
             ref: accountRef,
@@ -148,16 +133,21 @@ const EducationScreen: React.FC = () => {
         },
       ],
     );
-  }, [accountRef, dispatch]);
+  }, [accountRef, dispatch, t]);
 
-  const updateField = useCallback((key: keyof FormState, value: string) => {
+  const updateField = useCallback((key: keyof IEducationFormState, value: string) => {
     setForm(prev => ({...prev, [key]: value}));
   }, []);
 
   const renderItem = useCallback(({item}: {item: IEducation}) => (
-    <View style={[styles.card, {backgroundColor: surfaceColor, borderColor}]}>
-      <View style={styles.cardContent}>
-        <View style={styles.cardTextArea}>
+    <Box
+      borderRadius={12}
+      borderWidth={1}
+      borderColor="border"
+      bgColor="surface"
+      p={16}>
+      <HStack alignItems="flex-start">
+        <Box flex={1} mr={12}>
           <Text fontSize={15} fontWeight="700" color="text-primary" numberOfLines={1}>
             {item.institution}
           </Text>
@@ -167,41 +157,37 @@ const EducationScreen: React.FC = () => {
           <Text fontSize={12} color="text-subtle" mt={4}>
             {formatDateRange(item)}
           </Text>
-        </View>
-        <View style={styles.cardActions}>
-          <TouchableOpacity
+        </Box>
+        <HStack alignItems="center" gap={16}>
+          <Button
+            size="sm"
+            outlined
+            icon={<Edit3 size={18} />}
             onPress={() => openEditForm(item)}
-            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-            accessible
-            accessibilityLabel="Edit education"
-            accessibilityHint="Opens the edit form for this education entry">
-            <Edit3 size={18} color={primaryColor} />
-          </TouchableOpacity>
-          <TouchableOpacity
+          />
+          <Button
+            size="sm"
+            outlined
+            severity="danger"
+            icon={<Trash2 size={18} />}
             onPress={() => handleDelete(item)}
-            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-            style={styles.deleteBtn}
-            accessible
-            accessibilityLabel="Delete education"
-            accessibilityHint="Deletes this education entry">
-            <Trash2 size={18} color={dangerColor} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  ), [surfaceColor, borderColor, primaryColor, dangerColor, openEditForm, handleDelete]);
+          />
+        </HStack>
+      </HStack>
+    </Box>
+  ), [openEditForm, handleDelete]);
 
   const renderEmpty = () => (
     <Flex flex={1} justifyContent="center" alignItems="center" px={20} py={60}>
-      <GraduationCap color={subtleColor} size={48} />
+      <GraduationCap color="#999" size={48} />
       <Text fontSize={16} fontWeight="600" color="text-primary" mt={16}>
-        No education added yet
+        {t('profile.education.emptyTitle')}
       </Text>
       <Text fontSize={14} color="text-subtle" textAlign="center" mt={8}>
-        Add your educational background to strengthen your profile.
+        {t('profile.education.emptyDescription')}
       </Text>
       <Button
-        label="Add Education"
+        label={t('profile.education.addButton')}
         icon={<Plus size={18} color="#fff" />}
         mt={24}
         onPress={openAddForm}
@@ -209,51 +195,17 @@ const EducationScreen: React.FC = () => {
     </Flex>
   );
 
-  const renderFormField = (
-    label: string,
-    value: string,
-    key: keyof FormState,
-    options?: {
-      required?: boolean;
-      placeholder?: string;
-      keyboardType?: 'default' | 'numeric';
-    },
-  ) => (
-    <View style={styles.fieldContainer}>
-      <Text fontSize={13} fontWeight="600" color="text-secondary" mb={4}>
-        {label}{options?.required ? ' *' : ''}
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: bgColor,
-            borderColor,
-            color: textColor,
-          },
-        ]}
-        value={value}
-        onChangeText={(v) => updateField(key, v)}
-        placeholder={options?.placeholder}
-        placeholderTextColor={subtleColor}
-        keyboardType={options?.keyboardType ?? 'default'}
-      />
-    </View>
-  );
-
   const headerRight = items.length > 0 ? (
-    <TouchableOpacity
+    <Button
+      size="sm"
+      outlined
+      icon={<Plus size={22} />}
       onPress={openAddForm}
-      hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-      accessible
-      accessibilityLabel="Add education"
-      accessibilityHint="Opens the form to add a new education entry">
-      <Plus size={22} color={primaryColor} />
-    </TouchableOpacity>
+    />
   ) : undefined;
 
   return (
-    <AlphaLayout title="Education" headerStyle="solid" scrollEnabled={false} rightActions={headerRight}>
+    <AlphaLayout title={t('profile.education.title')} headerStyle="solid" scrollEnabled={false} rightActions={headerRight}>
       <FlatList
         data={items}
         keyExtractor={(item) => item.identifier}
@@ -269,38 +221,88 @@ const EducationScreen: React.FC = () => {
         presentationStyle="pageSheet"
         onRequestClose={closeForm}>
         <KeyboardAvoidingView
-          style={[styles.modalContainer, {backgroundColor: bgColor}]}
+          style={styles.modalContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={[styles.modalHeader, {borderBottomColor: borderColor}]}>
-            <TouchableOpacity onPress={closeForm} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-              <X size={22} color={textColor} />
-            </TouchableOpacity>
+          <HStack
+            alignItems="center"
+            justifyContent="space-between"
+            px={16}
+            py={14}
+            borderBottomWidth={1}
+            borderColor="border">
+            <Button
+              size="sm"
+              outlined
+              icon={<X size={22} />}
+              onPress={closeForm}
+            />
             <Text fontSize={16} fontWeight="700" color="text-primary">
-              {editingItem ? 'Edit Education' : 'Add Education'}
+              {editingItem ? t('profile.education.editTitle') : t('profile.education.addTitle')}
             </Text>
-            <View style={{width: 22}} />
-          </View>
+            <Box w={22} />
+          </HStack>
 
           <ScrollView
             style={styles.modalBody}
             contentContainerStyle={styles.modalBodyContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
-            {renderFormField('Country', form.country, 'country', {placeholder: 'e.g. Australia'})}
-            {renderFormField('Institution', form.institution, 'institution', {required: true, placeholder: 'e.g. University of Sydney'})}
-            {renderFormField('Degree', form.degree, 'degree', {required: true, placeholder: 'e.g. Bachelor of Engineering'})}
+            <Box mb={16}>
+              <KitsInputText
+                id="country"
+                label={t('profile.education.fields.country')}
+                value={form.country}
+                onChange={(e: any) => updateField('country', extractValue(e))}
+                placeholder={t('profile.education.fields.countryPlaceholder')}
+              />
+            </Box>
+            <Box mb={16}>
+              <KitsInputText
+                id="institution"
+                label={t('profile.education.fields.institution')}
+                required
+                value={form.institution}
+                onChange={(e: any) => updateField('institution', extractValue(e))}
+                placeholder={t('profile.education.fields.institutionPlaceholder')}
+              />
+            </Box>
+            <Box mb={16}>
+              <KitsInputText
+                id="degree"
+                label={t('profile.education.fields.degree')}
+                required
+                value={form.degree}
+                onChange={(e: any) => updateField('degree', extractValue(e))}
+                placeholder={t('profile.education.fields.degreePlaceholder')}
+              />
+            </Box>
 
-            <View style={styles.row}>
-              <View style={styles.halfField}>
-                {renderFormField('Start Year', form.startYear, 'startYear', {required: true, placeholder: 'e.g. 2018', keyboardType: 'numeric'})}
-              </View>
-              <View style={styles.halfField}>
-                {renderFormField('End Year', form.endYear, 'endYear', {placeholder: 'e.g. 2022', keyboardType: 'numeric'})}
-              </View>
-            </View>
+            <HStack gap={12} mb={16}>
+              <Box flex={1}>
+                <KitsInputText
+                  id="startYear"
+                  label={t('profile.education.fields.startYear')}
+                  required
+                  value={form.startYear}
+                  onChange={(e: any) => updateField('startYear', extractValue(e))}
+                  placeholder={t('profile.education.fields.startYearPlaceholder')}
+                  localProps={{keyboardType: 'numeric'}}
+                />
+              </Box>
+              <Box flex={1}>
+                <KitsInputText
+                  id="endYear"
+                  label={t('profile.education.fields.endYear')}
+                  value={form.endYear}
+                  onChange={(e: any) => updateField('endYear', extractValue(e))}
+                  placeholder={t('profile.education.fields.endYearPlaceholder')}
+                  localProps={{keyboardType: 'numeric'}}
+                />
+              </Box>
+            </HStack>
 
             <Button
-              label={editingItem ? 'Update Education' : 'Add Education'}
+              label={editingItem ? t('profile.education.updateButton') : t('profile.education.addButton')}
               onPress={handleSubmit}
               mt={12}
               mb={40}
@@ -321,61 +323,14 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
   },
-  card: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 16,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  cardTextArea: {
-    flex: 1,
-    marginRight: 12,
-  },
-  cardActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    paddingTop: 2,
-  },
-  deleteBtn: {
-    marginLeft: 0,
-  },
   modalContainer: {
     flex: 1,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   modalBody: {
     flex: 1,
   },
   modalBodyContent: {
     padding: 16,
-  },
-  fieldContainer: {
-    marginBottom: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  halfField: {
-    flex: 1,
   },
 });
 

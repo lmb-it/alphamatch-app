@@ -1,30 +1,31 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import IntroScreen from '@src/modules/TradingAccount/screens/IntroScreen';
-import BasicInformationScreen from '@src/modules/TradingAccount/screens/BasicInformationScreen';
-import AIInputScreen from '@src/modules/TradingAccount/screens/AIInputScreen';
-import CareerSelectionScreen from '@src/modules/TradingAccount/screens/CareerSelectionScreen';
-import CareerConfirmationScreen from '@src/modules/TradingAccount/screens/CareerConfirmationScreen';
-import MissingQuestionsScreen from '@src/modules/TradingAccount/screens/MissingQuestionsScreen';
-import TAConfirmationScreen from '@src/modules/TradingAccount/screens/TAConfirmationScreen';
-import TAProConfirmationScreen from '@src/modules/TradingAccount/screens/TAProConfirmationScreen';
-import FlexSubscriptionScreen from '@src/modules/TradingAccount/screens/FlexSubscriptionScreen';
-import VerificationScreen from '@src/modules/TradingAccount/screens/VerificationScreen';
-import DocumentFormScreen from '@src/modules/TradingAccount/screens/DocumentFormScreen';
-import CompletionScreen from '@src/modules/TradingAccount/screens/CompletionScreen';
+import IntroScreen from '@src/modules/TradingAccount/screens/Intro';
+import AIInputScreen from '@src/modules/TradingAccount/screens/AIInput';
+import CareerSelectionScreen from '@src/modules/TradingAccount/screens/CareerSelection';
+import CareerConfirmationScreen from '@src/modules/TradingAccount/screens/CareerConfirmation';
+import MissingQuestionsScreen from '@src/modules/TradingAccount/screens/MissingQuestions';
+import TAConfirmationScreen from '@src/modules/TradingAccount/screens/TAConfirmation';
+import TAProConfirmationScreen from '@src/modules/TradingAccount/screens/TAProConfirmation';
+import FlexSubscriptionScreen from '@src/modules/TradingAccount/screens/FlexSubscription';
+import VerificationScreen from '@src/modules/TradingAccount/screens/Verification';
+import DocumentFormScreen from '@src/modules/TradingAccount/screens/DocumentForm';
+import CompletionScreen from '@src/modules/TradingAccount/screens/Completion';
 
 /**
  * Route map — business model rules enforced here:
  *
+ * Flow: TAIntro (Pro/Flex explanation + T&C) → TAInput (AI textarea) → ...
+ *
  * Alpha Pro:  TAConfirmation → TAProConfirmation → TAVerification → TACompletion
  * Alpha Flex: TAConfirmation → TAFlexActivation  → TACompletion
  *
- * TASubscription (multi-plan picker) is intentionally absent.
- * Alpha Pro has no subscription. Alpha Flex has a single fixed plan rendered by TAFlexActivation.
+ * TABasicInfo has been removed — profile completeness is now checked via a gate
+ * modal before entering the flow. Business info fields are managed from the
+ * Trading Account Edit Profile page separately.
  */
 export type TradingAccountCreationParamList = {
   TAIntro: undefined;
-  TABasicInfo: undefined;
   TAInput: undefined;
   TACareerSelection: undefined;
   TACareerConfirmation: undefined;
@@ -48,7 +49,6 @@ export function TradingAccountCreationNavigator() {
       initialRouteName="TAIntro"
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="TAIntro" component={IntroScreen} />
-      <Stack.Screen name="TABasicInfo" component={BasicInformationScreen} />
       <Stack.Screen name="TAInput" component={AIInputScreen} />
       <Stack.Screen name="TACareerSelection" component={CareerSelectionScreen} />
       <Stack.Screen name="TACareerConfirmation" component={CareerConfirmationScreen} />

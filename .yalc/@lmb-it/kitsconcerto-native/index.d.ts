@@ -200,6 +200,14 @@ export interface ITextInput<T extends FieldValues = any> extends ITextFieldProps
     type: 'Text';
     keyFilter?: EKeyFilter | RegExp;
     withMask?: boolean;
+    /**
+     * Controls the keyboard type on mobile. No effect on web.
+     * @platform native
+     */
+    keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad' |
+                   'decimal-pad' | 'url' | 'number-pad' | 'visible-password' |
+                   'ascii-capable' | 'numbers-and-punctuation' | 'name-phone-pad' |
+                   'twitter' | 'web-search';
     localProps?: ITextInputProps;
 }
 
@@ -465,7 +473,11 @@ export type GroupFieldConfigs<T extends FieldValues> = {
     groupField?:{
         index:number;
         name:string;
-        values:any
+        values:any;
+        /** Append a new item to this group array */
+        append: (count?: number) => void;
+        /** Remove this specific group item (pre-bound to the current index) */
+        remove: () => void;
     };
 }
 
@@ -2127,6 +2139,16 @@ export interface IKitsInputTextBase extends Omit<IFormSingleElement, 'onFocus'>,
     containerStyle?: IStyleClasses;
 
     keyFilter?: EKeyFilter | RegExp;
+
+    /**
+     * Controls the keyboard type displayed on mobile devices.
+     * No effect on web — native-only prop.
+     * @platform native
+     */
+    keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad' |
+                   'decimal-pad' | 'url' | 'number-pad' | 'visible-password' |
+                   'ascii-capable' | 'numbers-and-punctuation' | 'name-phone-pad' |
+                   'twitter' | 'web-search';
 
     className?:string;
     /** platform-specific escape hatch */

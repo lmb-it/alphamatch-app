@@ -1,9 +1,9 @@
 import { jsx } from 'react/jsx-runtime';
 import React from 'react';
 import { createButton } from '@gluestack-ui/core/button/creator';
-import { useStyleContext, tva, withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { withStyleContext, tva, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
-import { ActivityIndicator, View, Text, Pressable } from 'react-native';
+import { Pressable, ActivityIndicator, View, Text } from 'react-native';
 import { UIIcon, PrimitiveIcon } from '@gluestack-ui/core/icon/creator';
 
 const SCOPE = "BUTTON";

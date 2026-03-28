@@ -1,6 +1,6 @@
 {
   "name": "@lmb-it/kitsconcerto-native",
-  "version": "0.1.176",
+  "version": "0.1.219",
   "description": "KitsConcerto — Native (React Native) UI components",
   "main": "index.js",
   "module": "index.js",
@@ -65,5 +65,5 @@
     "type": "git",
     "url": "https://github.com/lmb-it/kitsconcerto.git"
   },
-  "yalcSig": "fc84f203004c2911040903255d446777"
+  "yalcSig": "2fd9ec7c1592598d3b31e29b42d4d49c"
 }

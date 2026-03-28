@@ -179,3 +179,34 @@ export async function deletePortfolioItemApi(ref: string, itemRef: string): Prom
   const res = await api.delete(resolveUrl(URLs.tradingAccounts.portfolioItem, {ref, itemRef}));
   return res.data;
 }
+
+/**
+ * Fetch countries list for nationality dropdown.
+ * Returns array of { label: nationality name, value: iso2 code }
+ */
+export async function fetchNationalitiesApi(): Promise<Array<{label: string; value: string}>> {
+  const res = await api.get(URLs.lookups.countries);
+  const countries = res.data?.data ?? [];
+  return countries
+    .filter((c: any) => c.nationality)
+    .map((c: any) => ({
+      label: `${c.emoji ?? ''} ${c.nationality}`.trim(),
+      value: c.iso2,
+    }))
+    .sort((a: any, b: any) => a.label.localeCompare(b.label));
+}
+
+/**
+ * Fetch all active languages for the language selector.
+ * Returns { label: "English", value: "en" } format.
+ */
+export async function fetchLanguagesApi(): Promise<Array<{label: string; value: string}>> {
+  const res = await api.get(URLs.lookups.languages);
+  const langs = res.data?.data ?? [];
+  return langs
+    .map((l: any) => ({
+      label: l.name,
+      value: l.ref, // iso_2 code
+    }))
+    .sort((a: any, b: any) => a.label.localeCompare(b.label));
+}

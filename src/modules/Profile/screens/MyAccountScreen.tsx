@@ -23,6 +23,8 @@ import {selectIsTradeMode} from '@src/modules/Workspace';
 // Photo uploads now go through sagas (profileActions.uploadAvatar / uploadCover)
 import {fetchRequiredDocumentsApi} from '@src/modules/TradingAccount/api/tradingAccount.service';
 import type {IDocumentRequirement} from '@src/modules/TradingAccount';
+import {useProfileCompletionCheck} from '@src/modules/TradingAccount/hooks/useProfileCompletionCheck';
+import {ProfileSetupModal} from '@src/modules/TradingAccount/components/ProfileSetupModal';
 import type {ProfileStackNavigationProp} from '@src/routes/ProfileStackNavigator';
 import MenuItem from '../components/MenuItem';
 import AlphaLayout from '@src/layouts/AlphaLayout';
@@ -134,6 +136,24 @@ const MyAccountScreen: React.FC = () => {
 
   const hasNoTradingAccounts = tradingAccounts.length === 0;
 
+  // ── Profile completeness gate for TA creation ──
+  const {isComplete: isProfileComplete, missingFields} = useProfileCompletionCheck();
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+
+  const handleCreateTradingAccount = useCallback(() => {
+    if (isProfileComplete) {
+      navigation.navigate('TradingAccountCreation');
+    } else {
+      setShowProfileSetup(true);
+    }
+  }, [isProfileComplete, navigation]);
+
+  const handleProfileSetupComplete = useCallback(() => {
+    setShowProfileSetup(false);
+    // Profile is now complete — proceed to creation flow
+    navigation.navigate('TradingAccountCreation');
+  }, [navigation]);
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -210,7 +230,7 @@ const MyAccountScreen: React.FC = () => {
           {hasNoTradingAccounts && (
             <TouchableOpacity
               style={[styles.createAccountCard, {borderColor: primaryColor}]}
-              onPress={() => navigation.navigate('TradingAccountCreation')}
+              onPress={handleCreateTradingAccount}
               activeOpacity={0.7}>
               <View style={[styles.createAccountIcon, {backgroundColor: primaryColor + '15'}]}>
                 <Plus color={primaryColor} size={24} />
@@ -361,6 +381,12 @@ const MyAccountScreen: React.FC = () => {
         </>
       )}
 
+      <ProfileSetupModal
+        visible={showProfileSetup}
+        missingFields={missingFields}
+        onComplete={handleProfileSetupComplete}
+        onDismiss={() => setShowProfileSetup(false)}
+      />
     </AlphaLayout>
   );
 };

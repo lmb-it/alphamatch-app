@@ -9,7 +9,9 @@ export const API_CONFIG = {
   },
 };
 
-/** Form type reference IDs — sourced from form_types table */
+/** Form type reference IDs — from form_types table */
 export const FORM_TYPE_REFS = {
-  providerProfile: Config.PROVIDER_PROFILE_FORM_TYPE_REF || 'FOR-Y1JAJIHT',
+  provider: 'FOR-Y1JAJIHT',
+  client: 'FOR-GZNIEXXU',
+  document: 'FOR-TQRUFTUM',
 };

@@ -8,14 +8,11 @@ import {
   FlatList,
   Modal,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import {Text, Flex, Button, useKitsTheme} from '@lmb-it/kitsconcerto';
+import {Text, Flex, Box, HStack, Button, KitsInputText, KitsInputTextarea, useLanguage} from '@lmb-it/kitsconcerto';
 import {Award, Plus, X, Edit2, Trash2} from 'lucide-react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import AlphaLayout from '@src/layouts/AlphaLayout';
@@ -31,9 +28,12 @@ const EMPTY_FORM: ICreateQualification = {
   year: new Date().getFullYear(),
 };
 
+/** Extract string value from KitsConcerto onChange event */
+const extractValue = (e: any): string => e?.target?.value ?? e ?? '';
+
 const QualificationsScreen: React.FC = () => {
   const dispatch = useDispatch();
-  const {resolveToken} = useKitsTheme();
+  const {t} = useLanguage();
   const accountRef = useSelector(selectActiveWorkspaceId);
   const {items, loading} = useSelector(selectQualifications);
 
@@ -74,9 +74,9 @@ const QualificationsScreen: React.FC = () => {
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
-    if (!form.title.trim()) next.title = 'Certificate/award name is required';
-    if (!form.organisation.trim()) next.organisation = 'Organisation is required';
-    if (!form.year || isNaN(Number(form.year))) next.year = 'Year is required';
+    if (!form.title.trim()) next.title = t('profile.qualifications.validation.titleRequired');
+    if (!form.organisation.trim()) next.organisation = t('profile.qualifications.validation.organisationRequired');
+    if (!form.year || isNaN(Number(form.year))) next.year = t('profile.qualifications.validation.yearRequired');
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -99,12 +99,12 @@ const QualificationsScreen: React.FC = () => {
 
   const handleDelete = (item: IQualification) => {
     Alert.alert(
-      'Delete Qualification',
-      `Are you sure you want to delete "${item.title}"?`,
+      t('profile.qualifications.deleteConfirmTitle'),
+      t('profile.qualifications.deleteConfirmMessage'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('profile.qualifications.cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('profile.qualifications.delete'),
           style: 'destructive',
           onPress: () => {
             if (accountRef) {
@@ -116,17 +116,16 @@ const QualificationsScreen: React.FC = () => {
     );
   };
 
-  const primaryColor = resolveToken('primary');
-  const textColor = resolveToken('text-primary');
-  const subtleColor = resolveToken('text-subtle');
-  const surfaceColor = resolveToken('surface');
-  const borderColor = resolveToken('border');
-  const bgColor = resolveToken('bg');
-  const dangerColor = resolveToken('danger') || '#e74c3c';
-
   const renderItem = ({item}: {item: IQualification}) => (
-    <View style={[styles.card, {backgroundColor: surfaceColor, borderColor}]}>
-      <View style={styles.cardContent}>
+    <Box
+      flexDirection="row"
+      alignItems="center"
+      p={16}
+      borderRadius={12}
+      borderWidth={1}
+      bgColor="surface"
+      borderColor="border">
+      <Box flex={1} mr={12}>
         <Text fontSize={16} fontWeight="700" color="text-primary" numberOfLines={1}>
           {item.title}
         </Text>
@@ -136,29 +135,36 @@ const QualificationsScreen: React.FC = () => {
         <Text fontSize={13} color="text-subtle" mt={2}>
           {item.year}
         </Text>
-      </View>
-      <View style={styles.cardActions}>
-        <TouchableOpacity onPress={() => openEdit(item)} hitSlop={8} style={styles.actionBtn}>
-          <Edit2 size={18} color={primaryColor} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDelete(item)} hitSlop={8} style={styles.actionBtn}>
-          <Trash2 size={18} color={dangerColor} />
-        </TouchableOpacity>
-      </View>
-    </View>
+      </Box>
+      <HStack gap={12}>
+        <Button
+          size="sm"
+          outlined
+          icon={<Edit2 size={18} />}
+          onPress={() => openEdit(item)}
+        />
+        <Button
+          size="sm"
+          outlined
+          severity="danger"
+          icon={<Trash2 size={18} />}
+          onPress={() => handleDelete(item)}
+        />
+      </HStack>
+    </Box>
   );
 
   const renderEmpty = () => (
     <Flex flex={1} justifyContent="center" alignItems="center" px={20} py={40}>
-      <Award color={subtleColor} size={48} />
+      <Award color="#999" size={48} />
       <Text fontSize={16} fontWeight="600" color="text-primary" mt={16}>
-        No qualifications added yet
+        {t('profile.qualifications.emptyTitle')}
       </Text>
       <Text fontSize={14} color="text-subtle" textAlign="center" mt={8}>
-        Add certifications and awards to highlight your expertise.
+        {t('profile.qualifications.emptyDescription')}
       </Text>
       <Button
-        label="Add Qualification"
+        label={t('profile.qualifications.addButton')}
         icon={<Plus size={18} color="#fff" />}
         mt={24}
         onPress={openAdd}
@@ -167,13 +173,16 @@ const QualificationsScreen: React.FC = () => {
   );
 
   const headerRight = (
-    <TouchableOpacity onPress={openAdd} hitSlop={8}>
-      <Plus size={24} color={primaryColor} />
-    </TouchableOpacity>
+    <Button
+      size="sm"
+      outlined
+      icon={<Plus size={24} />}
+      onPress={openAdd}
+    />
   );
 
   return (
-    <AlphaLayout title="Qualifications" headerStyle="solid" rightActions={items.length > 0 ? headerRight : undefined}>
+    <AlphaLayout title={t('profile.qualifications.title')} headerStyle="solid" rightActions={items.length > 0 ? headerRight : undefined}>
       <FlatList
         data={items}
         keyExtractor={(item) => item.identifier}
@@ -190,93 +199,92 @@ const QualificationsScreen: React.FC = () => {
         presentationStyle="pageSheet"
         onRequestClose={closeModal}>
         <KeyboardAvoidingView
-          style={[styles.modalContainer, {backgroundColor: bgColor}]}
+          style={styles.modalContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {/* Modal Header */}
-          <View style={[styles.modalHeader, {borderBottomColor: borderColor}]}>
-            <TouchableOpacity onPress={closeModal} hitSlop={8}>
-              <X size={24} color={textColor} />
-            </TouchableOpacity>
+          <HStack
+            alignItems="center"
+            justifyContent="space-between"
+            px={16}
+            py={14}
+            borderBottomWidth={1}
+            borderColor="border">
+            <Button
+              size="sm"
+              outlined
+              icon={<X size={24} />}
+              onPress={closeModal}
+            />
             <Text fontSize={17} fontWeight="700" color="text-primary">
-              {editingItem ? 'Edit Qualification' : 'Add Qualification'}
+              {editingItem ? t('profile.qualifications.editTitle') : t('profile.qualifications.addTitle')}
             </Text>
-            <View style={{width: 24}} />
-          </View>
+            <Box w={24} />
+          </HStack>
 
           <ScrollView style={styles.formScroll} contentContainerStyle={styles.formContent}>
             {/* Title */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Certificate/Award Name <Text color="danger">*</Text>
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.title ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="title"
+                label={t('profile.qualifications.fields.certificateName')}
+                required
                 value={form.title}
-                onChangeText={(v) => setForm(prev => ({...prev, title: v}))}
-                placeholder="e.g. AWS Certified Solutions Architect"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => setForm(prev => ({...prev, title: extractValue(e)}))}
+                placeholder={t('profile.qualifications.fields.certificateNamePlaceholder')}
+                errors={errors.title}
               />
-              {errors.title && <Text fontSize={12} color="danger" mt={4}>{errors.title}</Text>}
-            </View>
+            </Box>
 
             {/* Organisation */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Conferring Organisation <Text color="danger">*</Text>
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.organisation ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="organisation"
+                label={t('profile.qualifications.fields.organisation')}
+                required
                 value={form.organisation}
-                onChangeText={(v) => setForm(prev => ({...prev, organisation: v}))}
-                placeholder="e.g. Amazon Web Services"
-                placeholderTextColor={subtleColor}
+                onChange={(e: any) => setForm(prev => ({...prev, organisation: extractValue(e)}))}
+                placeholder={t('profile.qualifications.fields.organisationPlaceholder')}
+                errors={errors.organisation}
               />
-              {errors.organisation && <Text fontSize={12} color="danger" mt={4}>{errors.organisation}</Text>}
-            </View>
+            </Box>
 
             {/* Summary */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Summary
-              </Text>
-              <TextInput
-                style={[styles.input, styles.multiline, {color: textColor, borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputTextarea
+                id="summary"
+                label={t('profile.qualifications.fields.summary')}
                 value={form.summary ?? ''}
-                onChangeText={(v) => setForm(prev => ({...prev, summary: v || null}))}
-                placeholder="Brief description of the qualification"
-                placeholderTextColor={subtleColor}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
+                onChange={(e: any) => {
+                  const v = extractValue(e);
+                  setForm(prev => ({...prev, summary: v || null}));
+                }}
+                placeholder={t('profile.qualifications.fields.summaryPlaceholder')}
               />
-            </View>
+            </Box>
 
             {/* Year */}
-            <View style={styles.fieldGroup}>
-              <Text fontSize={14} fontWeight="600" color="text-primary" mb={6}>
-                Year <Text color="danger">*</Text>
-              </Text>
-              <TextInput
-                style={[styles.input, {color: textColor, borderColor: errors.year ? dangerColor : borderColor, backgroundColor: surfaceColor}]}
+            <Box mb={20}>
+              <KitsInputText
+                id="year"
+                label={t('profile.qualifications.fields.year')}
+                required
                 value={String(form.year ?? '')}
-                onChangeText={(v) => setForm(prev => ({...prev, year: Number(v.replace(/[^0-9]/g, '')) || 0}))}
-                placeholder="e.g. 2023"
-                placeholderTextColor={subtleColor}
-                keyboardType="number-pad"
-                maxLength={4}
+                onChange={(e: any) => setForm(prev => ({...prev, year: Number(extractValue(e).replace(/[^0-9]/g, '')) || 0}))}
+                placeholder={t('profile.qualifications.fields.yearPlaceholder')}
+                localProps={{keyboardType: 'number-pad'}}
+                errors={errors.year}
               />
-              {errors.year && <Text fontSize={12} color="danger" mt={4}>{errors.year}</Text>}
-            </View>
+            </Box>
           </ScrollView>
 
           {/* Submit */}
-          <View style={[styles.modalFooter, {borderTopColor: borderColor}]}>
+          <Box p={16} borderTopWidth={1} borderColor="border">
             <Button
-              label={editingItem ? 'Update' : 'Add Qualification'}
+              label={editingItem ? t('profile.qualifications.updateButton') : t('profile.qualifications.addButton')}
               onPress={handleSubmit}
-              width="100%"
+              w="100%"
             />
-          </View>
+          </Box>
         </KeyboardAvoidingView>
       </Modal>
     </AlphaLayout>
@@ -286,40 +294,9 @@ const QualificationsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   emptyContainer: {flexGrow: 1},
   listContainer: {padding: 16, gap: 12},
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  cardContent: {flex: 1, marginRight: 12},
-  cardActions: {flexDirection: 'row', gap: 12},
-  actionBtn: {padding: 4},
   modalContainer: {flex: 1},
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-  },
   formScroll: {flex: 1},
-  formContent: {padding: 16, gap: 20},
-  fieldGroup: {},
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-  },
-  multiline: {minHeight: 80, paddingTop: 12},
-  modalFooter: {
-    padding: 16,
-    borderTopWidth: 1,
-  },
+  formContent: {padding: 16},
 });
 
 export default QualificationsScreen;

@@ -125,7 +125,22 @@ const KitsContainer = (rawProps) => {
   const isHorizontal = placement === "RL";
   const isBottom = placement === "B";
   const labelElement = !isFloatedLabel ? /* @__PURE__ */ jsx(Label, { isFormControl: true, label, elementId, required, style: elStyles.label || void 0 }) : null;
-  const contentElement = /* @__PURE__ */ jsx(Addons, { additionalClassName, leftAddon, rightAddon, invalid, children });
+  const inputGroupStyle = useMemo(
+    () => elStyles.inputGroup && Object.keys(elStyles.inputGroup).length ? elStyles.inputGroup : void 0,
+    [elStyles.inputGroup]
+  );
+  const contentElement = /* @__PURE__ */ jsx(View, { style: inputGroupStyle ? { width: "100%", ...inputGroupStyle } : { width: "100%" }, children: /* @__PURE__ */ jsx(
+    Addons,
+    {
+      additionalClassName,
+      leftAddon,
+      rightAddon,
+      invalid,
+      leftAddonStyle: elStyles.leftAddon,
+      rightAddonStyle: elStyles.rightAddon,
+      children
+    }
+  ) });
   const themeRnStyle = useMemo(
     () => themeStyle && Object.keys(themeStyle).length ? style(themeStyle) : {},
     [themeStyle]

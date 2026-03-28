@@ -16,22 +16,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useRoute, type RouteProp} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import {Paperclip, Send} from 'lucide-react-native';
 import {LockOverlay} from '@src/components/shared/LockOverlay';
-import type {MessagesStackParamList} from '@src/routes/MessagesStackNavigator';
 import AlphaLayout from '@src/layouts/AlphaLayout';
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-type ChatRoomRouteProp = RouteProp<MessagesStackParamList, 'ChatRoom'>;
-
-interface IMessage {
-  id: string;
-  text: string;
-  fromMe: boolean;
-  time: string;
-}
+import type {ChatRoomRouteProp, IMessage} from '../models/chat.screen.types';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

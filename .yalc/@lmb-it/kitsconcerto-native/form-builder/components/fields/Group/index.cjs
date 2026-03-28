@@ -141,7 +141,6 @@ const Group = ({
       const min = settings.repeatable.minRepeats || 0;
       if (fields.length < min) {
         const itemsToAppend = min - fields.length;
-        console.log({ itemsToAppend, current: fields.length });
         handleAppend(itemsToAppend);
       }
     };
@@ -162,9 +161,9 @@ const Group = ({
   if (!isShown) {
     return null;
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(index.default, { id: element.id, w: "full", flexDirection: "column", gap: 10, mb: 6, children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs(index.default, { id: element.id.toString(), w: "full", flexDirection: "column", gap: 10, mb: 6, children: [
     label && /* @__PURE__ */ jsxRuntime.jsxs(index$1.default, { mt: 15, mb: 15, w: "100%", children: [
-      /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { as: "h2", label, elementId: element.id }),
+      /* @__PURE__ */ jsxRuntime.jsx(label_native.default, { as: "h2", label, elementId: element.id.toString() }),
       /* @__PURE__ */ jsxRuntime.jsx(index$2.Divider, { style: { width: "100%" }, className: "my-2" })
     ] }),
     fields.map((field, index$2) => /* @__PURE__ */ jsxRuntime.jsxs(
@@ -181,9 +180,15 @@ const Group = ({
             {
               elements: reBuildElements(field, index$2),
               control,
-              groupField: { index: index$2, name: element.id, values: getValues()[element.id][index$2] },
+              groupField: {
+                index: index$2,
+                name: element.id.toString(),
+                values: getValues()[element.id][index$2],
+                append: handleAppend,
+                remove: () => handleRemove(index$2)
+              },
               getValues,
-              parentPath: `${element.id}.${index$2}.`,
+              parentPath: `${element.id.toString()}.${index$2}.`,
               focusedField: _focusedField,
               setFocusedField: _setFocusedField,
               grid: groupsSettings?.grid

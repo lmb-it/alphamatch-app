@@ -30,8 +30,19 @@ export interface IProfileUser {
   avatar: string | null;
   coverImage: string | null;
   contactPhone: string | null;
+  phoneCountryId: number | null;
   phoneVerified: boolean;
   addresses: IAddress[];
+  languages: IUserLanguage[];
+}
+
+export interface IUserLanguage {
+  ref: string;
+  name: string;
+  nameNative: string;
+  iso2: string;
+  proficiencyLevel: 'beginner' | 'intermediate' | 'advanced' | 'fluent';
+  isNative: boolean;
 }
 
 /**
@@ -84,10 +95,12 @@ export interface IUpdateProfilePayload {
   middleName?: string;
   familyName?: string;
   contactPhone?: string;
+  phoneCountryId?: number;
   shortBio?: string;
   nationalityRef?: string;
-  gender?: 'male' | 'female';
+  gender?: 'male' | 'female' | string;
   birthDate?: string;
+  languages?: Array<{ref: string; proficiencyLevel: string; isNative: boolean}>;
 }
 
 export interface IProfileState {

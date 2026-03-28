@@ -185,10 +185,12 @@ const useFieldLogic = ({
       onDepsChange(watchedValues, allFormValues, formContext, groupField);
     }
   }, [watchedValues]);
+  const isObjectElement = element.type === "Object";
   const { field, fieldState } = reactHookForm.useController({
     name: element.id,
     control,
-    shouldUnregister: !isShown
+    shouldUnregister: !isShown,
+    ...isObjectElement ? { defaultValue: {} } : {}
   });
   React.useEffect(() => {
     if (!onDepsChange) return;

@@ -128,7 +128,11 @@ const getDefaultValues = (fields) => {
         defaultFormValues[elementId] = getDefaultValues(elements);
       }
       if (element.type === "Group") {
-        defaultFormValues[elementId] = [];
+        if ("initialValue" in element && Array.isArray(element.initialValue) && element.initialValue.length > 0) {
+          defaultFormValues[elementId] = element.initialValue;
+        } else {
+          defaultFormValues[elementId] = [];
+        }
       }
       return;
     }
